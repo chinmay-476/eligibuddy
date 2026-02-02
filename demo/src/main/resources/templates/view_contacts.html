@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Contacts - Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .nav-link {
+            color: #343a40;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+        .nav-link:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .d-flex {
+            display: flex;
+        }
+        .align-items-center {
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 100px auto 50px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        .no-contacts {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">🔍 EligibilityHub</div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <!-- Show Contact Form only for non-admin users -->
+                <a th:if="${!isAdmin}" href="/contact" class="nav-link">Contact Form</a>
+                <!-- Show View Contacts only for admin users -->
+                <a th:if="${isAdmin}" href="/view-contacts" class="nav-link">View Contacts</a>
+                <!-- Show View Users only for admin users -->
+                <a th:if="${isAdmin}" href="/view-users" class="nav-link">View Users</a>
+            
+                <!-- Show login/register for anonymous users -->
+                <div th:if="${username == null}">
+                    <a href="/login" class="nav-link">Login</a>
+                    <a href="/register" class="btn-primary">Register</a>
+                </div>
+                
+                <!-- Show user info and logout for authenticated users -->
+                <div th:if="${username != null}" class="d-flex align-items-center">
+                    <span class="nav-link" style="margin-right: 1rem;">
+                        <i class="fas fa-user me-2"></i>
+                        <span th:text="${username}">User</span>
+                    </span>
+                    <form th:action="@{/logout}" method="post" style="margin: 0;">
+                        <button type="submit" class="btn-primary" style="background: #dc3545; border: none;">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1><i class="fas fa-users me-2"></i>All Contacts - Admin Panel</h1>
+        
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+        
+        <div th:if="${contacts != null and !contacts.empty}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="contact : ${contacts}">
+                        <td th:text="${contact.id}"></td>
+                        <td th:text="${contact.name}"></td>
+                        <td th:text="${contact.email}"></td>
+                        <td th:text="${contact.message}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:unless="${contacts != null and !contacts.empty}" class="no-contacts">
+            <p>No contacts found in the database.</p>
+        </div>
+    </div>
+</body>
+</html> 

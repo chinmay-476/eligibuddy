@@ -1,0 +1,4354 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Eligibility Checker | Production System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            --warning-gradient: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+            --shadow-lg: 0 15px 35px rgba(0,0,0,0.1);
+            --border-radius: 15px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Enhanced Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-content {
+            text-align: center;
+            color: var(--dark-color);
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Navigation */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            background: rgba(255,255,255,0.98);
+            padding: 0.75rem 0;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: var(--light-color);
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 100px auto 0;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Enhanced Hero Section */
+        .hero-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+            animation: slideInLeft 0.8s ease-out 0.2s both;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+            animation: fadeInUp 0.6s ease-out calc(0.4s + var(--delay, 0s)) both;
+        }
+
+        .feature-card:nth-child(1) { --delay: 0s; }
+        .feature-card:nth-child(2) { --delay: 0.1s; }
+        .feature-card:nth-child(3) { --delay: 0.2s; }
+        .feature-card:nth-child(4) { --delay: 0.3s; }
+
+        .feature-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Enhanced Form Section */
+        .form-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 25px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--secondary-gradient);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group .input-icon {
+            position: absolute;
+            right: 1rem;
+            top: 2.3rem;
+            color: #999;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus + .input-icon,
+        .form-group select:focus + .input-icon {
+            color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .advanced-options {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .advanced-options:hover {
+            border-color: #667eea;
+        }
+
+        .advanced-toggle {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .advanced-toggle:hover {
+            color: #5a6fd8;
+            transform: translateX(5px);
+        }
+
+        .advanced-content {
+            display: none;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .advanced-content.show {
+            display: block;
+            opacity: 1;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 20px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .submit-section {
+            text-align: center;
+        }
+
+        .submit-btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1.25rem 3rem;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn:disabled::before {
+            display: none;
+        }
+
+        /* Enhanced Results Section */
+        .results-section {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 25px;
+            box-shadow: var(--shadow-lg);
+            margin-top: 2rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .results-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-title {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-white {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .results-stats {
+            padding: 2rem 3rem;
+            background: var(--light-color);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            display: block;
+            animation: countUp 1s ease-out;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .results-content {
+            padding: 3rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .filter-btn.active::before,
+        .filter-btn:hover::before {
+            left: 0;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            color: white;
+            border-color: #667eea;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-section {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            border-left: 5px solid #667eea;
+            transition: var(--transition);
+        }
+
+        .category-section:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s infinite;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .opportunity-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .opportunity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-gradient);
+        }
+
+        .opportunity-card:hover {
+            transform: translateX(10px) translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: #667eea;
+        }
+
+        .opportunity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .opportunity-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .opportunity-badge {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            animation: glow 2s infinite alternate;
+        }
+
+        .opportunity-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .opportunity-details {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+            background: var(--light-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+        }
+
+        .opportunity-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            animation: bounce 2s infinite;
+        }
+
+        /* Success Message */
+        .success-message {
+            background: var(--success-gradient);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            animation: slideInDown 0.5s ease-out;
+        }
+
+        .success-message.show {
+            display: flex;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-content {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .main-container {
+                padding: 1rem;
+                margin-top: 120px;
+            }
+            
+            .hero-section,
+            .form-section {
+                padding: 2rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .results-content {
+                padding: 2rem;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        /* Login Required Message */
+        .login-required {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(220, 53, 69, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Print Styles */
+        @media print {
+            .navbar,
+            .results-actions,
+            .opportunity-actions,
+            .filter-bar {
+                display: none;
+            }
+            
+            .results-section {
+                box-shadow: none;
+                margin: 0;
+            }
+            
+            body {
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">Analyzing Your Eligibility</div>
+            <div class="loading-subtext">Please wait while we find the best opportunities for you...</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <i class="fas fa-search"></i>
+                Eligibuddy
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <!-- Show Contact Form only for non-admin users -->
+                <a th:if="${!isAdmin}" href="/contact" class="nav-link">Contact Form</a>
+                <!-- Show View Contacts only for admin users -->
+                <a th:if="${isAdmin}" href="/view-contacts" class="nav-link">View Contacts</a>
+                <!-- Show View Users only for admin users -->
+                <a th:if="${isAdmin}" href="/view-users" class="nav-link">View Users</a>
+                
+                <!-- Show login/register for anonymous users -->
+                <div th:if="${username == null}">
+                    <a href="/login" class="nav-link">Login</a>
+                    <a href="/register" class="btn-primary">Register</a>
+                </div>
+                
+                <!-- Show user info and logout for authenticated users -->
+                <div th:if="${username != null}" class="d-flex align-items-center">
+                    <a href="/profile" class="nav-link" style="margin-right: 1rem;">
+                        <i class="fas fa-user me-2"></i>
+                        <span th:text="${username}">User</span>
+                    </a>
+                    <form th:action="@{/logout}" method="post" style="margin: 0;">
+                        <button type="submit" class="btn-primary" style="background: #dc3545; border: none;">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1>Find Your Perfect Opportunity</h1>
+                <p>Discover scholarships, government schemes, competitive exams, and job opportunities tailored specifically for you with our advanced AI-powered eligibility checker.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🎓</span>
+                        <div class="feature-title">10,000+ Scholarships</div>
+                        <div class="feature-desc">From merit-based to need-based funding opportunities</div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🏛️</span>
+                        <div class="feature-title">500+ Gov Schemes</div>
+                        <div class="feature-desc">Central and state government programs</div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📝</span>
+                        <div class="feature-title">200+ Exams</div>
+                        <div class="feature-desc">Competitive exams across all fields</div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">💼</span>
+                        <div class="feature-title">1000+ Jobs</div>
+                        <div class="feature-desc">Government and PSU opportunities</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <div class="form-header">
+                <h2>Check Your Eligibility</h2>
+                <p>Fill in your details to get personalized recommendations</p>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <span>Eligibility check completed successfully!</span>
+            </div>
+
+            <form id="eligibilityForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input type="text" id="firstName" name="firstName" required placeholder="Enter first name">
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input type="text" id="lastName" name="lastName" required placeholder="Enter last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age *</label>
+                        <input type="number" id="age" name="age" required min="1" max="100" placeholder="Your age">
+                        <span class="input-icon">🎂</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender *</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State *</label>
+                        <select id="state" name="state" required>
+                            <option value="">Select your state</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="West Bengal">West Bengal</option>
+                        </select>
+                        <span class="input-icon">📍</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="district">District</label>
+                        <input type="text" id="district" name="district" placeholder="Enter your district">
+                    </div>
+                    <div class="form-group">
+                        <label for="qualification">Highest Qualification *</label>
+                        <select id="qualification" name="qualification" required>
+                            <option value="">Select qualification</option>
+                            <option value="Below 10th">Below 10th</option>
+                            <option value="10th">10th Standard</option>
+                            <option value="12th">12th Standard</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Graduate">Graduate</option>
+                            <option value="Post Graduate">Post Graduate</option>
+                            <option value="PhD">PhD</option>
+                        </select>
+                        <span class="input-icon">🎓</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select category</option>
+                            <option value="General">General</option>
+                            <option value="SC">SC (Scheduled Caste)</option>
+                            <option value="ST">ST (Scheduled Tribe)</option>
+                            <option value="OBC">OBC (Other Backward Class)</option>
+                            <option value="EWS">EWS (Economically Weaker Section)</option>
+                        </select>
+                        <span class="input-icon">📋</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="income">Annual Family Income *</label>
+                        <select id="income" name="income" required>
+                            <option value="">Select income range</option>
+                            <option value="0-100000">Below ₹1 Lakh</option>
+                            <option value="100000-250000">₹1-2.5 Lakh</option>
+                            <option value="250000-500000">₹2.5-5 Lakh</option>
+                            <option value="500000-800000">₹5-8 Lakh</option>
+                            <option value="800000-1500000">₹8-15 Lakh</option>
+                            <option value="1500000+">Above ₹15 Lakh</option>
+                        </select>
+                        <span class="input-icon">💰</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="your.email@example.com">
+                        <span class="input-icon">📧</span>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="advanced-options">
+                    <button type="button" class="advanced-toggle" onclick="toggleAdvanced()">
+                        <i class="fas fa-cogs"></i>
+                        Advanced Options 
+                        <span id="advancedIcon"><i class="fas fa-chevron-down"></i></span>
+                    </button>
+                    <div class="advanced-content" id="advancedContent">
+                        <div class="form-grid" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <label for="field">Field of Interest</label>
+                                <select id="field" name="field">
+                                    <option value="">Select field</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Arts">Arts</option>
+                                    <option value="Commerce">Commerce</option>
+                                    <option value="Science">Science</option>
+                                    <option value="Law">Law</option>
+                                    <option value="Management">Management</option>
+                                    <option value="Agriculture">Agriculture</option>
+                                    <option value="Teaching">Teaching</option>
+                                    <option value="Research">Research</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="disability">Person with Disability</label>
+                                <select id="disability" name="disability">
+                                    <option value="No">No</option>
+                                    <option value="Yes">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <label style="display: block; margin: 1rem 0 0.5rem 0; font-weight: 600;">Preferences:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="scholarships" name="preferences" value="scholarships" checked>
+                                <label for="scholarships">🎓 Scholarships</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="schemes" name="preferences" value="schemes" checked>
+                                <label for="schemes">🏛️ Government Schemes</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="exams" name="preferences" value="exams" checked>
+                                <label for="exams">📝 Competitive Exams</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="jobs" name="preferences" value="jobs" checked>
+                                <label for="jobs">💼 Government Jobs</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button type="button" class="submit-btn" id="submitBtn" onclick="checkAuthentication()">
+                        <i class="fas fa-search"></i>
+                        <span id="buttonText">Analyze My Eligibility</span>
+                    </button>
+                    <p class="login-required" id="loginRequired" style="display: none; color: #dc3545; font-size: 0.9rem; margin-top: 0.5rem;">
+                        <i class="fas fa-lock"></i> Login required to access this feature
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section" id="resultsSection">
+        <div class="results-header">
+            <div class="results-title">
+                <i class="fas fa-chart-line"></i>
+                Your Eligibility Results
+            </div>
+            <div class="results-actions">
+                <button class="btn-white" onclick="downloadPDF()">
+                    <i class="fas fa-download"></i>
+                    Download PDF
+                </button>
+                <button class="btn-white" onclick="printResults()">
+                    <i class="fas fa-print"></i>
+                    Print
+                </button>
+                <button class="btn-white" onclick="shareResults()">
+                    <i class="fas fa-share"></i>
+                    Share
+                </button>
+            </div>
+        </div>
+
+        <div class="results-stats" id="resultsStats">
+            <div class="stat-card">
+                <span class="stat-icon">🎓</span>
+                <span class="stat-number" id="scholarshipCount">0</span>
+                <span class="stat-label">Scholarships Available</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🏛️</span>
+                <span class="stat-number" id="schemeCount">0</span>
+                <span class="stat-label">Government Schemes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📝</span>
+                <span class="stat-number" id="examCount">0</span>
+                <span class="stat-label">Competitive Exams</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">💼</span>
+                <span class="stat-number" id="jobCount">0</span>
+                <span class="stat-label">Job Opportunities</span>
+            </div>
+        </div>
+
+        <div class="results-content">
+            <div class="filter-bar" id="filterBar">
+                <button class="filter-btn active" onclick="filterResults('all')">
+                    <i class="fas fa-globe"></i> All Results
+                </button>
+                <button class="filter-btn" onclick="filterResults('scholarships')">
+                    <i class="fas fa-graduation-cap"></i> Scholarships
+                </button>
+                <button class="filter-btn" onclick="filterResults('schemes')">
+                    <i class="fas fa-university"></i> Gov Schemes
+                </button>
+                <button class="filter-btn" onclick="filterResults('exams')">
+                    <i class="fas fa-file-alt"></i> Exams
+                </button>
+                <button class="filter-btn" onclick="filterResults('jobs')">
+                    <i class="fas fa-briefcase"></i> Jobs
+                </button>
+            </div>
+
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced database with more comprehensive eligibility rules
+       // Enhanced comprehensive eligibility database with realistic data
+const eligibilityDatabase = {
+    scholarships: [
+        // Merit-based Scholarships
+        {
+            name: "National Merit Scholarship",
+            description: "For students with excellent academic performance across India",
+            eligibility: {
+                qualification: ["12th", "Graduate", "Post Graduate"],
+                income: ["0-100000", "100000-250000"],
+                category: ["General", "OBC", "SC", "ST", "EWS"]
+            },
+            amount: "₹50,000 per year",
+            deadline: "March 31, 2025",
+            type: "Merit-based"
+        },
+        {
+            name: "Inspire Scholarship (KVPY)",
+            description: "Kishore Vaigyanik Protsahan Yojana for science students",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                field: ["Science", "Engineering", "Medical"],
+                age: [16, 25]
+            },
+            amount: "₹5,000-7,000 per month",
+            deadline: "September 15, 2025",
+            type: "Merit-based"
+        },
+        {
+            name: "Central Sector Scholarship",
+            description: "Merit-based scholarship for college and university students",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                income: ["0-100000", "100000-250000", "250000-500000"],
+                category: ["General", "OBC", "SC", "ST", "EWS"]
+            },
+            amount: "₹10,000-20,000 per year",
+            deadline: "October 31, 2025",
+            type: "Merit-based"
+        },
+
+        // Category-based Scholarships
+        {
+            name: "SC/ST Excellence Scholarship",
+            description: "Promoting higher education among SC/ST students",
+            eligibility: {
+                category: ["SC", "ST"],
+                qualification: ["10th", "12th", "Graduate", "Post Graduate"],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            amount: "₹75,000 per year",
+            deadline: "May 30, 2025",
+            type: "Category-based"
+        },
+        {
+            name: "OBC Merit Scholarship",
+            description: "Financial assistance for Other Backward Class students",
+            eligibility: {
+                category: ["OBC"],
+                qualification: ["12th", "Graduate", "Post Graduate"],
+                income: ["0-100000", "100000-250000"]
+            },
+            amount: "₹35,000 per year",
+            deadline: "June 30, 2025",
+            type: "Category-based"
+        },
+        {
+            name: "EWS Scholarship Scheme",
+            description: "Support for Economically Weaker Section students",
+            eligibility: {
+                category: ["EWS"],
+                qualification: ["12th", "Graduate"],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            amount: "₹40,000 per year",
+            deadline: "July 15, 2025",
+            type: "Category-based"
+        },
+
+        // Gender-based Scholarships
+        {
+            name: "Girl Child Education Fund",
+            description: "Empowering girls through education funding",
+            eligibility: {
+                qualification: ["10th", "12th", "Graduate"],
+                income: ["0-100000", "100000-250000"],
+                gender: ["Female"]
+            },
+            amount: "₹40,000 per year",
+            deadline: "June 15, 2025",
+            type: "Gender-based"
+        },
+        {
+            name: "Women in STEM Scholarship",
+            description: "Encouraging women to pursue science and technology",
+            eligibility: {
+                qualification: ["12th", "Graduate", "Post Graduate"],
+                field: ["Science", "Engineering", "Medical"],
+                gender: ["Female"],
+                age: [17, 30]
+            },
+            amount: "₹1,25,000 per year",
+            deadline: "April 30, 2025",
+            type: "Gender-based"
+        },
+        {
+            name: "Widow's Children Scholarship",
+            description: "Educational support for children of widowed mothers",
+            eligibility: {
+                qualification: ["10th", "12th", "Graduate"],
+                income: ["0-100000", "100000-250000"]
+            },
+            amount: "₹25,000 per year",
+            deadline: "August 31, 2025",
+            type: "Social Support"
+        },
+
+        // Field-specific Scholarships
+        {
+            name: "Engineering Excellence Award",
+            description: "For aspiring engineers with outstanding potential",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                field: ["Engineering"],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            amount: "₹1,00,000 per year",
+            deadline: "July 31, 2025",
+            type: "Field-specific"
+        },
+        {
+            name: "Medical Student Support Scheme",
+            description: "Supporting future doctors and healthcare professionals",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                field: ["Medical"],
+                income: ["0-100000", "100000-250000"]
+            },
+            amount: "₹1,50,000 per year",
+            deadline: "August 15, 2025",
+            type: "Field-specific"
+        },
+        {
+            name: "Arts and Culture Scholarship",
+            description: "Promoting arts, literature, and cultural studies",
+            eligibility: {
+                qualification: ["12th", "Graduate", "Post Graduate"],
+                field: ["Arts"],
+                age: [16, 35]
+            },
+            amount: "₹30,000 per year",
+            deadline: "September 30, 2025",
+            type: "Field-specific"
+        },
+        {
+            name: "Agriculture Innovation Grant",
+            description: "Supporting agricultural research and development",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                field: ["Agriculture"],
+                age: [20, 40]
+            },
+            amount: "₹60,000 per year",
+            deadline: "November 15, 2025",
+            type: "Field-specific"
+        },
+        {
+            name: "Law Students Excellence Award",
+            description: "Supporting aspiring legal professionals",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                field: ["Law"],
+                age: [20, 35]
+            },
+            amount: "₹45,000 per year",
+            deadline: "January 31, 2025",
+            type: "Field-specific"
+        },
+
+        // State-specific Scholarships
+        {
+            name: "Odisha Merit Scholarship",
+            description: "State government scholarship for Odisha students",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                state: ["Odisha"],
+                income: ["0-100000", "100000-250000"]
+            },
+            amount: "₹15,000 per year",
+            deadline: "March 15, 2025",
+            type: "State-specific"
+        },
+        {
+            name: "Maharashtra Talent Search",
+            description: "Identifying and nurturing talent in Maharashtra",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                state: ["Maharashtra"],
+                age: [14, 20]
+            },
+            amount: "₹12,000 per year",
+            deadline: "February 28, 2025",
+            type: "State-specific"
+        },
+
+        // Minority Scholarships
+        {
+            name: "Muslim Minority Scholarship",
+            description: "Educational support for Muslim community students",
+            eligibility: {
+                qualification: ["10th", "12th", "Graduate"],
+                income: ["0-100000", "100000-250000"]
+            },
+            amount: "₹30,000 per year",
+            deadline: "April 15, 2025",
+            type: "Minority"
+        },
+        {
+            name: "Christian Minority Education Fund",
+            description: "Supporting Christian community students",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            amount: "₹25,000 per year",
+            deadline: "May 31, 2025",
+            type: "Minority"
+        },
+
+        // Disability Scholarships
+        {
+            name: "Divyang Scholarship Scheme",
+            description: "Supporting students with disabilities",
+            eligibility: {
+                qualification: ["10th", "12th", "Graduate", "Post Graduate"],
+                disability: ["Yes"],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            amount: "₹50,000 per year",
+            deadline: "December 31, 2025",
+            type: "Special Needs"
+        }
+    ],
+
+    schemes: [
+        // Housing Schemes
+        {
+            name: "Pradhan Mantri Awas Yojana (Urban)",
+            description: "Affordable housing scheme for urban economically weaker sections",
+            eligibility: {
+                age: [25, 60],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            benefit: "₹2.5 Lakh subsidy + Low interest loan",
+            deadline: "Ongoing",
+            type: "Housing"
+        },
+        {
+            name: "Pradhan Mantri Awas Yojana (Rural)",
+            description: "Housing for All in rural areas",
+            eligibility: {
+                age: [25, 65],
+                income: ["0-100000", "100000-250000"]
+            },
+            benefit: "₹1.2 Lakh construction assistance",
+            deadline: "Ongoing",
+            type: "Housing"
+        },
+
+        // Healthcare Schemes
+        {
+            name: "Ayushman Bharat - PMJAY",
+            description: "World's largest health insurance scheme for poor families",
+            eligibility: {
+                income: ["0-100000", "100000-250000"],
+                category: ["SC", "ST", "OBC", "EWS"]
+            },
+            benefit: "₹5 Lakh health cover per family",
+            deadline: "Ongoing",
+            type: "Healthcare"
+        },
+        {
+            name: "Pradhan Mantri Suraksha Bima Yojana",
+            description: "Accident insurance scheme for all",
+            eligibility: {
+                age: [18, 70],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            benefit: "₹2 Lakh accident insurance",
+            deadline: "Ongoing",
+            type: "Insurance"
+        },
+        {
+            name: "Pradhan Mantri Jan Arogya Yojana",
+            description: "Comprehensive healthcare coverage",
+            eligibility: {
+                income: ["0-100000", "100000-250000"],
+                category: ["SC", "ST", "OBC", "EWS"]
+            },
+            benefit: "Free treatment up to ₹5 Lakh",
+            deadline: "Ongoing",
+            type: "Healthcare"
+        },
+
+        // Social Security Schemes
+        {
+            name: "Pension Scheme for Senior Citizens",
+            description: "Monthly pension for elderly citizens",
+            eligibility: {
+                age: [60, 100],
+                income: ["0-100000", "100000-250000"]
+            },
+            benefit: "₹3,000 per month",
+            deadline: "Ongoing",
+            type: "Social Security"
+        },
+        {
+            name: "Widow Pension Scheme",
+            description: "Financial support for widowed women",
+            eligibility: {
+                age: [18, 80],
+                gender: ["Female"],
+                income: ["0-100000", "100000-250000"]
+            },
+            benefit: "₹1,500 per month",
+            deadline: "Ongoing",
+            type: "Social Security"
+        },
+        {
+            name: "Disability Pension Scheme",
+            description: "Monthly assistance for persons with disabilities",
+            eligibility: {
+                age: [18, 80],
+                disability: ["Yes"],
+                income: ["0-100000", "100000-250000"]
+            },
+            benefit: "₹2,000 per month",
+            deadline: "Ongoing",
+            type: "Social Security"
+        },
+
+        // Business & Employment Schemes
+        {
+            name: "Startup India Initiative",
+            description: "Support ecosystem for nurturing innovation and startups",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [21, 45],
+                field: ["Management", "Engineering", "Commerce"]
+            },
+            benefit: "Tax benefits, funding support, mentorship",
+            deadline: "Ongoing",
+            type: "Business"
+        },
+        {
+            name: "Pradhan Mantri Mudra Yojana",
+            description: "Micro-finance scheme for small businesses",
+            eligibility: {
+                age: [18, 65],
+                qualification: ["10th", "12th", "Graduate"],
+                income: ["0-100000", "100000-250000", "250000-500000"]
+            },
+            benefit: "Loans from ₹50,000 to ₹10 Lakh",
+            deadline: "Ongoing",
+            type: "Finance"
+        },
+        {
+            name: "Stand Up India Scheme",
+            description: "Supporting SC/ST and women entrepreneurs",
+            eligibility: {
+                age: [18, 65],
+                category: ["SC", "ST"],
+                gender: ["Female"]
+            },
+            benefit: "₹10 Lakh to ₹1 Crore loan",
+            deadline: "Ongoing",
+            type: "Business"
+        },
+        {
+            name: "Prime Minister Employment Generation Programme",
+            description: "Setting up micro enterprises for employment generation",
+            eligibility: {
+                age: [18, 55],
+                qualification: ["10th", "12th", "Graduate"]
+            },
+            benefit: "Up to ₹25 Lakh project cost",
+            deadline: "Ongoing",
+            type: "Employment"
+        },
+
+        // Skill Development Schemes
+        {
+            name: "Skill India Mission",
+            description: "Training programs for skill development",
+            eligibility: {
+                age: [15, 45],
+                qualification: ["Below 10th", "10th", "12th"]
+            },
+            benefit: "Free training + certificate + job assistance",
+            deadline: "Ongoing",
+            type: "Skill Development"
+        },
+        {
+            name: "Pradhan Mantri Kaushal Vikas Yojana",
+            description: "Recognition of Prior Learning and skill certification",
+            eligibility: {
+                age: [15, 45],
+                qualification: ["Below 10th", "10th", "12th", "Graduate"]
+            },
+            benefit: "Free skill training + ₹8,000 incentive",
+            deadline: "Ongoing",
+            type: "Skill Development"
+        },
+
+        // Agricultural Schemes
+        {
+            name: "Pradhan Mantri Kisan Samman Nidhi",
+            description: "Income support for small and marginal farmers",
+            eligibility: {
+                age: [18, 70],
+                qualification: ["Below 10th", "10th", "12th"]
+            },
+            benefit: "₹6,000 per year in 3 installments",
+            deadline: "Ongoing",
+            type: "Agriculture"
+        },
+        {
+            name: "Pradhan Mantri Fasal Bima Yojana",
+            description: "Crop insurance scheme for farmers",
+            eligibility: {
+                age: [18, 70],
+                qualification: ["Below 10th", "10th", "12th", "Graduate"]
+            },
+            benefit: "Crop insurance at subsidized rates",
+            deadline: "Ongoing",
+            type: "Agriculture"
+        },
+
+        // Education Schemes
+        {
+            name: "Samagra Shiksha Abhiyan",
+            description: "Holistic education from pre-school to Class XII",
+            eligibility: {
+                age: [3, 18],
+                income: ["0-100000", "100000-250000"]
+            },
+            benefit: "Free education, books, uniforms",
+            deadline: "Ongoing",
+            type: "Education"
+        },
+        {
+            name: "Mid Day Meal Scheme",
+            description: "Nutritional support to school children",
+            eligibility: {
+                age: [6, 14],
+                qualification: ["Below 10th"]
+            },
+            benefit: "Free nutritious meals",
+            deadline: "Ongoing",
+            type: "Education"
+        }
+    ],
+
+    exams: [
+        // Civil Services Exams
+        {
+            name: "UPSC Civil Services Examination",
+            description: "Premier examination for joining Indian Administrative Service",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [21, 32],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "June 2025 (Prelims)",
+            applicationFee: "₹100 (General), Free (SC/ST/Female)",
+            type: "Civil Services"
+        },
+        {
+            name: "State Public Service Commission",
+            description: "State-level civil services examination",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [21, 40],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "Various dates by state",
+            applicationFee: "₹150-500",
+            type: "Civil Services"
+        },
+
+        // Staff Selection Commission
+        {
+            name: "SSC Combined Graduate Level (CGL)",
+            description: "Recruitment for various Group B and C posts",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [18, 32],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "July 2025",
+            applicationFee: "₹100 (General), Free (SC/ST/Female)",
+            type: "Staff Selection"
+        },
+        {
+            name: "SSC Combined Higher Secondary Level (CHSL)",
+            description: "Recruitment for 10+2 level posts",
+            eligibility: {
+                qualification: ["12th"],
+                age: [18, 27],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "August 2025",
+            applicationFee: "₹100 (General), Free (SC/ST/Female)",
+            type: "Staff Selection"
+        },
+        {
+            name: "SSC Multi Tasking Staff (MTS)",
+            description: "Multi-tasking staff recruitment",
+            eligibility: {
+                qualification: ["10th"],
+                age: [18, 25],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "September 2025",
+            applicationFee: "₹100 (General), Free (SC/ST/Female)",
+            type: "Staff Selection"
+        },
+
+        // Banking Exams
+        {
+            name: "IBPS Bank PO",
+            description: "Probationary Officer recruitment in public sector banks",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [20, 30],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                },
+                field: ["Commerce", "Management", "Arts", "Science"]
+            },
+            examDate: "October 2025",
+            applicationFee: "₹175 (General), ₹100 (SC/ST)",
+            type: "Banking"
+        },
+        {
+            name: "IBPS Bank Clerk",
+            description: "Clerical cadre recruitment in banks",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [20, 28],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "December 2025",
+            applicationFee: "₹175 (General), ₹100 (SC/ST)",
+            type: "Banking"
+        },
+        {
+            name: "SBI PO (Probationary Officer)",
+            description: "Officer recruitment in State Bank of India",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [21, 30],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "November 2025",
+            applicationFee: "₹750 (General), ₹125 (SC/ST)",
+            type: "Banking"
+        },
+        {
+            name: "RBI Grade B Officer",
+            description: "Reserve Bank of India Officer recruitment",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [21, 30],
+                field: ["Commerce", "Management", "Economics"]
+            },
+            examDate: "March 2025",
+            applicationFee: "₹850 (General), ₹100 (SC/ST)",
+            type: "Banking"
+        },
+
+        // Railway Exams
+        {
+            name: "Railway Recruitment Board NTPC",
+            description: "Non-Technical Popular Categories in Indian Railways",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [18, 33],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "August 2025",
+            applicationFee: "₹500 (General), ₹250 (SC/ST)",
+            type: "Railway"
+        },
+        {
+            name: "RRB Group D",
+            description: "Level-1 posts in Indian Railways",
+            eligibility: {
+                qualification: ["10th"],
+                age: [18, 33],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "June 2025",
+            applicationFee: "₹500 (General), ₹250 (SC/ST)",
+            type: "Railway"
+        },
+        {
+            name: "RRB Assistant Loco Pilot",
+            description: "Technical posts in Indian Railways",
+            eligibility: {
+                qualification: ["12th", "Diploma"],
+                age: [18, 28],
+                field: ["Engineering"],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            examDate: "July 2025",
+            applicationFee: "₹500 (General), ₹250 (SC/ST)",
+            type: "Railway"
+        },
+
+        // Engineering Entrance Exams
+        {
+            name: "GATE (Graduate Aptitude Test)",
+            description: "For admission to PG programs and PSU recruitment",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                field: ["Engineering", "Science"],
+                age: [21, 35]
+            },
+            examDate: "February 2025",
+            applicationFee: "₹1,850 (General), ₹925 (SC/ST/Female)",
+            type: "Engineering"
+        },
+        {
+            name: "JEE Main",
+            description: "Joint Entrance Examination for engineering colleges",
+            eligibility: {
+                qualification: ["12th"],
+                field: ["Science", "Engineering"],
+                age: [17, 25]
+            },
+            examDate: "April & May 2025",
+            applicationFee: "₹1,000 (General), ₹500 (SC/ST)",
+            type: "Engineering"
+        },
+        {
+            name: "JEE Advanced",
+            description: "For admission to IITs",
+            eligibility: {
+                qualification: ["12th"],
+                field: ["Science", "Engineering"],
+                age: [17, 22]
+            },
+            examDate: "May 2025",
+            applicationFee: "₹2,800 (General), ₹1,400 (SC/ST)",
+            type: "Engineering"
+        },
+
+        // Medical Entrance Exams
+        {
+            name: "NEET (Medical Entrance)",
+            description: "National eligibility entrance test for medical courses",
+            eligibility: {
+                qualification: ["12th"],
+                field: ["Medical", "Science"],
+                age: [17, 25],
+                ageRelaxation: {
+                    "SC": 5,
+                    "ST": 5,
+                    "OBC": 5
+                }
+            },
+            examDate: "May 2025",
+            applicationFee: "₹1,700 (General), ₹1,000 (SC/ST/OBC)",
+            type: "Medical"
+        },
+        {
+            name: "AIIMS MBBS Entrance",
+            description: "All India Institute of Medical Sciences entrance",
+            eligibility: {
+                qualification: ["12th"],
+                field: ["Medical", "Science"],
+                age: [17, 25]
+            },
+            examDate: "May 2025",
+            applicationFee: "₹1,600 (General), ₹800 (SC/ST)",
+            type: "Medical"
+        },
+
+        // Defense Exams
+        {
+            name: "NDA (National Defence Academy)",
+            description: "Joint services training for Army, Navy, Air Force",
+            eligibility: {
+                qualification: ["12th"],
+                age: [16, 19],
+                gender: ["Male"]
+            },
+            examDate: "April & September 2025",
+            applicationFee: "₹100",
+            type: "Defense"
+        },
+        {
+            name: "CDS (Combined Defence Services)",
+            description: "Officer entry in Indian Armed Forces",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [19, 25],
+                gender: ["Male", "Female"]
+            },
+            examDate: "February & November 2025",
+            applicationFee: "₹200",
+            type: "Defense"
+        },
+        {
+            name: "AFCAT (Air Force Common Admission Test)",
+            description: "Officer entry in Indian Air Force",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [20, 24],
+                gender: ["Male", "Female"]
+            },
+            examDate: "February & August 2025",
+            applicationFee: "₹250",
+            type: "Defense"
+        },
+
+        // Teaching Exams
+        {
+            name: "CTET (Central Teacher Eligibility Test)",
+            description: "Teaching eligibility for central government schools",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                age: [18, 35],
+                field: ["Teaching", "Arts", "Science"]
+            },
+            examDate: "July 2025",
+            applicationFee: "₹1,000 (One level), ₹1,200 (Both levels)",
+            type: "Teaching"
+        },
+        {
+            name: "UGC NET",
+            description: "National eligibility test for lectureship",
+            eligibility: {
+                qualification: ["Post Graduate"],
+                age: [18, 30],
+                field: ["Arts", "Science", "Commerce"]
+            },
+            examDate: "Multiple sessions",
+            applicationFee: "₹1,150 (General), ₹600 (SC/ST)",
+            type: "Teaching"
+        },
+
+        // Law Exams
+        {
+            name: "CLAT (Common Law Admission Test)",
+            description: "For admission to National Law Universities",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                age: [17, 30],
+                field: ["Law", "Arts"]
+            },
+            examDate: "May 2025",
+            applicationFee: "₹4,000 (General), ₹3,500 (SC/ST)",
+            type: "Law"
+        },
+
+        // Management Exams
+        {
+            name: "CAT (Common Admission Test)",
+            description: "For admission to IIMs and top B-schools",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [20, 35],
+                field: ["Management", "Commerce", "Arts", "Science"]
+            },
+            examDate: "November 2025",
+            applicationFee: "₹2,300 (General), ₹1,150 (SC/ST)",
+            type: "Management"
+        }
+    ],
+
+    jobs: [
+        // Police & Law Enforcement
+        {
+            name: "State Police Constable",
+            description: "Constable recruitment in state police forces",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 25],
+                gender: ["Male", "Female"],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹25,000 - ₹35,000 per month",
+            vacancies: "10,000+ (varies by state)",
+            type: "Law Enforcement"
+        },
+        {
+            name: "Sub Inspector (SI) Police",
+            description: "Sub Inspector recruitment in state police",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [21, 28],
+                gender: ["Male", "Female"],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹35,000 - ₹50,000 per month",
+            vacancies: "5,000+ (varies by state)",
+            type: "Law Enforcement"
+        },
+        {
+            name: "Central Reserve Police Force (CRPF)",
+            description: "Paramilitary force recruitment",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 25],
+                gender: ["Male", "Female"]
+            },
+            salary: "₹25,000 - ₹40,000 per month",
+            vacancies: "15,000+",
+            type: "Law Enforcement"
+        },
+        {
+            name: "Border Security Force (BSF)",
+            description: "Border guarding force recruitment",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 25],
+                gender: ["Male", "Female"]
+            },
+            salary: "₹25,000 - ₹40,000 per month",
+            vacancies: "8,000+",
+            type: "Law Enforcement"
+        },
+
+        // Teaching Jobs
+        {
+            name: "Primary School Teacher (TGT)",
+            description: "Teaching positions in government primary schools",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                age: [18, 35],
+                field: ["Teaching", "Arts", "Science"],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹35,000 - ₹50,000 per month",
+            vacancies: "25,000+ (varies by state)",
+            type: "Education"
+        },
+        {
+            name: "Post Graduate Teacher (PGT)",
+            description: "Senior secondary school teaching positions",
+            eligibility: {
+                qualification: ["Post Graduate"],
+                age: [21, 40],
+                field: ["Teaching", "Arts", "Science", "Commerce"]
+            },
+            salary: "₹45,000 - ₹65,000 per month",
+            vacancies: "15,000+",
+            type: "Education"
+        },
+        {
+            name: "Assistant Professor",
+            description: "College and university teaching positions",
+            eligibility: {
+                qualification: ["Post Graduate", "PhD"],
+                age: [21, 40],
+                field: ["Teaching", "Arts", "Science", "Commerce", "Engineering"]
+            },
+            salary: "₹57,700 - ₹1,82,400 per month",
+            vacancies: "5,000+",
+            type: "Education"
+        },
+        {
+            name: "Anganwadi Worker",
+            description: "Child care and development worker",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 35],
+                gender: ["Female"]
+            },
+            salary: "₹8,000 - ₹15,000 per month",
+            vacancies: "50,000+",
+            type: "Social Work"
+        },
+
+        // Administrative Jobs
+        {
+            name: "Government Clerk (Multi-tasking)",
+            description: "Clerical positions in various government departments",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                age: [18, 28],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹18,000 - ₹30,000 per month",
+            vacancies: "50,000+ (various departments)",
+            type: "Administrative"
+        },
+        {
+            name: "Lower Division Clerk (LDC)",
+            description: "Entry-level clerical positions",
+            eligibility: {
+                qualification: ["12th"],
+                age: [18, 27],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "25,000+",
+            type: "Administrative"
+        },
+        {
+            name: "Upper Division Clerk (UDC)",
+            description: "Senior clerical positions",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [18, 30],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "15,000+",
+            type: "Administrative"
+        },
+        {
+            name: "Section Officer",
+            description: "Middle management positions in government",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [21, 30],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹44,900 - ₹1,42,400 per month",
+            vacancies: "5,000+",
+            type: "Administrative"
+        },
+
+        // Technical & Engineering Jobs
+        {
+            name: "Junior Engineer (Civil)",
+            description: "Civil engineering positions in public works",
+            eligibility: {
+                qualification: ["Diploma", "Graduate"],
+                field: ["Engineering"],
+                age: [18, 30],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹40,000 - ₹60,000 per month",
+            vacancies: "8,000+",
+            type: "Engineering"
+        },
+        {
+            name: "Junior Engineer (Electrical)",
+            description: "Electrical engineering positions",
+            eligibility: {
+                qualification: ["Diploma", "Graduate"],
+                field: ["Engineering"],
+                age: [18, 30]
+            },
+            salary: "₹40,000 - ₹60,000 per month",
+            vacancies: "6,000+",
+            type: "Engineering"
+        },
+        {
+            name: "Junior Engineer (Mechanical)",
+            description: "Mechanical engineering positions",
+            eligibility: {
+                qualification: ["Diploma", "Graduate"],
+                field: ["Engineering"],
+                age: [18, 30]
+            },
+            salary: "₹40,000 - ₹60,000 per month",
+            vacancies: "5,000+",
+            type: "Engineering"
+        },
+        {
+            name: "Assistant Engineer",
+            description: "Senior technical positions in government",
+            eligibility: {
+                qualification: ["Graduate"],
+                field: ["Engineering"],
+                age: [21, 35]
+            },
+            salary: "₹56,100 - ₹1,77,500 per month",
+            vacancies: "3,000+",
+            type: "Engineering"
+        },
+        {
+            name: "Technical Assistant",
+            description: "Technical support roles in laboratories",
+            eligibility: {
+                qualification: ["12th", "Diploma"],
+                field: ["Science", "Engineering"],
+                age: [18, 28]
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "4,000+",
+            type: "Technical"
+        },
+
+        // Banking & Finance Jobs
+        {
+            name: "Bank Clerk (IBPS)",
+            description: "Clerical positions in nationalized banks",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [20, 28],
+                field: ["Commerce", "Arts", "Science"],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹30,000 - ₹45,000 per month",
+            vacancies: "12,000+",
+            type: "Banking"
+        },
+        {
+            name: "Bank Probationary Officer",
+            description: "Officer positions in public sector banks",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                age: [20, 30],
+                field: ["Commerce", "Management"]
+            },
+            salary: "₹50,000 - ₹75,000 per month",
+            vacancies: "8,000+",
+            type: "Banking"
+        },
+        {
+            name: "Insurance Agent (LIC)",
+            description: "Life Insurance Corporation agent positions",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                age: [18, 55]
+            },
+            salary: "₹15,000 - ₹40,000 per month (Commission based)",
+            vacancies: "20,000+",
+            type: "Insurance"
+        },
+        {
+            name: "Accounts Officer",
+            description: "Financial management positions",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                field: ["Commerce"],
+                age: [21, 35]
+            },
+            salary: "₹44,900 - ₹1,42,400 per month",
+            vacancies: "3,000+",
+            type: "Finance"
+        },
+
+        // Healthcare Jobs
+        {
+            name: "Staff Nurse",
+            description: "Nursing positions in government hospitals",
+            eligibility: {
+                qualification: ["12th", "Diploma"],
+                field: ["Medical"],
+                age: [18, 30],
+                gender: ["Female", "Male"]
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "15,000+",
+            type: "Healthcare"
+        },
+        {
+            name: "Pharmacist",
+            description: "Pharmacy positions in hospitals",
+            eligibility: {
+                qualification: ["Diploma", "Graduate"],
+                field: ["Medical"],
+                age: [18, 32]
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "5,000+",
+            type: "Healthcare"
+        },
+        {
+            name: "Medical Officer",
+            description: "Doctor positions in government hospitals",
+            eligibility: {
+                qualification: ["Graduate", "Post Graduate"],
+                field: ["Medical"],
+                age: [21, 35]
+            },
+            salary: "₹56,100 - ₹1,77,500 per month",
+            vacancies: "8,000+",
+            type: "Healthcare"
+        },
+        {
+            name: "Lab Technician",
+            description: "Laboratory technician positions",
+            eligibility: {
+                qualification: ["12th", "Diploma"],
+                field: ["Science", "Medical"],
+                age: [18, 30]
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "6,000+",
+            type: "Healthcare"
+        },
+        {
+            name: "ASHA Worker",
+            description: "Accredited Social Health Activist",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 45],
+                gender: ["Female"]
+            },
+            salary: "₹5,000 - ₹12,000 per month",
+            vacancies: "30,000+",
+            type: "Healthcare"
+        },
+
+        // Forest & Environment Jobs
+        {
+            name: "Forest Guard",
+            description: "Protection and conservation of forest resources",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 25],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹20,000 - ₹35,000 per month",
+            vacancies: "3,000+",
+            type: "Forest Department"
+        },
+        {
+            name: "Forest Ranger",
+            description: "Senior forest protection officer",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [21, 30],
+                field: ["Science", "Agriculture"]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "1,500+",
+            type: "Forest Department"
+        },
+        {
+            name: "Wildlife Inspector",
+            description: "Wildlife protection and conservation",
+            eligibility: {
+                qualification: ["Graduate"],
+                field: ["Science"],
+                age: [21, 35]
+            },
+            salary: "₹44,900 - ₹1,42,400 per month",
+            vacancies: "800+",
+            type: "Environment"
+        },
+
+        // Railway Jobs
+        {
+            name: "Group D Railway Employee",
+            description: "Level-1 posts in Indian Railways",
+            eligibility: {
+                qualification: ["10th"],
+                age: [18, 33],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹18,000 - ₹56,900 per month",
+            vacancies: "1,03,769",
+            type: "Railway"
+        },
+        {
+            name: "Assistant Loco Pilot",
+            description: "Train operation technical posts",
+            eligibility: {
+                qualification: ["12th", "Diploma"],
+                field: ["Engineering"],
+                age: [18, 28]
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "26,502",
+            type: "Railway"
+        },
+        {
+            name: "Station Master",
+            description: "Railway station management",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [18, 33]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "5,000+",
+            type: "Railway"
+        },
+        {
+            name: "Ticket Collector (TTE)",
+            description: "Train ticket examination",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [18, 33]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "8,000+",
+            type: "Railway"
+        },
+
+        // Postal Jobs
+        {
+            name: "Postman/Mail Guard",
+            description: "Mail delivery and handling",
+            eligibility: {
+                qualification: ["10th"],
+                age: [18, 27],
+                ageRelaxation: {
+                    "OBC": 3,
+                    "SC": 5,
+                    "ST": 5
+                }
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "10,000+",
+            type: "Postal"
+        },
+        {
+            name: "Postal Assistant/Sorting Assistant",
+            description: "Mail sorting and assistance",
+            eligibility: {
+                qualification: ["12th"],
+                age: [18, 27]
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "8,000+",
+            type: "Postal"
+        },
+
+        // Defense Jobs (Civilian)
+        {
+            name: "Defense Civilian Employee",
+            description: "Civilian positions in defense establishments",
+            eligibility: {
+                qualification: ["10th", "12th", "Graduate"],
+                age: [18, 35]
+            },
+            salary: "₹18,000 - ₹56,900 per month",
+            vacancies: "15,000+",
+            type: "Defense Civilian"
+        },
+        {
+            name: "Tradesman (Defense)",
+            description: "Skilled technical positions in defense",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 25]
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "8,000+",
+            type: "Defense Civilian"
+        },
+
+        // Agriculture Jobs
+        {
+            name: "Agriculture Extension Officer",
+            description: "Agricultural development and farmer assistance",
+            eligibility: {
+                qualification: ["Graduate"],
+                field: ["Agriculture"],
+                age: [21, 35]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "5,000+",
+            type: "Agriculture"
+        },
+        {
+            name: "Village Development Officer",
+            description: "Rural development programs",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [21, 40]
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "8,000+",
+            type: "Rural Development"
+        },
+        {
+            name: "Krishi Sahayak",
+            description: "Agricultural assistant",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                field: ["Agriculture", "Science"],
+                age: [18, 30]
+            },
+            salary: "₹15,000 - ₹30,000 per month",
+            vacancies: "10,000+",
+            type: "Agriculture"
+        },
+
+        // Legal Jobs
+        {
+            name: "Court Clerk",
+            description: "Administrative support in courts",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [18, 35],
+                field: ["Law", "Arts"]
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "3,000+",
+            type: "Legal"
+        },
+        {
+            name: "Public Prosecutor",
+            description: "Government legal representation",
+            eligibility: {
+                qualification: ["Post Graduate"],
+                field: ["Law"],
+                age: [25, 45]
+            },
+            salary: "₹56,100 - ₹1,77,500 per month",
+            vacancies: "1,000+",
+            type: "Legal"
+        },
+
+        // Municipal Jobs
+        {
+            name: "Safai Karmachari",
+            description: "Municipal cleaning and sanitation",
+            eligibility: {
+                qualification: ["Below 10th", "10th"],
+                age: [18, 35]
+            },
+            salary: "₹12,000 - ₹25,000 per month",
+            vacancies: "50,000+",
+            type: "Municipal"
+        },
+        {
+            name: "Municipal Inspector",
+            description: "Municipal administration and inspection",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [21, 35]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "2,000+",
+            type: "Municipal"
+        },
+
+        // Transport Jobs
+        {
+            name: "Government Driver",
+            description: "Driving positions in government departments",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 35]
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "15,000+",
+            type: "Transport"
+        },
+        {
+            name: "Bus Conductor",
+            description: "Public transport conductor",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 35]
+            },
+            salary: "₹15,000 - ₹30,000 per month",
+            vacancies: "8,000+",
+            type: "Transport"
+        },
+
+        // Food & Civil Supplies
+        {
+            name: "Food Inspector",
+            description: "Food safety and quality inspection",
+            eligibility: {
+                qualification: ["Graduate"],
+                field: ["Science"],
+                age: [21, 35]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "2,000+",
+            type: "Food Safety"
+        },
+        {
+            name: "Fair Price Shop Dealer",
+            description: "Public distribution system management",
+            eligibility: {
+                qualification: ["10th", "12th"],
+                age: [18, 45]
+            },
+            salary: "₹10,000 - ₹25,000 per month",
+            vacancies: "20,000+",
+            type: "Civil Supplies"
+        },
+
+        // Sports & Youth Affairs
+        {
+            name: "Sports Coach",
+            description: "Government sports coaching positions",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [21, 35]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "1,500+",
+            type: "Sports"
+        },
+        {
+            name: "Physical Training Instructor",
+            description: "Physical education in schools",
+            eligibility: {
+                qualification: ["Graduate"],
+                age: [21, 35]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "3,000+",
+            type: "Education"
+        },
+
+        // Fisheries & Animal Husbandry
+        {
+            name: "Veterinary Assistant",
+            description: "Animal healthcare support",
+            eligibility: {
+                qualification: ["12th", "Diploma"],
+                field: ["Science"],
+                age: [18, 30]
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "4,000+",
+            type: "Animal Husbandry"
+        },
+        {
+            name: "Fisheries Development Officer",
+            description: "Fisheries sector development",
+            eligibility: {
+                qualification: ["Graduate"],
+                field: ["Science"],
+                age: [21, 35]
+            },
+            salary: "₹35,400 - ₹1,12,400 per month",
+            vacancies: "1,000+",
+            type: "Fisheries"
+        },
+
+        // Statistical Jobs
+        {
+            name: "Statistical Investigator",
+            description: "Data collection and statistical analysis",
+            eligibility: {
+                qualification: ["Graduate"],
+                field: ["Commerce", "Science"],
+                age: [18, 30]
+            },
+            salary: "₹25,500 - ₹81,100 per month",
+            vacancies: "2,000+",
+            type: "Statistics"
+        },
+
+        // Information Technology Jobs
+        {
+            name: "Computer Operator",
+            description: "Data entry and computer operations",
+            eligibility: {
+                qualification: ["12th", "Graduate"],
+                age: [18, 30]
+            },
+            salary: "₹19,900 - ₹63,200 per month",
+            vacancies: "10,000+",
+            type: "IT Support"
+        },
+        {
+            name: "Junior Programmer",
+            description: "Software development in government",
+            eligibility: {
+                qualification: ["Graduate"],
+                field: ["Science", "Engineering"],
+                age: [21, 35]
+            },
+            salary: "₹44,900 - ₹1,42,400 per month",
+            vacancies: "3,000+",
+            type: "IT"
+        },
+
+        // Miscellaneous Jobs
+        {
+            name: "Peon/Attendant",
+            description: "Office support and maintenance",
+            eligibility: {
+                qualification: ["Below 10th", "10th"],
+                age: [18, 27]
+            },
+            salary: "₹18,000 - ₹56,900 per month",
+            vacancies: "25,000+",
+            type: "Support Staff"
+        },
+        {
+            name: "Chowkidar/Watchman",
+            description: "Security and watch duties",
+            eligibility: {
+                qualification: ["Below 10th", "10th"],
+                age: [18, 35]
+            },
+            salary: "₹15,000 - ₹30,000 per month",
+            vacancies: "20,000+",
+            type: "Security"
+        },
+        {
+            name: "Mali/Gardener",
+            description: "Gardening and landscaping",
+            eligibility: {
+                qualification: ["Below 10th", "10th"],
+                age: [18, 35]
+            },
+            salary: "₹15,000 - ₹25,000 per month",
+            vacancies: "5,000+",
+            type: "Maintenance"
+        }
+    ]
+};
+
+        let currentResults = null;
+        let currentFilter = 'all';
+
+        // Authentication check function
+        function checkAuthentication() {
+            // Check if user is authenticated using Thymeleaf variables
+            const username = '[[${username}]]';
+            const isAuthenticated = username && username !== 'Guest' && username !== 'null';
+            
+            if (!isAuthenticated) {
+                // Show alert and redirect to login
+                alert('Please login to access the eligibility analysis feature!');
+                window.location.href = '/login';
+                return;
+            }
+            
+            // If authenticated, proceed with form submission
+            const form = document.getElementById('eligibilityForm');
+            if (form.checkValidity()) {
+                // Show loading overlay
+                showLoading();
+                
+                // Simulate processing time for better UX
+                setTimeout(() => {
+                    checkEligibility();
+                    hideLoading();
+                }, 2000);
+            } else {
+                // Trigger form validation
+                form.reportValidity();
+            }
+        }
+
+        // Enhanced form submission with loading and animations
+        document.getElementById('eligibilityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            checkAuthentication();
+        });
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function checkEligibility() {
+            try {
+                const formData = new FormData(document.getElementById('eligibilityForm'));
+                const userData = {
+                    firstName: formData.get('firstName') || '',
+                    lastName: formData.get('lastName') || '',
+                    fullName: (formData.get('firstName') || '') + ' ' + (formData.get('lastName') || ''),
+                    age: parseInt(formData.get('age')) || 0,
+                    gender: formData.get('gender') || '',
+                    state: formData.get('state') || '',
+                    district: formData.get('district') || '',
+                    qualification: formData.get('qualification') || '',
+                    category: formData.get('category') || '',
+                    income: formData.get('income') || '',
+                    email: formData.get('email') || '',
+                    field: formData.get('field') || '',
+                    disability: formData.get('disability') || 'No',
+                    preferences: Array.from(formData.getAll('preferences'))
+                };
+
+                // Validate required fields
+                if (!userData.firstName || !userData.lastName || !userData.age || !userData.gender || 
+                    !userData.state || !userData.qualification || !userData.category || !userData.income) {
+                    alert('Please fill in all required fields!');
+                    return;
+                }
+
+                const results = {
+                    scholarships: [],
+                    schemes: [],
+                    exams: [],
+                    jobs: []
+                };
+
+                // Check eligibility for each category based on user preferences
+                userData.preferences.forEach(preference => {
+                    if (eligibilityDatabase[preference]) {
+                        eligibilityDatabase[preference].forEach(item => {
+                            if (isEligible(userData, item.eligibility)) {
+                                results[preference].push(item);
+                            }
+                        });
+                    }
+                });
+
+                currentResults = { results, userData };
+                displayResults(results, userData);
+                
+                // Show success message
+                const successMessage = document.getElementById('successMessage');
+                if (successMessage) {
+                    successMessage.classList.add('show');
+                    setTimeout(() => {
+                        successMessage.classList.remove('show');
+                    }, 5000);
+                }
+            } catch (error) {
+                console.error('Error checking eligibility:', error);
+                alert('An error occurred while checking eligibility. Please try again.');
+                hideLoading();
+            }
+        }
+
+        function isEligible(userData, eligibility) {
+            try {
+                // Check age eligibility with category-based relaxation
+                if (eligibility.age && Array.isArray(eligibility.age) && eligibility.age.length === 2) {
+                    const [minAge, maxAge] = eligibility.age;
+                    let adjustedMaxAge = maxAge;
+                    
+                    // Apply age relaxation for reserved categories
+                    if (eligibility.ageRelaxation && userData.category) {
+                        const relaxation = eligibility.ageRelaxation[userData.category];
+                        if (relaxation) {
+                            adjustedMaxAge += relaxation;
+                        }
+                    }
+                    
+                    if (userData.age < minAge || userData.age > adjustedMaxAge) {
+                        return false;
+                    }
+                }
+
+                // Check gender eligibility
+                if (eligibility.gender && Array.isArray(eligibility.gender) && !eligibility.gender.includes(userData.gender)) {
+                    return false;
+                }
+
+                // Check qualification eligibility
+                if (eligibility.qualification && Array.isArray(eligibility.qualification) && !eligibility.qualification.includes(userData.qualification)) {
+                    return false;
+                }
+
+                // Check category eligibility
+                if (eligibility.category && Array.isArray(eligibility.category) && !eligibility.category.includes(userData.category)) {
+                    return false;
+                }
+
+                // Check income eligibility
+                if (eligibility.income && Array.isArray(eligibility.income) && !eligibility.income.includes(userData.income)) {
+                    return false;
+                }
+
+                // Check field eligibility
+                if (eligibility.field && Array.isArray(eligibility.field) && userData.field && !eligibility.field.includes(userData.field)) {
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error checking eligibility:', error);
+                return false;
+            }
+        }
+
+        function displayResults(results, userData) {
+            try {
+                const resultsSection = document.getElementById('resultsSection');
+                if (!resultsSection) {
+                    console.error('Results section not found');
+                    return;
+                }
+                
+                // Update statistics with animation
+                animateCountUp('scholarshipCount', results.scholarships.length);
+                animateCountUp('schemeCount', results.schemes.length);
+                animateCountUp('examCount', results.exams.length);
+                animateCountUp('jobCount', results.jobs.length);
+
+                // Show results section
+                resultsSection.classList.add('show');
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Generate and display results
+                generateResultsHTML(results);
+            } catch (error) {
+                console.error('Error displaying results:', error);
+                alert('An error occurred while displaying results. Please try again.');
+            }
+        }
+
+        function animateCountUp(elementId, targetValue) {
+            try {
+                const element = document.getElementById(elementId);
+                if (!element) {
+                    console.error(`Element with id '${elementId}' not found`);
+                    return;
+                }
+                
+                let currentValue = 0;
+                const increment = targetValue / 20;
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= targetValue) {
+                        currentValue = targetValue;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(currentValue);
+                }, 50);
+            } catch (error) {
+                console.error('Error in count up animation:', error);
+            }
+        }
+
+        function generateResultsHTML(results) {
+            try {
+                const resultsGrid = document.getElementById('resultsGrid');
+                if (!resultsGrid) {
+                    console.error('Results grid not found');
+                    return;
+                }
+                
+                let resultsHTML = '';
+
+                const categoryInfo = {
+                    scholarships: { 
+                        icon: 'fas fa-graduation-cap', 
+                        title: 'Scholarships',
+                        color: '#667eea'
+                    },
+                    schemes: { 
+                        icon: 'fas fa-university', 
+                        title: 'Government Schemes',
+                        color: '#28a745'
+                    },
+                    exams: { 
+                        icon: 'fas fa-file-alt', 
+                        title: 'Competitive Exams',
+                        color: '#ffc107'
+                    },
+                    jobs: { 
+                        icon: 'fas fa-briefcase', 
+                        title: 'Government Jobs',
+                        color: '#17a2b8'
+                    }
+                };
+
+                Object.keys(results).forEach(category => {
+                    if (results[category] && Array.isArray(results[category]) && results[category].length > 0) {
+                        resultsHTML += `
+                            <div class="category-section" data-category="${category}">
+                                <div class="category-header">
+                                    <i class="category-icon ${categoryInfo[category]?.icon || 'fas fa-info-circle'}"></i>
+                                    <div class="category-title">${categoryInfo[category]?.title || category}</div>
+                                </div>
+                        `;
+
+                        results[category].forEach(item => {
+                            resultsHTML += createOpportunityCard(item, category);
+                        });
+
+                        resultsHTML += '</div>';
+                    }
+                });
+
+                if (resultsHTML === '') {
+                    resultsHTML = `
+                        <div class="no-results">
+                            <i class="no-results-icon fas fa-search"></i>
+                            <h3>No matching opportunities found</h3>
+                            <p>Try adjusting your criteria or enabling more preferences in the advanced options.</p>
+                        </div>
+                    `;
+                }
+
+                resultsGrid.innerHTML = resultsHTML;
+            } catch (error) {
+                console.error('Error generating results HTML:', error);
+                const resultsGrid = document.getElementById('resultsGrid');
+                if (resultsGrid) {
+                    resultsGrid.innerHTML = `
+                        <div class="no-results">
+                            <i class="no-results-icon fas fa-exclamation-triangle"></i>
+                            <h3>Error displaying results</h3>
+                            <p>An error occurred while generating the results. Please try again.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function createOpportunityCard(item, category) {
+            try {
+                if (!item || !item.name) {
+                    console.error('Invalid item data:', item);
+                    return '';
+                }
+                
+                const details = getItemDetails(item, category);
+                const itemName = item.name.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                
+                return `
+                    <div class="opportunity-card">
+                        <div class="opportunity-header">
+                            <div>
+                                <div class="opportunity-title">${item.name || 'Unknown Opportunity'}</div>
+                            </div>
+                            <div class="opportunity-badge">${item.type || 'Available'}</div>
+                        </div>
+                        <div class="opportunity-description">${item.description || 'No description available'}</div>
+                        <div class="opportunity-details">
+                            ${details}
+                        </div>
+                        <div class="opportunity-actions">
+                            <button class="btn-sm btn-outline" onclick="viewDetails('${itemName}', '${category}')">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </button>
+                            <button class="btn-sm btn-outline" onclick="applyNow('${itemName}', '${category}')">
+                                <i class="fas fa-external-link-alt"></i> Apply Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error creating opportunity card:', error);
+                return '';
+            }
+        }
+
+        function getItemDetails(item, category) {
+            try {
+                if (!item) {
+                    return '';
+                }
+                
+                let details = '';
+                
+                switch(category) {
+                    case 'scholarships':
+                        details = `
+                            <div class="detail-item">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>${item.amount || 'Amount varies'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Deadline: ${item.deadline || 'Not specified'}</span>
+                            </div>
+                        `;
+                        break;
+                    case 'schemes':
+                        details = `
+                            <div class="detail-item">
+                                <i class="fas fa-gift"></i>
+                                <span>${item.benefit || 'Benefits vary'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${item.deadline || 'Ongoing'}</span>
+                            </div>
+                        `;
+                        break;
+                    case 'exams':
+                        details = `
+                            <div class="detail-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${item.examDate || 'Date TBA'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span>Fee: ${item.applicationFee || 'Not specified'}</span>
+                            </div>
+                        `;
+                        break;
+                    case 'jobs':
+                        details = `
+                            <div class="detail-item">
+                                <i class="fas fa-rupee-sign"></i>
+                                <span>${item.salary || 'Salary varies'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-users"></i>
+                                <span>${item.vacancies || 'Multiple'} positions</span>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        details = `
+                            <div class="detail-item">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Details available</span>
+                            </div>
+                        `;
+                }
+                
+                return details;
+            } catch (error) {
+                console.error('Error getting item details:', error);
+                return '';
+            }
+        }
+
+        // Filter functionality
+        function filterResults(category) {
+            currentFilter = category;
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide categories
+            const categoryElements = document.querySelectorAll('.category-section');
+            categoryElements.forEach(element => {
+                if (category === 'all' || element.dataset.category === category) {
+                    element.style.display = 'block';
+                    element.style.animation = 'fadeInUp 0.5s ease-out';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        }
+
+        // Advanced options toggle
+        function toggleAdvanced() {
+            const content = document.getElementById('advancedContent');
+            const icon = document.getElementById('advancedIcon');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.innerHTML = '<i class="fas fa-chevron-down"></i>';
+            } else {
+                content.classList.add('show');
+                icon.innerHTML = '<i class="fas fa-chevron-up"></i>';
+            }
+        }
+
+        // Action handlers
+        function viewDetails(itemName, category) {
+            // Find the item in the database
+            const item = eligibilityDatabase[category].find(i => i.name === itemName);
+            if (item) {
+                // Create a modal or detailed view
+                showDetailModal(item, category);
+            }
+        }
+
+        function applyNow(itemName, category) {
+            // In a real application, this would redirect to the application portal
+            alert(`Redirecting to application portal for: ${itemName}`);
+        }
+
+        function showDetailModal(item, category) {
+            // Create a detailed modal with all information
+            const modalHTML = `
+                <div class="modal-overlay" onclick="closeModal()">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h2>${item.name}</h2>
+                            <button class="modal-close" onclick="closeModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Description:</strong> ${item.description}</p>
+                            ${getDetailedInfo(item, category)}
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-primary" onclick="applyNow('${item.name}', '${category}')">
+                                Apply Now
+                            </button>
+                            <button class="btn-white" onclick="closeModal()">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function getDetailedInfo(item, category) {
+            switch(category) {
+                case 'scholarships':
+                    return `
+                        <p><strong>Amount:</strong> ${item.amount || 'Not specified'}</p>
+                        <p><strong>Type:</strong> ${item.type || 'General'}</p>
+                        <p><strong>Deadline:</strong> ${item.deadline || 'Not specified'}</p>
+                        <p><strong>Eligibility:</strong></p>
+                        <ul>
+                            ${item.eligibility.qualification ? `<li>Qualification: ${item.eligibility.qualification.join(', ')}</li>` : ''}
+                            ${item.eligibility.category ? `<li>Category: ${item.eligibility.category.join(', ')}</li>` : ''}
+                            ${item.eligibility.income ? `<li>Income: ${item.eligibility.income.join(', ')}</li>` : ''}
+                        </ul>
+                    `;
+                case 'schemes':
+                    return `
+                        <p><strong>Benefit:</strong> ${item.benefit || 'Not specified'}</p>
+                        <p><strong>Type:</strong> ${item.type || 'General'}</p>
+                        <p><strong>Status:</strong> ${item.deadline || 'Ongoing'}</p>
+                    `;
+                case 'exams':
+                    return `
+                        <p><strong>Exam Date:</strong> ${item.examDate || 'To be announced'}</p>
+                        <p><strong>Application Fee:</strong> ${item.applicationFee || 'Not specified'}</p>
+                        <p><strong>Type:</strong> ${item.type || 'General'}</p>
+                    `;
+                case 'jobs':
+                    return `
+                        <p><strong>Salary:</strong> ${item.salary || 'Not specified'}</p>
+                        <p><strong>Vacancies:</strong> ${item.vacancies || 'Multiple'}</p>
+                        <p><strong>Type:</strong> ${item.type || 'Government'}</p>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Download PDF functionality
+        function downloadPDF() {
+            if (!currentResults) {
+                alert('Please check eligibility first!');
+                return;
+            }
+
+            const { results, userData } = currentResults;
+            
+            // Create comprehensive report content
+            let content = `ELIGIBILITY ANALYSIS REPORT\n`;
+            content += `${'='.repeat(50)}\n\n`;
+            content += `PERSONAL INFORMATION\n`;
+            content += `${'─'.repeat(25)}\n`;
+            content += `Name: ${userData.fullName}\n`;
+            content += `Age: ${userData.age} years\n`;
+            content += `Gender: ${userData.gender}\n`;
+            content += `State: ${userData.state}\n`;
+            if (userData.district) content += `District: ${userData.district}\n`;
+            content += `Highest Qualification: ${userData.qualification}\n`;
+            content += `Category: ${userData.category}\n`;
+            content += `Annual Family Income: ${userData.income}\n`;
+            if (userData.field) content += `Field of Interest: ${userData.field}\n`;
+            if (userData.email) content += `Email: ${userData.email}\n`;
+            content += `\nREPORT GENERATED ON: ${new Date().toLocaleDateString()}\n\n`;
+
+            // Add summary statistics
+            content += `SUMMARY STATISTICS\n`;
+            content += `${'─'.repeat(25)}\n`;
+            content += `• Total Scholarships Found: ${results.scholarships.length}\n`;
+            content += `• Government Schemes Available: ${results.schemes.length}\n`;
+            content += `• Competitive Exams Eligible: ${results.exams.length}\n`;
+            content += `• Job Opportunities: ${results.jobs.length}\n\n`;
+
+            const categories = ['scholarships', 'schemes', 'exams', 'jobs'];
+            const categoryTitles = ['SCHOLARSHIPS', 'GOVERNMENT SCHEMES', 'COMPETITIVE EXAMS', 'GOVERNMENT JOBS'];
+
+            categories.forEach((category, index) => {
+                if (results[category].length > 0) {
+                    content += `${categoryTitles[index]}\n`;
+                    content += `${'─'.repeat(categoryTitles[index].length)}\n`;
+                    results[category].forEach((item, itemIndex) => {
+                        content += `${itemIndex + 1}. ${item.name}\n`;
+                        content += `   Description: ${item.description}\n`;
+                        
+                        // Add category-specific details
+                        switch(category) {
+                            case 'scholarships':
+                                if (item.amount) content += `   Amount: ${item.amount}\n`;
+                                if (item.deadline) content += `   Deadline: ${item.deadline}\n`;
+                                if (item.type) content += `   Type: ${item.type}\n`;
+                                break;
+                            case 'schemes':
+                                if (item.benefit) content += `   Benefit: ${item.benefit}\n`;
+                                if (item.type) content += `   Type: ${item.type}\n`;
+                                break;
+                            case 'exams':
+                                if (item.examDate) content += `   Exam Date: ${item.examDate}\n`;
+                                if (item.applicationFee) content += `   Application Fee: ${item.applicationFee}\n`;
+                                break;
+                            case 'jobs':
+                                if (item.salary) content += `   Salary: ${item.salary}\n`;
+                                if (item.vacancies) content += `   Vacancies: ${item.vacancies}\n`;
+                                break;
+                        }
+                        content += `\n`;
+                    });
+                    content += `\n`;
+                }
+            });
+
+            // Add footer
+            content += `${'='.repeat(50)}\n`;
+            content += `This report was generated by EligibilityHub\n`;
+            content += `For more information, visit our website or contact support.\n`;
+            content += `\nDISCLAIMER: This report is for informational purposes only.\n`;
+            content += `Please verify all details from official sources before applying.\n`;
+
+            // Create and download file
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `eligibility_report_${userData.firstName}_${userData.lastName}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Print functionality
+        function printResults() {
+            if (!currentResults) {
+                alert('Please check eligibility first!');
+                return;
+            }
+            window.print();
+        }
+
+        // Share functionality
+        function shareResults() {
+            if (!currentResults) {
+                alert('Please check eligibility first!');
+                return;
+            }
+
+            const { results, userData } = currentResults;
+            const totalOpportunities = results.scholarships.length + results.schemes.length + 
+                                     results.exams.length + results.jobs.length;
+
+            const shareText = `🎯 Found ${totalOpportunities} opportunities on EligibilityHub!\n\n` +
+                            `📊 My Results:\n` +
+                            `🎓 ${results.scholarships.length} Scholarships\n` +
+                            `🏛️ ${results.schemes.length} Government Schemes\n` +
+                            `📝 ${results.exams.length} Competitive Exams\n` +
+                            `💼 ${results.jobs.length} Job Opportunities\n\n` +
+                            `Check your eligibility at EligibilityHub! #EligibilityCheck #Opportunities`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Eligibility Results - EligibilityHub',
+                    text: shareText,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support native sharing
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('Results copied to clipboard! You can now share them.');
+                }).catch(() => {
+                    alert('Sharing not supported on this browser. You can manually copy the URL to share.');
+                });
+            }
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Form validation enhancements
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('blur', function() {
+                validateField(this);
+            });
+        });
+
+        function validateField(field) {
+            try {
+                const value = field.value.trim();
+                const isRequired = field.hasAttribute('required');
+                
+                // Remove existing validation styles
+                field.classList.remove('error', 'success');
+                
+                if (isRequired && !value) {
+                    field.classList.add('error');
+                    return false;
+                } else if (field.type === 'email' && value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        field.classList.add('error');
+                        return false;
+                    }
+                } else if (field.type === 'number' && value) {
+                    const num = parseInt(value);
+                    const min = parseInt(field.min);
+                    const max = parseInt(field.max);
+                    if (isNaN(num) || (min && num < min) || (max && num > max)) {
+                        field.classList.add('error');
+                        return false;
+                    }
+                }
+                
+                if (value) {
+                    field.classList.add('success');
+                }
+                return true;
+            } catch (error) {
+                console.error('Validation error:', error);
+                return false;
+            }
+        }
+
+        // Auto-save form data to localStorage (for better UX)
+        function saveFormData() {
+            const formData = new FormData(document.getElementById('eligibilityForm'));
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            // Note: localStorage is not available in Claude artifacts, but this would work in a real browser
+            // localStorage.setItem('eligibilityFormData', JSON.stringify(data));
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication status and update UI
+            updateAuthenticationUI();
+            
+            // Add smooth scrolling to all links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Add form auto-save
+            document.getElementById('eligibilityForm').addEventListener('input', saveFormData);
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Ctrl/Cmd + Enter to submit form
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    document.getElementById('eligibilityForm').dispatchEvent(new Event('submit'));
+                }
+                
+                // Escape to close modal
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        });
+
+        // Function to update UI based on authentication status
+        function updateAuthenticationUI() {
+            const username = '[[${username}]]';
+            const isAuthenticated = username && username !== 'Guest' && username !== 'null';
+            const loginRequired = document.getElementById('loginRequired');
+            const buttonText = document.getElementById('buttonText');
+            
+            if (!isAuthenticated) {
+                // Show login required message
+                if (loginRequired) loginRequired.style.display = 'block';
+                if (buttonText) buttonText.textContent = 'Login to Analyze';
+            } else {
+                // Hide login required message
+                if (loginRequired) loginRequired.style.display = 'none';
+                if (buttonText) buttonText.textContent = 'Analyze My Eligibility';
+            }
+        }
+
+        // Add CSS for validation styles and modal
+        const additionalCSS = `
+            <style>
+                .form-group input.error,
+                .form-group select.error {
+                    border-color: #dc3545;
+                    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+                }
+                
+                .form-group input.success,
+                .form-group select.success {
+                    border-color: #28a745;
+                    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+                }
+                
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                    animation: fadeIn 0.3s ease-out;
+                }
+                
+                .modal-content {
+                    background: white;
+                    border-radius: var(--border-radius);
+                    max-width: 600px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    animation: slideInUp 0.3s ease-out;
+                }
+                
+                .modal-header {
+                    padding: 2rem;
+                    border-bottom: 1px solid #e9ecef;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .modal-header h2 {
+                    margin: 0;
+                    color: var(--dark-color);
+                }
+                
+                .modal-close {
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    color: #666;
+                    padding: 0.5rem;
+                    border-radius: 50%;
+                    transition: var(--transition);
+                }
+                
+                .modal-close:hover {
+                    background: var(--light-color);
+                    color: var(--dark-color);
+                }
+                
+                .modal-body {
+                    padding: 2rem;
+                }
+                
+                .modal-body ul {
+                    margin: 1rem 0;
+                    padding-left: 2rem;
+                }
+                
+                .modal-body li {
+                    margin: 0.5rem 0;
+                }
+                
+                .modal-footer {
+                    padding: 2rem;
+                    border-top: 1px solid #e9ecef;
+                    display: flex;
+                    gap: 1rem;
+                    justify-content: flex-end;
+                }
+                
+                @keyframes slideInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(50px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                /* Enhanced responsive design */
+                @media (max-width: 480px) {
+                    .modal-content {
+                        width: 95%;
+                        margin: 1rem;
+                    }
+                    
+                    .modal-header,
+                    .modal-body,
+                    .modal-footer {
+                        padding: 1rem;
+                    }
+                    
+                    .checkbox-group {
+                        flex-direction: column;
+                    }
+                    
+                    .results-actions {
+                        flex-direction: column;
+                    }
+                    
+                    .opportunity-actions {
+                        flex-direction: column;
+                    }
+                }
+            </style>
+        `;
+        
+        document.head.insertAdjacentHTML('beforeend', additionalCSS);
+    </script>
+
+    <!-- Gemini AI Chatbot Widget -->
+    <button class="gemini-fab" id="geminiToggle" title="Ask Gemini AI about the project">
+        🤖
+    </button>
+
+    <div class="gemini-chat-widget" id="geminiWidget">
+        <div class="gemini-chat-header">
+            <h3>
+                🤖 Project Assistant
+            </h3>
+            <button class="gemini-minimize-btn" id="minimizeChat" title="Minimize">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+
+        <div class="project-context-panel">
+            <button class="context-toggle" onclick="toggleContext()">
+                <i class="fas fa-info-circle"></i>
+                Project Context
+                <i class="fas fa-chevron-down" id="contextIcon"></i>
+            </button>
+            <div class="context-details" id="contextDetails">
+                <strong>Universal Eligibility Checker System</strong><br>
+                A comprehensive platform for checking eligibility for scholarships, government schemes, competitive exams, and job opportunities. Built with Spring Boot backend and dynamic frontend with AI assistance.
+            </div>
+        </div>
+
+        <div class="gemini-chat-messages" id="geminiMessages">
+            <div class="gemini-message ai">
+                👋 Hi! I'm your AI assistant. I can help you with questions about the Universal Eligibility Checker project, suggest improvements, debug issues, or discuss implementation details. What would you like to know?
+            </div>
+        </div>
+
+        <div class="gemini-quick-actions">
+            <button class="quick-action-btn" onclick="askQuickQuestion('How can I improve the user experience?')">
+                Improve UX
+            </button>
+            <button class="quick-action-btn" onclick="askQuickQuestion('Suggest new features for this project')">
+                New Features
+            </button>
+            <button class="quick-action-btn" onclick="askQuickQuestion('Help me with accessibility improvements')">
+                Accessibility
+            </button>
+            <button class="quick-action-btn" onclick="askQuickQuestion('Code optimization tips?')">
+                Optimize Code
+            </button>
+        </div>
+
+        <div class="gemini-loading" id="geminiLoading">
+            <div class="gemini-typing-indicator">
+                <div class="gemini-typing-dot"></div>
+                <div class="gemini-typing-dot"></div>
+                <div class="gemini-typing-dot"></div>
+            </div>
+        </div>
+
+        <div class="gemini-chat-input">
+            <input 
+                type="text" 
+                class="gemini-input-field" 
+                id="geminiInput" 
+                placeholder="Ask about the project..."
+                maxlength="500"
+            >
+            <button class="gemini-send-btn" id="geminiSend" title="Send message">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <style>
+        /* Gemini Chat Styles */
+        .gemini-chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 400px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            z-index: 1001;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+        }
+
+        .gemini-chat-widget.active {
+            display: flex;
+            animation: slideInUp 0.4s ease-out;
+        }
+
+        .gemini-chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gemini-chat-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gemini-minimize-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gemini-minimize-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .gemini-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+        }
+
+        .gemini-message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 12px;
+            max-width: 85%;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .gemini-message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+        }
+
+        .gemini-message.ai {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+        }
+
+        .gemini-message.ai::before {
+            content: "🤖 ";
+            font-size: 1rem;
+        }
+
+        .gemini-loading {
+            display: none;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 12px;
+            max-width: 85%;
+            border: 1px solid #e9ecef;
+        }
+
+        .gemini-loading.active {
+            display: block;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .gemini-typing-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .gemini-typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .gemini-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .gemini-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .gemini-chat-input {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .gemini-input-field {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .gemini-input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .gemini-send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gemini-send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .gemini-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .gemini-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .gemini-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .gemini-fab.hidden {
+            display: none;
+        }
+
+        .project-context-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .context-toggle {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .context-details {
+            display: none;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .context-details.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .gemini-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .gemini-quick-actions {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            background: white;
+            border: 1px solid #667eea;
+            color: #667eea;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .gemini-chat-widget {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+                height: 60vh;
+            }
+        }
+    </style>
+
+    <script>
+        // Gemini AI Integration
+        class GeminiProjectAssistant {
+            constructor() {
+                this.messagesContainer = document.getElementById('geminiMessages');
+                this.inputField = document.getElementById('geminiInput');
+                this.sendButton = document.getElementById('geminiSend');
+                this.loadingIndicator = document.getElementById('geminiLoading');
+                this.widget = document.getElementById('geminiWidget');
+                this.fab = document.getElementById('geminiToggle');
+                
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                // Toggle widget
+                this.fab.addEventListener('click', () => this.toggleWidget());
+                document.getElementById('minimizeChat').addEventListener('click', () => this.hideWidget());
+
+                // Send message
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.inputField.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                // Auto-resize input and enable/disable send button
+                this.inputField.addEventListener('input', () => {
+                    this.sendButton.disabled = !this.inputField.value.trim();
+                });
+            }
+
+            toggleWidget() {
+                if (this.widget.classList.contains('active')) {
+                    this.hideWidget();
+                } else {
+                    this.showWidget();
+                }
+            }
+
+            showWidget() {
+                this.widget.classList.add('active');
+                this.fab.classList.add('hidden');
+                this.inputField.focus();
+            }
+
+            hideWidget() {
+                this.widget.classList.remove('active');
+                this.fab.classList.remove('hidden');
+            }
+
+            async sendMessage() {
+                const message = this.inputField.value.trim();
+                if (!message) return;
+
+                // Add user message
+                this.addMessage(message, 'user');
+                this.inputField.value = '';
+                this.sendButton.disabled = true;
+
+                // Show loading
+                this.showLoading();
+
+                try {
+                    const response = await fetch('/api/gemini/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: message })
+                    });
+
+                    const data = await response.json();
+                    this.hideLoading();
+
+                    if (response.ok) {
+                        this.addMessage(data.response, 'ai');
+                    } else {
+                        this.showError(data.error || 'Failed to get response from AI');
+                    }
+                } catch (error) {
+                    this.hideLoading();
+                    console.error('Gemini API Error:', error);
+                    this.showError(`Sorry, I encountered an error: ${error.message}. Please try again.`);
+                }
+            }
+
+            addMessage(text, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `gemini-message ${type}`;
+                
+                // Format the message text (basic markdown support)
+                let formattedText = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code style="background: #f1f3f4; padding: 2px 4px; border-radius: 3px;">$1</code>')
+                    .replace(/\n/g, '<br>');
+
+                messageDiv.innerHTML = formattedText;
+                
+                this.messagesContainer.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            showError(errorMessage) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'gemini-error';
+                errorDiv.textContent = errorMessage;
+                this.messagesContainer.appendChild(errorDiv);
+                this.scrollToBottom();
+            }
+
+            showLoading() {
+                this.loadingIndicator.classList.add('active');
+                this.scrollToBottom();
+            }
+
+            hideLoading() {
+                this.loadingIndicator.classList.remove('active');
+            }
+
+            scrollToBottom() {
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            }
+        }
+
+        // Quick Actions
+        function askQuickQuestion(question) {
+            document.getElementById('geminiInput').value = question;
+            if (window.geminiAssistant) {
+                window.geminiAssistant.sendMessage();
+            }
+        }
+
+        // Project Context Toggle
+        function toggleContext() {
+            const details = document.getElementById('contextDetails');
+            const icon = document.getElementById('contextIcon');
+            
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                details.classList.add('show');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Initialize Gemini Assistant when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            window.geminiAssistant = new GeminiProjectAssistant();
+        });
+    </script>
+</body>
+</html>
