@@ -23,7 +23,7 @@ public class SecurityConfig {
 				.requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/test-auth", "/debug-users", "/users-info").permitAll()
 				.requestMatchers("/contact").authenticated()
 				.requestMatchers("/profile", "/profile/**").authenticated()
-				.requestMatchers("/view-contacts", "/view-users", "/manage-scholarships").hasRole("ADMIN")
+				.requestMatchers("/view-contacts", "/view-users", "/manage-scholarships", "/manage-schemes").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.GET, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.PUT, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")

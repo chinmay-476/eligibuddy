@@ -24,7 +24,7 @@ Eligibuddy is a Spring Boot web application for discovering opportunities based 
 - Provides a public landing page with an eligibility form and results UI.
 - Lets users register, login, logout, and manage profile/password.
 - Restricts contact form usage to authenticated users.
-- Restricts admin pages (`/view-contacts`, `/view-users`, `/manage-scholarships`) to `ADMIN`.
+- Restricts admin pages (`/view-contacts`, `/view-users`, `/manage-scholarships`, `/manage-schemes`) to `ADMIN`.
 - Exposes REST APIs for scholarships, schemes, exams, jobs, and Gemini chat.
 - Seeds sample data at startup:
   - default users: `admin/admin123` and `user/user123`
@@ -58,6 +58,7 @@ Eligibility fields for opportunities are stored as JSON text (for example: quali
 
 - `frontend.html`: primary UI, eligibility form, results, filters, export/share actions, Gemini chat widget
 - `manage_scholarships.html`: admin scholarship management UI
+- `manage_schemes.html`: admin government scheme management UI
 - auth/templates for login, register, profile, contact, and admin views
 
 Important note: current eligibility matching in `frontend.html` is computed client-side from a large in-page JavaScript dataset, not from the REST database APIs.
@@ -116,6 +117,7 @@ demo/
 |   |   |   |   |-- view_contacts.html
 |   |   |   |   |-- view_users.html
 |   |   |   |   |-- manage_scholarships.html
+|   |   |   |   |-- manage_schemes.html
 |   |   |   |   |-- error.html
 |   |-- test/java/com/example/demo/
 |   |   |-- DemoApplicationTests.java
@@ -134,7 +136,7 @@ Configured in `src/main/java/com/example/demo/config/SecurityConfig.java`.
 
 - Public routes: `/`, `/login`, `/register`, static assets, debug routes, and all `/api/**` routes
 - Authenticated routes: `/contact`, `/profile/**`, and all unmatched routes
-- Admin-only routes: `/view-contacts`, `/view-users`, `/manage-scholarships`
+- Admin-only routes: `/view-contacts`, `/view-users`, `/manage-scholarships`, `/manage-schemes`
 - Form login page: `/login`
 - Password hashing: BCrypt
 

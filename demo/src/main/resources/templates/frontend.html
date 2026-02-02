@@ -1037,6 +1037,8 @@
                 <a th:if="${isAdmin}" href="/view-contacts" class="nav-link">View Contacts</a>
                 <!-- Show View Users only for admin users -->
                 <a th:if="${isAdmin}" href="/view-users" class="nav-link">View Users</a>
+                <a th:if="${isAdmin}" href="/manage-scholarships" class="nav-link">Manage Scholarships</a>
+                <a th:if="${isAdmin}" href="/manage-schemes" class="nav-link">Manage Schemes</a>
                 
                 <!-- Show login/register for anonymous users -->
                 <div th:if="${username == null}">

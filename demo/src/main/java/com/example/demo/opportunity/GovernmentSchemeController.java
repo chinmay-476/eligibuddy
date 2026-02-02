@@ -46,6 +46,12 @@ public class GovernmentSchemeController {
     
     @PostMapping
     public ResponseEntity<GovernmentScheme> createScheme(@RequestBody GovernmentScheme scheme) {
+        if (scheme.getName() == null || scheme.getName().trim().isEmpty()
+                || scheme.getType() == null || scheme.getType().trim().isEmpty()
+                || scheme.getBenefit() == null || scheme.getBenefit().trim().isEmpty()
+                || scheme.getDeadline() == null || scheme.getDeadline().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         scheme.setActive(true);
         GovernmentScheme savedScheme = schemeRepository.save(scheme);
         return ResponseEntity.ok(savedScheme);
@@ -55,6 +61,12 @@ public class GovernmentSchemeController {
     public ResponseEntity<GovernmentScheme> updateScheme(@PathVariable Long id, @RequestBody GovernmentScheme scheme) {
         if (!schemeRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
+        }
+        if (scheme.getName() == null || scheme.getName().trim().isEmpty()
+                || scheme.getType() == null || scheme.getType().trim().isEmpty()
+                || scheme.getBenefit() == null || scheme.getBenefit().trim().isEmpty()
+                || scheme.getDeadline() == null || scheme.getDeadline().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
         scheme.setId(id);
         GovernmentScheme updatedScheme = schemeRepository.save(scheme);
@@ -67,6 +79,18 @@ public class GovernmentSchemeController {
         if (schemeOpt.isPresent()) {
             GovernmentScheme scheme = schemeOpt.get();
             scheme.setActive(false);
+            GovernmentScheme updatedScheme = schemeRepository.save(scheme);
+            return ResponseEntity.ok(updatedScheme);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<GovernmentScheme> activateScheme(@PathVariable Long id) {
+        Optional<GovernmentScheme> schemeOpt = schemeRepository.findById(id);
+        if (schemeOpt.isPresent()) {
+            GovernmentScheme scheme = schemeOpt.get();
+            scheme.setActive(true);
             GovernmentScheme updatedScheme = schemeRepository.save(scheme);
             return ResponseEntity.ok(updatedScheme);
         }

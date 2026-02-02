@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Schemes - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .btn-action {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="admin-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-landmark me-2"></i>
+                        Manage Government Schemes
+                    </h2>
+                    <div>
+                        <span class="badge bg-primary me-2">Welcome, <span th:text="${username}">Admin</span></span>
+                        <a href="/manage-scholarships" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-graduation-cap me-1"></i>Scholarships
+                        </a>
+                        <a href="/" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                        <a href="/logout" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <button class="btn btn-success" onclick="showAddSchemeModal()">
+                        <i class="fas fa-plus me-2"></i>Add New Scheme
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Benefit</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="schemesTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="loadingSpinner" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="schemeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Add New Scheme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="schemeForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Scheme Name</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Type</label>
+                                <input type="text" class="form-control" id="type" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="benefit" class="form-label">Benefit</label>
+                                <input type="text" class="form-control" id="benefit" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="deadline" class="form-label">Deadline</label>
+                                <input type="text" class="form-control" id="deadline" placeholder="Ongoing or DD/MM/YYYY" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="qualificationCriteria" class="form-label">Qualifications (JSON array)</label>
+                                <input type="text" class="form-control" id="qualificationCriteria" placeholder='["12th","Graduate"]'>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="incomeCriteria" class="form-label">Income (JSON array)</label>
+                                <input type="text" class="form-control" id="incomeCriteria" placeholder='["0-100000","100000-250000"]'>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="categoryCriteria" class="form-label">Category (JSON array)</label>
+                                <input type="text" class="form-control" id="categoryCriteria" placeholder='["General","OBC","SC","ST"]'>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="fieldCriteria" class="form-label">Field (JSON array)</label>
+                                <input type="text" class="form-control" id="fieldCriteria" placeholder='["Engineering","Medical"]'>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="genderCriteria" class="form-label">Gender (JSON array)</label>
+                                <input type="text" class="form-control" id="genderCriteria" placeholder='["Female"]'>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="disabilityCriteria" class="form-label">Disability (JSON array)</label>
+                                <input type="text" class="form-control" id="disabilityCriteria" placeholder='["Yes"]'>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="minAge" class="form-label">Min Age</label>
+                                <input type="number" class="form-control" id="minAge">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="maxAge" class="form-label">Max Age</label>
+                                <input type="number" class="form-control" id="maxAge">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveScheme()">Save Scheme</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let currentSchemeId = null;
+    const schemeModal = new bootstrap.Modal(document.getElementById('schemeModal'));
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadSchemes();
+    });
+
+    async function loadSchemes() {
+        try {
+            const response = await fetch('/api/schemes');
+            const schemes = await response.json();
+            displaySchemes(schemes);
+        } catch (error) {
+            console.error('Error loading schemes:', error);
+            document.getElementById('schemesTableBody').innerHTML =
+                '<tr><td colspan="6" class="text-center text-danger">Error loading schemes</td></tr>';
+        } finally {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+    }
+
+    function displaySchemes(schemes) {
+        const tbody = document.getElementById('schemesTableBody');
+        tbody.innerHTML = '';
+
+        schemes.forEach(scheme => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${scheme.name}</td>
+                <td><span class="badge bg-info">${scheme.type}</span></td>
+                <td>${scheme.benefit}</td>
+                <td>${scheme.deadline}</td>
+                <td>
+                    <span class="badge ${scheme.active ? 'bg-success' : 'bg-danger'}">
+                        ${scheme.active ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary btn-action" onclick="editScheme(${scheme.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning btn-action" onclick="toggleScheme(${scheme.id}, ${scheme.active})">
+                        <i class="fas fa-${scheme.active ? 'pause' : 'play'}"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger btn-action" onclick="deleteScheme(${scheme.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function showAddSchemeModal() {
+        currentSchemeId = null;
+        document.getElementById('modalTitle').textContent = 'Add New Scheme';
+        document.getElementById('schemeForm').reset();
+        schemeModal.show();
+    }
+
+    function editScheme(id) {
+        currentSchemeId = id;
+        document.getElementById('modalTitle').textContent = 'Edit Scheme';
+
+        fetch(`/api/schemes/${id}`)
+            .then(response => response.json())
+            .then(scheme => {
+                document.getElementById('name').value = scheme.name;
+                document.getElementById('description').value = scheme.description || '';
+                document.getElementById('type').value = scheme.type;
+                document.getElementById('benefit').value = scheme.benefit;
+                document.getElementById('deadline').value = scheme.deadline;
+                document.getElementById('qualificationCriteria').value = scheme.qualificationCriteria || '';
+                document.getElementById('incomeCriteria').value = scheme.incomeCriteria || '';
+                document.getElementById('categoryCriteria').value = scheme.categoryCriteria || '';
+                document.getElementById('fieldCriteria').value = scheme.fieldCriteria || '';
+                document.getElementById('genderCriteria').value = scheme.genderCriteria || '';
+                document.getElementById('disabilityCriteria').value = scheme.disabilityCriteria || '';
+                document.getElementById('minAge').value = scheme.minAge || '';
+                document.getElementById('maxAge').value = scheme.maxAge || '';
+                schemeModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading scheme:', error);
+                alert('Error loading scheme data');
+            });
+    }
+
+    async function saveScheme() {
+        const formData = {
+            name: document.getElementById('name').value,
+            description: document.getElementById('description').value,
+            type: document.getElementById('type').value,
+            benefit: document.getElementById('benefit').value,
+            deadline: document.getElementById('deadline').value,
+            qualificationCriteria: document.getElementById('qualificationCriteria').value,
+            incomeCriteria: document.getElementById('incomeCriteria').value,
+            categoryCriteria: document.getElementById('categoryCriteria').value,
+            fieldCriteria: document.getElementById('fieldCriteria').value,
+            genderCriteria: document.getElementById('genderCriteria').value,
+            disabilityCriteria: document.getElementById('disabilityCriteria').value,
+            minAge: document.getElementById('minAge').value ? parseInt(document.getElementById('minAge').value) : null,
+            maxAge: document.getElementById('maxAge').value ? parseInt(document.getElementById('maxAge').value) : null,
+            active: true
+        };
+
+        try {
+            const url = currentSchemeId ? `/api/schemes/${currentSchemeId}` : '/api/schemes';
+            const method = currentSchemeId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                schemeModal.hide();
+                loadSchemes();
+                alert(currentSchemeId ? 'Scheme updated successfully!' : 'Scheme added successfully!');
+            } else {
+                alert('Failed to save scheme. Please check required fields.');
+            }
+        } catch (error) {
+            console.error('Error saving scheme:', error);
+            alert('Error saving scheme');
+        }
+    }
+
+    async function toggleScheme(id, currentStatus) {
+        try {
+            const endpoint = currentStatus ? 'deactivate' : 'activate';
+            const response = await fetch(`/api/schemes/${id}/${endpoint}`, {
+                method: 'PUT'
+            });
+
+            if (response.ok) {
+                loadSchemes();
+                alert(`Scheme ${currentStatus ? 'deactivated' : 'activated'} successfully!`);
+            } else {
+                throw new Error('Failed to toggle scheme status');
+            }
+        } catch (error) {
+            console.error('Error toggling scheme:', error);
+            alert('Error updating scheme status');
+        }
+    }
+
+    async function deleteScheme(id) {
+        if (confirm('Are you sure you want to delete this scheme?')) {
+            try {
+                const response = await fetch(`/api/schemes/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadSchemes();
+                    alert('Scheme deleted successfully!');
+                } else {
+                    throw new Error('Failed to delete scheme');
+                }
+            } catch (error) {
+                console.error('Error deleting scheme:', error);
+                alert('Error deleting scheme');
+            }
+        }
+    }
+</script>
+</body>
+</html>
