@@ -330,7 +330,8 @@
 
         async function toggleScholarship(id, currentStatus) {
             try {
-                const response = await fetch(`/api/scholarships/${id}/deactivate`, {
+                const endpoint = currentStatus ? 'deactivate' : 'activate';
+                const response = await fetch(`/api/scholarships/${id}/${endpoint}`, {
                     method: 'PUT'
                 });
                 

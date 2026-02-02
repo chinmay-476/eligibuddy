@@ -50,6 +50,15 @@ public class ScholarshipService {
             scholarshipRepository.save(s);
         }
     }
+
+    public void activateScholarship(Long id) {
+        Optional<Scholarship> scholarship = scholarshipRepository.findById(id);
+        if (scholarship.isPresent()) {
+            Scholarship s = scholarship.get();
+            s.setActive(true);
+            scholarshipRepository.save(s);
+        }
+    }
     
     public List<Scholarship> getScholarshipsByCriteria(String type, Integer minAmount) {
         return scholarshipRepository.findByCriteria(type, minAmount);

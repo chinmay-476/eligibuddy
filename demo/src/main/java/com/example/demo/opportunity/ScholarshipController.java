@@ -52,6 +52,12 @@ public class ScholarshipController {
     
     @PostMapping
     public ResponseEntity<Scholarship> createScholarship(@RequestBody Scholarship scholarship) {
+        if (scholarship.getName() == null || scholarship.getName().trim().isEmpty()
+                || scholarship.getType() == null || scholarship.getType().trim().isEmpty()
+                || scholarship.getAmount() == null || scholarship.getAmount().trim().isEmpty()
+                || scholarship.getDeadline() == null) {
+            return ResponseEntity.badRequest().build();
+        }
         Scholarship savedScholarship = scholarshipService.saveScholarship(scholarship);
         return ResponseEntity.ok(savedScholarship);
     }
@@ -60,6 +66,12 @@ public class ScholarshipController {
     public ResponseEntity<Scholarship> updateScholarship(@PathVariable Long id, @RequestBody Scholarship scholarship) {
         Optional<Scholarship> existingScholarship = scholarshipService.getScholarshipById(id);
         if (existingScholarship.isPresent()) {
+            if (scholarship.getName() == null || scholarship.getName().trim().isEmpty()
+                    || scholarship.getType() == null || scholarship.getType().trim().isEmpty()
+                    || scholarship.getAmount() == null || scholarship.getAmount().trim().isEmpty()
+                    || scholarship.getDeadline() == null) {
+                return ResponseEntity.badRequest().build();
+            }
             scholarship.setId(id);
             Scholarship updatedScholarship = scholarshipService.saveScholarship(scholarship);
             return ResponseEntity.ok(updatedScholarship);
@@ -75,7 +87,19 @@ public class ScholarshipController {
     
     @PutMapping("/{id}/deactivate")
     public ResponseEntity<Void> deactivateScholarship(@PathVariable Long id) {
+        if (scholarshipService.getScholarshipById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         scholarshipService.deactivateScholarship(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<Void> activateScholarship(@PathVariable Long id) {
+        if (scholarshipService.getScholarshipById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        scholarshipService.activateScholarship(id);
         return ResponseEntity.ok().build();
     }
 }

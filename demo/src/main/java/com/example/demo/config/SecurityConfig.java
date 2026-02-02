@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,7 +24,11 @@ public class SecurityConfig {
 				.requestMatchers("/contact").authenticated()
 				.requestMatchers("/profile", "/profile/**").authenticated()
 				.requestMatchers("/view-contacts", "/view-users", "/manage-scholarships").hasRole("ADMIN")
-				.requestMatchers("/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**", "/api/gemini/**").permitAll() // Allow public access to all APIs
+				.requestMatchers(HttpMethod.GET, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.PUT, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.DELETE, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")
+				.requestMatchers("/api/gemini/**").permitAll()
 				.anyRequest().authenticated() // Changed from permitAll() to authenticated()
 			)
 			.formLogin(form -> form
