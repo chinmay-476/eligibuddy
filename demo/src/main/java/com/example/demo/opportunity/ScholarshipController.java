@@ -18,10 +18,23 @@ public class ScholarshipController {
         List<Scholarship> scholarships = scholarshipService.getAllScholarships();
         return ResponseEntity.ok(scholarships);
     }
+
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<Scholarship>> getAllScholarshipsForAdmin() {
+        return ResponseEntity.ok(scholarshipService.getAllScholarshipsForAdmin());
+    }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<Scholarship> getScholarshipByIdForAdmin(@PathVariable Long id) {
+        return scholarshipService.getScholarshipById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
     
     @GetMapping("/{id}")
     public ResponseEntity<Scholarship> getScholarshipById(@PathVariable Long id) {
-        Optional<Scholarship> scholarship = scholarshipService.getScholarshipById(id);
+        Optional<Scholarship> scholarship = scholarshipService.getScholarshipById(id)
+                .filter(Scholarship::isActive);
         return scholarship.map(ResponseEntity::ok)
                         .orElse(ResponseEntity.notFound().build());
     }
@@ -52,12 +65,11 @@ public class ScholarshipController {
     
     @PostMapping
     public ResponseEntity<Scholarship> createScholarship(@RequestBody Scholarship scholarship) {
-        if (scholarship.getName() == null || scholarship.getName().trim().isEmpty()
-                || scholarship.getType() == null || scholarship.getType().trim().isEmpty()
-                || scholarship.getAmount() == null || scholarship.getAmount().trim().isEmpty()
-                || scholarship.getDeadline() == null) {
+        normalizeScholarship(scholarship);
+        if (isInvalidScholarship(scholarship)) {
             return ResponseEntity.badRequest().build();
         }
+        scholarship.setActive(true);
         Scholarship savedScholarship = scholarshipService.saveScholarship(scholarship);
         return ResponseEntity.ok(savedScholarship);
     }
@@ -66,13 +78,14 @@ public class ScholarshipController {
     public ResponseEntity<Scholarship> updateScholarship(@PathVariable Long id, @RequestBody Scholarship scholarship) {
         Optional<Scholarship> existingScholarship = scholarshipService.getScholarshipById(id);
         if (existingScholarship.isPresent()) {
-            if (scholarship.getName() == null || scholarship.getName().trim().isEmpty()
-                    || scholarship.getType() == null || scholarship.getType().trim().isEmpty()
-                    || scholarship.getAmount() == null || scholarship.getAmount().trim().isEmpty()
-                    || scholarship.getDeadline() == null) {
+            normalizeScholarship(scholarship);
+            if (isInvalidScholarship(scholarship)) {
                 return ResponseEntity.badRequest().build();
             }
+            Scholarship existing = existingScholarship.get();
             scholarship.setId(id);
+            scholarship.setActive(existing.isActive());
+            scholarship.setCreatedAt(existing.getCreatedAt());
             Scholarship updatedScholarship = scholarshipService.saveScholarship(scholarship);
             return ResponseEntity.ok(updatedScholarship);
         }
@@ -101,6 +114,43 @@ public class ScholarshipController {
         }
         scholarshipService.activateScholarship(id);
         return ResponseEntity.ok().build();
+    }
+
+    private void normalizeScholarship(Scholarship scholarship) {
+        if (scholarship == null) {
+            return;
+        }
+        scholarship.setName(trimToNull(scholarship.getName()));
+        scholarship.setDescription(trimToNull(scholarship.getDescription()));
+        scholarship.setType(trimToNull(scholarship.getType()));
+        scholarship.setAmount(trimToNull(scholarship.getAmount()));
+        scholarship.setQualificationCriteria(trimToNull(scholarship.getQualificationCriteria()));
+        scholarship.setIncomeCriteria(trimToNull(scholarship.getIncomeCriteria()));
+        scholarship.setCategoryCriteria(trimToNull(scholarship.getCategoryCriteria()));
+        scholarship.setFieldCriteria(trimToNull(scholarship.getFieldCriteria()));
+        scholarship.setGenderCriteria(trimToNull(scholarship.getGenderCriteria()));
+        scholarship.setStateCriteria(trimToNull(scholarship.getStateCriteria()));
+    }
+
+    private boolean isInvalidScholarship(Scholarship scholarship) {
+        return scholarship == null
+                || scholarship.getName() == null
+                || scholarship.getType() == null
+                || scholarship.getAmount() == null
+                || scholarship.getDeadline() == null
+                || hasInvalidAgeRange(scholarship.getMinAge(), scholarship.getMaxAge());
+    }
+
+    private boolean hasInvalidAgeRange(Integer minAge, Integer maxAge) {
+        return minAge != null && maxAge != null && minAge > maxAge;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
 

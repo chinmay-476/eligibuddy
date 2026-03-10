@@ -272,6 +272,52 @@ public class HelloController {
         }
         return "manage_schemes";
     }
+
+    @GetMapping("/manage-exams")
+    public String manageExams(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+            return "redirect:/login";
+        }
+
+        if (!userService.isAdmin(auth.getName())) {
+            return "redirect:/";
+        }
+
+        try {
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("isAdmin", true);
+        } catch (Exception e) {
+            model.addAttribute("error", "Error: " + e.getMessage());
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("isAdmin", true);
+        }
+        return "manage_exams";
+    }
+
+    @GetMapping("/manage-jobs")
+    public String manageJobs(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+            return "redirect:/login";
+        }
+
+        if (!userService.isAdmin(auth.getName())) {
+            return "redirect:/";
+        }
+
+        try {
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("isAdmin", true);
+        } catch (Exception e) {
+            model.addAttribute("error", "Error: " + e.getMessage());
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("isAdmin", true);
+        }
+        return "manage_jobs";
+    }
 }
 
 

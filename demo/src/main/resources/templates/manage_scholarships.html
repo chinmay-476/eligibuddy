@@ -54,6 +54,8 @@
                 <a href="/view-users" class="console-link">Users</a>
                 <a href="/manage-scholarships" class="console-link">Scholarships</a>
                 <a href="/manage-schemes" class="console-link">Schemes</a>
+                <a href="/manage-exams" class="console-link">Exams</a>
+                <a href="/manage-jobs" class="console-link">Jobs</a>
                 <span class="console-chip" th:text="${username}">Admin</span>
                 <form th:action="@{/logout}" method="post" style="margin:0;">
                     <button type="submit" class="console-button console-button-danger">
@@ -90,8 +92,14 @@
                     </div>
                 </section>
                 <section class="console-panel">
-                    <h3>Admin controls</h3>
-                    <p>Use the modal to maintain eligibility metadata. Records update directly through the secured scholarship API.</p>
+                    <h3>Switch manager</h3>
+                    <p>Move between scholarship, scheme, exam, and job administration without leaving the opportunity console.</p>
+                    <select class="console-select" onchange="if (this.value) { window.location.href = this.value; }" aria-label="Choose admin manager">
+                        <option value="/manage-scholarships" selected>Scholarships</option>
+                        <option value="/manage-schemes">Government schemes</option>
+                        <option value="/manage-exams">Competitive exams</option>
+                        <option value="/manage-jobs">Government jobs</option>
+                    </select>
                 </section>
             </div>
         </section>
@@ -244,6 +252,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let currentScholarshipId = null;
+        let currentScholarshipActive = true;
         const scholarshipModal = new bootstrap.Modal(document.getElementById('scholarshipModal'));
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -252,7 +261,7 @@
 
         async function loadScholarships() {
             try {
-                const response = await fetch('/api/scholarships');
+                const response = await fetch('/api/scholarships/admin/all');
                 const scholarships = await response.json();
                 displayScholarships(scholarships);
                 updateStats(scholarships);
@@ -300,6 +309,7 @@
 
         function showAddScholarshipModal() {
             currentScholarshipId = null;
+            currentScholarshipActive = true;
             document.getElementById('modalTitle').textContent = 'Add New Scholarship';
             document.getElementById('scholarshipForm').reset();
             scholarshipModal.show();
@@ -309,9 +319,10 @@
             currentScholarshipId = id;
             document.getElementById('modalTitle').textContent = 'Edit Scholarship';
 
-            fetch(`/api/scholarships/${id}`)
+            fetch(`/api/scholarships/admin/${id}`)
                 .then(response => response.json())
                 .then(scholarship => {
+                    currentScholarshipActive = scholarship.active;
                     document.getElementById('name').value = scholarship.name;
                     document.getElementById('description').value = scholarship.description;
                     document.getElementById('type').value = scholarship.type;
@@ -346,7 +357,7 @@
                 genderCriteria: document.getElementById('genderCriteria').value,
                 minAge: document.getElementById('minAge').value ? parseInt(document.getElementById('minAge').value) : null,
                 maxAge: document.getElementById('maxAge').value ? parseInt(document.getElementById('maxAge').value) : null,
-                active: true
+                active: currentScholarshipId ? currentScholarshipActive : true
             };
 
             try {

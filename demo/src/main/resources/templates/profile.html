@@ -23,6 +23,8 @@
                 <a th:if="${isAdmin}" href="/view-users" class="console-link">View Users</a>
                 <a th:if="${isAdmin}" href="/manage-scholarships" class="console-link">Scholarships</a>
                 <a th:if="${isAdmin}" href="/manage-schemes" class="console-link">Schemes</a>
+                <a th:if="${isAdmin}" href="/manage-exams" class="console-link">Exams</a>
+                <a th:if="${isAdmin}" href="/manage-jobs" class="console-link">Jobs</a>
                 <span class="console-chip" th:text="${username}">User</span>
                 <form th:action="@{/logout}" method="post" style="margin:0;">
                     <button type="submit" class="console-button console-button-danger">

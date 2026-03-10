@@ -15,13 +15,26 @@ public class CompetitiveExamController {
     
     @GetMapping
     public ResponseEntity<List<CompetitiveExam>> getAllExams() {
-        List<CompetitiveExam> exams = examRepository.findAll();
+        List<CompetitiveExam> exams = examRepository.findByActiveTrue();
         return ResponseEntity.ok(exams);
+    }
+
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<CompetitiveExam>> getAllExamsForAdmin() {
+        return ResponseEntity.ok(examRepository.findAll());
+    }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<CompetitiveExam> getExamByIdForAdmin(@PathVariable Long id) {
+        return examRepository.findById(id)
+                  .map(ResponseEntity::ok)
+                  .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<CompetitiveExam> getExamById(@PathVariable Long id) {
-        Optional<CompetitiveExam> exam = examRepository.findById(id);
+        Optional<CompetitiveExam> exam = examRepository.findById(id)
+                .filter(CompetitiveExam::isActive);
         return exam.map(ResponseEntity::ok)
                   .orElse(ResponseEntity.notFound().build());
     }
@@ -46,6 +59,10 @@ public class CompetitiveExamController {
     
     @PostMapping
     public ResponseEntity<CompetitiveExam> createExam(@RequestBody CompetitiveExam exam) {
+        normalizeExam(exam);
+        if (isInvalidExam(exam)) {
+            return ResponseEntity.badRequest().build();
+        }
         exam.setActive(true);
         CompetitiveExam savedExam = examRepository.save(exam);
         return ResponseEntity.ok(savedExam);
@@ -53,10 +70,18 @@ public class CompetitiveExamController {
     
     @PutMapping("/{id}")
     public ResponseEntity<CompetitiveExam> updateExam(@PathVariable Long id, @RequestBody CompetitiveExam exam) {
-        if (!examRepository.existsById(id)) {
+        Optional<CompetitiveExam> existingExam = examRepository.findById(id);
+        if (existingExam.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        normalizeExam(exam);
+        if (isInvalidExam(exam)) {
+            return ResponseEntity.badRequest().build();
+        }
+        CompetitiveExam existing = existingExam.get();
         exam.setId(id);
+        exam.setActive(existing.isActive());
+        exam.setCreatedAt(existing.getCreatedAt());
         CompetitiveExam updatedExam = examRepository.save(exam);
         return ResponseEntity.ok(updatedExam);
     }
@@ -72,6 +97,18 @@ public class CompetitiveExamController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<CompetitiveExam> activateExam(@PathVariable Long id) {
+        Optional<CompetitiveExam> examOpt = examRepository.findById(id);
+        if (examOpt.isPresent()) {
+            CompetitiveExam exam = examOpt.get();
+            exam.setActive(true);
+            CompetitiveExam updatedExam = examRepository.save(exam);
+            return ResponseEntity.ok(updatedExam);
+        }
+        return ResponseEntity.notFound().build();
+    }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExam(@PathVariable Long id) {
@@ -80,6 +117,42 @@ public class CompetitiveExamController {
         }
         examRepository.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    private void normalizeExam(CompetitiveExam exam) {
+        if (exam == null) {
+            return;
+        }
+        exam.setName(trimToNull(exam.getName()));
+        exam.setDescription(trimToNull(exam.getDescription()));
+        exam.setType(trimToNull(exam.getType()));
+        exam.setExamDate(trimToNull(exam.getExamDate()));
+        exam.setApplicationFee(trimToNull(exam.getApplicationFee()));
+        exam.setQualificationCriteria(trimToNull(exam.getQualificationCriteria()));
+        exam.setFieldCriteria(trimToNull(exam.getFieldCriteria()));
+        exam.setGenderCriteria(trimToNull(exam.getGenderCriteria()));
+        exam.setAgeRelaxationCriteria(trimToNull(exam.getAgeRelaxationCriteria()));
+    }
+
+    private boolean isInvalidExam(CompetitiveExam exam) {
+        return exam == null
+                || exam.getName() == null
+                || exam.getType() == null
+                || exam.getExamDate() == null
+                || exam.getApplicationFee() == null
+                || hasInvalidAgeRange(exam.getMinAge(), exam.getMaxAge());
+    }
+
+    private boolean hasInvalidAgeRange(Integer minAge, Integer maxAge) {
+        return minAge != null && maxAge != null && minAge > maxAge;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
 

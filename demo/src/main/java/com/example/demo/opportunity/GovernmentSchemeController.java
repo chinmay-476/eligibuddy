@@ -15,13 +15,26 @@ public class GovernmentSchemeController {
     
     @GetMapping
     public ResponseEntity<List<GovernmentScheme>> getAllSchemes() {
-        List<GovernmentScheme> schemes = schemeRepository.findAll();
+        List<GovernmentScheme> schemes = schemeRepository.findByActiveTrue();
         return ResponseEntity.ok(schemes);
+    }
+
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<GovernmentScheme>> getAllSchemesForAdmin() {
+        return ResponseEntity.ok(schemeRepository.findAll());
+    }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<GovernmentScheme> getSchemeByIdForAdmin(@PathVariable Long id) {
+        return schemeRepository.findById(id)
+                   .map(ResponseEntity::ok)
+                   .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<GovernmentScheme> getSchemeById(@PathVariable Long id) {
-        Optional<GovernmentScheme> scheme = schemeRepository.findById(id);
+        Optional<GovernmentScheme> scheme = schemeRepository.findById(id)
+                .filter(GovernmentScheme::isActive);
         return scheme.map(ResponseEntity::ok)
                    .orElse(ResponseEntity.notFound().build());
     }
@@ -46,10 +59,8 @@ public class GovernmentSchemeController {
     
     @PostMapping
     public ResponseEntity<GovernmentScheme> createScheme(@RequestBody GovernmentScheme scheme) {
-        if (scheme.getName() == null || scheme.getName().trim().isEmpty()
-                || scheme.getType() == null || scheme.getType().trim().isEmpty()
-                || scheme.getBenefit() == null || scheme.getBenefit().trim().isEmpty()
-                || scheme.getDeadline() == null || scheme.getDeadline().trim().isEmpty()) {
+        normalizeScheme(scheme);
+        if (isInvalidScheme(scheme)) {
             return ResponseEntity.badRequest().build();
         }
         scheme.setActive(true);
@@ -59,16 +70,18 @@ public class GovernmentSchemeController {
     
     @PutMapping("/{id}")
     public ResponseEntity<GovernmentScheme> updateScheme(@PathVariable Long id, @RequestBody GovernmentScheme scheme) {
-        if (!schemeRepository.existsById(id)) {
+        Optional<GovernmentScheme> existingScheme = schemeRepository.findById(id);
+        if (existingScheme.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        if (scheme.getName() == null || scheme.getName().trim().isEmpty()
-                || scheme.getType() == null || scheme.getType().trim().isEmpty()
-                || scheme.getBenefit() == null || scheme.getBenefit().trim().isEmpty()
-                || scheme.getDeadline() == null || scheme.getDeadline().trim().isEmpty()) {
+        normalizeScheme(scheme);
+        if (isInvalidScheme(scheme)) {
             return ResponseEntity.badRequest().build();
         }
+        GovernmentScheme existing = existingScheme.get();
         scheme.setId(id);
+        scheme.setActive(existing.isActive());
+        scheme.setCreatedAt(existing.getCreatedAt());
         GovernmentScheme updatedScheme = schemeRepository.save(scheme);
         return ResponseEntity.ok(updatedScheme);
     }
@@ -104,6 +117,45 @@ public class GovernmentSchemeController {
         }
         schemeRepository.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    private void normalizeScheme(GovernmentScheme scheme) {
+        if (scheme == null) {
+            return;
+        }
+        scheme.setName(trimToNull(scheme.getName()));
+        scheme.setDescription(trimToNull(scheme.getDescription()));
+        scheme.setType(trimToNull(scheme.getType()));
+        scheme.setBenefit(trimToNull(scheme.getBenefit()));
+        scheme.setDeadline(trimToNull(scheme.getDeadline()));
+        scheme.setQualificationCriteria(trimToNull(scheme.getQualificationCriteria()));
+        scheme.setIncomeCriteria(trimToNull(scheme.getIncomeCriteria()));
+        scheme.setCategoryCriteria(trimToNull(scheme.getCategoryCriteria()));
+        scheme.setFieldCriteria(trimToNull(scheme.getFieldCriteria()));
+        scheme.setGenderCriteria(trimToNull(scheme.getGenderCriteria()));
+        scheme.setStateCriteria(trimToNull(scheme.getStateCriteria()));
+        scheme.setDisabilityCriteria(trimToNull(scheme.getDisabilityCriteria()));
+    }
+
+    private boolean isInvalidScheme(GovernmentScheme scheme) {
+        return scheme == null
+                || scheme.getName() == null
+                || scheme.getType() == null
+                || scheme.getBenefit() == null
+                || scheme.getDeadline() == null
+                || hasInvalidAgeRange(scheme.getMinAge(), scheme.getMaxAge());
+    }
+
+    private boolean hasInvalidAgeRange(Integer minAge, Integer maxAge) {
+        return minAge != null && maxAge != null && minAge > maxAge;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
 

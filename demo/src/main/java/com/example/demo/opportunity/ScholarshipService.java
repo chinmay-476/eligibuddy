@@ -15,6 +15,10 @@ public class ScholarshipService {
     public List<Scholarship> getAllScholarships() {
         return scholarshipRepository.findByActiveTrue();
     }
+
+    public List<Scholarship> getAllScholarshipsForAdmin() {
+        return scholarshipRepository.findAll();
+    }
     
     public List<Scholarship> getScholarshipsByType(String type) {
         return scholarshipRepository.findByTypeAndActiveTrue(type);
