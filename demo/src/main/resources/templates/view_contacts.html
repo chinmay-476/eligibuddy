@@ -58,7 +58,7 @@
                 </section>
                 <section class="console-panel">
                     <h3>Admin note</h3>
-                    <p>Use the phone column for follow-up when email alone is not enough. The contact form now validates both values before saving.</p>
+                    <p>Reply inside the inbox so the response stays attached to the original contact record and is visible to the user later.</p>
                 </section>
             </div>
         </section>
@@ -71,6 +71,7 @@
                 </div>
             </div>
 
+            <div th:if="${message}" class="console-alert" style="background: rgba(23, 114, 69, 0.12); color: var(--console-success);" th:text="${message}"></div>
             <div th:if="${error}" class="console-alert console-alert-error" th:text="${error}"></div>
 
             <div th:if="${contacts == null or contacts.empty}" class="console-empty">
@@ -87,6 +88,7 @@
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Message</th>
+                            <th>Reply</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,7 +97,33 @@
                             <td th:text="${contact.name}">Name</td>
                             <td th:text="${contact.email}">email@example.com</td>
                             <td th:text="${contact.phoneNumber}">9876543210</td>
-                            <td th:text="${contact.message}">Message</td>
+                            <td>
+                                <div style="display:grid; gap:8px;">
+                                    <div th:text="${contact.message}">Message</div>
+                                    <small style="color: var(--console-muted);" th:if="${contact.submittedAt != null}" th:text="${'Submitted: ' + #temporals.format(contact.submittedAt, 'dd MMM yyyy HH:mm')}">Submitted time</small>
+                                    <small style="color: var(--console-muted);" th:if="${contact.submittedBy != null}" th:text="${'User: ' + contact.submittedBy}">User</small>
+                                </div>
+                            </td>
+                            <td style="min-width: 320px;">
+                                <div style="display:grid; gap:12px;">
+                                    <div th:if="${contact.adminReply != null and !#strings.isEmpty(contact.adminReply)}" style="padding:12px 14px; border-radius:16px; background: rgba(14, 107, 99, 0.08); border:1px solid rgba(14, 107, 99, 0.12);">
+                                        <strong style="display:block; margin-bottom:6px;">Current reply</strong>
+                                        <div th:text="${contact.adminReply}">Reply text</div>
+                                        <small style="display:block; margin-top:8px; color: var(--console-muted);" th:if="${contact.repliedAt != null}" th:text="${'By ' + contact.repliedBy + ' on ' + #temporals.format(contact.repliedAt, 'dd MMM yyyy HH:mm')}">Reply meta</small>
+                                    </div>
+
+                                    <form th:action="@{'/view-contacts/' + ${contact.id} + '/reply'}" method="post" class="console-form" style="display:grid; gap:10px;">
+                                        <label th:for="${'reply-' + contact.id}" style="margin:0;">Reply to user</label>
+                                        <textarea th:id="${'reply-' + contact.id}" name="replyMessage" maxlength="2000" placeholder="Write the admin response here..." th:text="${contact.adminReply}"></textarea>
+                                        <div class="console-form-actions">
+                                            <button type="submit" class="console-button">
+                                                <i class="fas fa-reply"></i>
+                                                <span th:text="${contact.adminReply != null and !#strings.isEmpty(contact.adminReply) ? 'Update Reply' : 'Send Reply'}">Send Reply</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Document(collection = "contacts")
 @Data
 @NoArgsConstructor
@@ -36,5 +38,15 @@ public class Contact {
     @NotBlank(message = "Message is required")
     @Size(min = 10, max = 1000, message = "Message must be between 10 and 1000 characters")
     private String message;
+
+    private String submittedBy;
+
+    private LocalDateTime submittedAt;
+
+    private String adminReply;
+
+    private String repliedBy;
+
+    private LocalDateTime repliedAt;
 }
 

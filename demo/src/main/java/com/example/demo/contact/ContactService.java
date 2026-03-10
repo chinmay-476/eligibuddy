@@ -1,8 +1,11 @@
 package com.example.demo.contact;
 
 import com.example.demo.config.MongoSequenceService;
+import org.springframework.lang.Nullable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,12 +23,19 @@ public class ContactService {
     }
     
     public List<Contact> getAllContacts() {
-        return contactRepository.findAll();
+        return contactRepository.findAllByOrderByIdDesc();
+    }
+
+    public List<Contact> getContactsForUser(@NonNull String username) {
+        return contactRepository.findBySubmittedByOrderByIdDesc(username);
     }
     
     public Contact saveContact(@NonNull Contact contact) {
         if (contact.getId() == null) {
             contact.setId(mongoSequenceService.generateSequence(CONTACT_SEQUENCE));
+        }
+        if (contact.getSubmittedAt() == null) {
+            contact.setSubmittedAt(LocalDateTime.now());
         }
         return contactRepository.save(contact);
     }
@@ -40,6 +50,21 @@ public class ContactService {
     
     public void deleteAllContacts() {
         contactRepository.deleteAll();
+    }
+
+    public Optional<Contact> saveAdminReply(@NonNull Long id, @Nullable String replyMessage, @NonNull String adminUsername) {
+        String normalizedReply = replyMessage == null ? null : replyMessage.trim();
+        if (normalizedReply == null || normalizedReply.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return contactRepository.findById(id)
+                .map(contact -> {
+                    contact.setAdminReply(normalizedReply);
+                    contact.setRepliedBy(adminUsername);
+                    contact.setRepliedAt(LocalDateTime.now());
+                    return contactRepository.save(contact);
+                });
     }
 } 
 
