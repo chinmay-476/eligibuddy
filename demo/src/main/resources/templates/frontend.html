@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal Eligibility Checker | Production System</title>
+    <title>Eligibuddy | Opportunity Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -1009,6 +1012,184 @@
             body {
                 background: white;
             }
+        }
+</style>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0e6b63 0%, #0a4744 100%);
+            --secondary-gradient: linear-gradient(135deg, #c97a48 0%, #8f4d2f 100%);
+            --success-gradient: linear-gradient(135deg, #1d8b5f 0%, #0e6b63 100%);
+            --warning-gradient: linear-gradient(135deg, #d89a34 0%, #b7791f 100%);
+            --danger-color: #b42318;
+            --info-color: #0e6b63;
+            --dark-color: #17212b;
+            --light-color: #f7f1e6;
+            --shadow-lg: 0 26px 60px rgba(23, 33, 43, 0.16);
+            --border-radius: 22px;
+        }
+
+        body {
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 14% 16%, rgba(201, 122, 72, 0.18), transparent 24%),
+                radial-gradient(circle at 86% 82%, rgba(14, 107, 99, 0.18), transparent 24%),
+                linear-gradient(150deg, #f6f2ea 0%, #eee5d7 100%);
+            color: var(--dark-color);
+        }
+
+        .navbar,
+        .hero-section,
+        .form-section,
+        .results-section {
+            border: 1px solid rgba(23, 33, 43, 0.08);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .navbar {
+            background: rgba(255, 251, 245, 0.82);
+        }
+
+        .logo,
+        .hero-content h1,
+        .results-title,
+        .form-header h2,
+        .category-title {
+            font-family: "Source Serif 4", Georgia, serif;
+        }
+
+        .logo {
+            background: linear-gradient(135deg, #0a4744 0%, #b66438 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .hero-section,
+        .form-section,
+        .results-section,
+        .stat-card,
+        .feature-card,
+        .advanced-options,
+        .category-section,
+        .opportunity-card {
+            background: rgba(255, 251, 245, 0.9);
+        }
+
+        .feature-card,
+        .stat-card,
+        .category-section,
+        .opportunity-card {
+            border: 1px solid rgba(23, 33, 43, 0.06);
+        }
+
+        .hero-content p,
+        .form-header p,
+        .feature-desc,
+        .stat-label,
+        .loading-subtext {
+            color: #5f6c79;
+        }
+
+        .feature-icon,
+        .stat-icon,
+        .category-icon {
+            color: #b66438;
+            background: none;
+            -webkit-text-fill-color: currentColor;
+        }
+
+        .features-grid .feature-card .feature-icon,
+        .results-stats .stat-card .stat-icon,
+        .gemini-fab {
+            font-size: 0;
+        }
+
+        .features-grid .feature-card .feature-icon::before,
+        .results-stats .stat-card .stat-icon::before,
+        .gemini-fab::before {
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 2rem;
+        }
+
+        .features-grid .feature-card:nth-child(1) .feature-icon::before,
+        .results-stats .stat-card:nth-child(1) .stat-icon::before {
+            content: "\f19d";
+        }
+
+        .features-grid .feature-card:nth-child(2) .feature-icon::before,
+        .results-stats .stat-card:nth-child(2) .stat-icon::before {
+            content: "\f66f";
+        }
+
+        .features-grid .feature-card:nth-child(3) .feature-icon::before,
+        .results-stats .stat-card:nth-child(3) .stat-icon::before {
+            content: "\f15c";
+        }
+
+        .features-grid .feature-card:nth-child(4) .feature-icon::before,
+        .results-stats .stat-card:nth-child(4) .stat-icon::before {
+            content: "\f0b1";
+        }
+
+        .gemini-fab::before {
+            content: "\f544";
+            font-size: 1.4rem;
+        }
+
+        .btn-primary,
+        .submit-btn,
+        .btn-white,
+        .gemini-send-btn,
+        .gemini-fab {
+            background: linear-gradient(135deg, #0e6b63 0%, #0a4744 100%);
+        }
+
+        .btn-white {
+            color: #0a4744;
+        }
+
+        .filter-btn::before,
+        .opportunity-badge,
+        .results-header,
+        .gemini-chat-header {
+            background: linear-gradient(135deg, #0e6b63 0%, #0a4744 100%);
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            border-color: #0e6b63;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .gemini-input-field:focus {
+            border-color: #0e6b63;
+            box-shadow: 0 0 0 3px rgba(14, 107, 99, 0.12);
+        }
+
+        .advanced-options:hover,
+        .opportunity-card:hover,
+        .category-section:hover {
+            border-color: rgba(14, 107, 99, 0.32);
+        }
+
+        .checkbox-item:hover {
+            background: #0e6b63;
+        }
+
+        .project-context-panel,
+        .gemini-chat-widget,
+        .gemini-message.ai {
+            background: rgba(255, 251, 245, 0.96);
+        }
+
+        .quick-action-btn {
+            border-color: #0e6b63;
+            color: #0e6b63;
+        }
+
+        .quick-action-btn:hover {
+            background: #0e6b63;
         }
     </style>
 </head>
@@ -3548,7 +3729,7 @@ const eligibilityDatabase = {
 
             // Add footer
             content += `${'='.repeat(50)}\n`;
-            content += `This report was generated by EligibilityHub\n`;
+            content += `This report was generated by Eligibuddy\n`;
             content += `For more information, visit our website or contact support.\n`;
             content += `\nDISCLAIMER: This report is for informational purposes only.\n`;
             content += `Please verify all details from official sources before applying.\n`;
@@ -3585,17 +3766,17 @@ const eligibilityDatabase = {
             const totalOpportunities = results.scholarships.length + results.schemes.length + 
                                      results.exams.length + results.jobs.length;
 
-            const shareText = `🎯 Found ${totalOpportunities} opportunities on EligibilityHub!\n\n` +
+            const shareText = `🎯 Found ${totalOpportunities} opportunities on Eligibuddy!\n\n` +
                             `📊 My Results:\n` +
                             `🎓 ${results.scholarships.length} Scholarships\n` +
                             `🏛️ ${results.schemes.length} Government Schemes\n` +
                             `📝 ${results.exams.length} Competitive Exams\n` +
                             `💼 ${results.jobs.length} Job Opportunities\n\n` +
-                            `Check your eligibility at EligibilityHub! #EligibilityCheck #Opportunities`;
+                            `Check your eligibility at Eligibuddy! #EligibilityCheck #Opportunities`;
 
             if (navigator.share) {
                 navigator.share({
-                    title: 'My Eligibility Results - EligibilityHub',
+                    title: 'My Eligibility Results - Eligibuddy',
                     text: shareText,
                     url: window.location.href
                 });
@@ -4349,6 +4530,21 @@ const eligibilityDatabase = {
 
         // Initialize Gemini Assistant when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            const chatTitle = document.querySelector('.gemini-chat-header h3');
+            if (chatTitle) {
+                chatTitle.innerHTML = '<i class="fas fa-robot"></i> Eligibuddy Assistant';
+            }
+
+            const contextDetails = document.getElementById('contextDetails');
+            if (contextDetails) {
+                contextDetails.innerHTML = '<strong>Eligibuddy platform</strong><br>Discover scholarships, schemes, exams, and government jobs through one eligibility-focused interface built with Spring Boot and an AI assistant.';
+            }
+
+            const introMessage = document.querySelector('#geminiMessages .gemini-message.ai');
+            if (introMessage) {
+                introMessage.textContent = "Hi. I can answer questions about Eligibuddy, explain features, and suggest improvements or implementation ideas.";
+            }
+
             window.geminiAssistant = new GeminiProjectAssistant();
         });
     </script>

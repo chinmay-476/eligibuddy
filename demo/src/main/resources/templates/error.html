@@ -3,100 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - Universal Eligibility Checker</title>
+    <title>Error | Eligibuddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/console-ui.css}">
     <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .error-shell {
+            width: min(840px, calc(100% - 32px));
+            margin: 48px auto;
+        }
+
+        .error-card {
+            border-radius: 34px;
+            overflow: hidden;
+            box-shadow: var(--console-shadow);
+            background: var(--console-surface);
+            border: 1px solid rgba(255, 255, 255, 0.46);
+            backdrop-filter: blur(16px);
+        }
+
+        .error-top {
+            padding: 44px 38px 26px;
+            background: linear-gradient(160deg, rgba(159, 47, 36, 0.95), rgba(180, 35, 24, 0.86));
+            color: #fff6f5;
+        }
+
+        .error-top h1 {
+            margin: 12px 0 6px;
+            font-family: "Source Serif 4", Georgia, serif;
+            font-size: clamp(2.4rem, 4vw, 4rem);
+            line-height: 0.98;
+        }
+
+        .error-top p {
             margin: 0;
+            color: rgba(255, 246, 245, 0.84);
+        }
+
+        .error-body {
+            padding: 32px 38px 38px;
+            display: grid;
+            gap: 24px;
+        }
+
+        .error-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .error-card-block {
             padding: 20px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.84);
+            border: 1px solid rgba(23, 33, 43, 0.08);
         }
-        .error-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 3rem;
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
+
+        .error-card-block span {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--console-muted);
+            font-size: 0.88rem;
         }
-        .error-icon {
-            font-size: 4rem;
-            color: #dc3545;
-            margin-bottom: 1rem;
+
+        .error-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        .error-code {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #dc3545;
-            margin-bottom: 0.5rem;
+
+        .error-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--console-muted);
         }
-        .error-message {
-            color: #666;
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
+
+        .error-list li + li {
+            margin-top: 8px;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        .suggestions {
-            margin-top: 2rem;
-            text-align: left;
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 10px;
-        }
-        .suggestions h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-        .suggestions ul {
-            color: #666;
-            line-height: 1.6;
+
+        @media (max-width: 720px) {
+            .error-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .error-top,
+            .error-body {
+                padding: 28px 22px;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="error-container">
-        <div class="error-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="error-code" th:text="${errorCode}">500</div>
-        <div class="error-message" th:text="${errorMessage}">Something went wrong</div>
-        
-        <a href="/" class="btn-primary">
-            <i class="fas fa-home me-2"></i>Go to Homepage
-        </a>
-        
-        <div class="suggestions">
-            <h3>What you can try:</h3>
-            <ul>
-                <li>Check if the database is running (MySQL)</li>
-                <li>Refresh the page</li>
-                <li>Clear your browser cache</li>
-                <li>Try accessing the application later</li>
-                <li>Contact support if the problem persists</li>
-            </ul>
-        </div>
-    </div>
+<body class="console-body">
+    <main class="error-shell">
+        <section class="error-card">
+            <div class="error-top">
+                <div class="console-banner-tag">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    Request error
+                </div>
+                <h1 th:text="${errorCode}">500</h1>
+                <p th:text="${errorMessage}">Something went wrong while loading the page.</p>
+            </div>
+
+            <div class="error-body">
+                <div class="error-grid">
+                    <div class="error-card-block">
+                        <span>What happened</span>
+                        <strong>The application could not complete the requested page load.</strong>
+                    </div>
+                    <div class="error-card-block">
+                        <span>Suggested first move</span>
+                        <strong>Return home, then retry the action once.</strong>
+                    </div>
+                </div>
+
+                <div class="error-card-block">
+                    <span>What you can try</span>
+                    <ul class="error-list">
+                        <li>Refresh the page once to rule out a stale request.</li>
+                        <li>Check whether the backing database or local server is available.</li>
+                        <li>Return to the home page and re-enter the flow from the start.</li>
+                        <li>Use the contact form or admin tools only after logging in again if the session expired.</li>
+                    </ul>
+                </div>
+
+                <div class="error-actions">
+                    <a href="/" class="console-button">
+                        <i class="fas fa-house"></i>
+                        Go to home
+                    </a>
+                    <a href="/login" class="console-button-outline">
+                        <i class="fas fa-arrow-right-to-bracket"></i>
+                        Login
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
 </body>
-</html> 
+</html>

@@ -3,206 +3,443 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Form</title>
+    <title>Contact | Eligibuddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Source+Serif+4:wght@600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            min-height: 100vh;
+        :root {
+            --canvas: #f2efe8;
+            --ink: #18212b;
+            --muted: #5f6c79;
+            --line: rgba(24, 33, 43, 0.12);
+            --accent: #0b6e4f;
+            --accent-deep: #084c3d;
+            --warm: #c06c4d;
+            --paper: rgba(255, 252, 246, 0.92);
+            --shadow: 0 28px 64px rgba(24, 33, 43, 0.16);
         }
-        .form-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 100px auto 50px;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="text"], input[type="email"], textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+
+        * {
             box-sizing: border-box;
         }
-        textarea {
-            height: 100px;
-            resize: vertical;
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(11, 110, 79, 0.18), transparent 25%),
+                radial-gradient(circle at bottom right, rgba(192, 108, 77, 0.2), transparent 22%),
+                linear-gradient(150deg, #f6f3ec 0%, #eee7dc 100%);
         }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+
         .navbar {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px);
-            padding: 1rem 0;
-            position: fixed;
+            position: sticky;
             top: 0;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            z-index: 10;
+            backdrop-filter: blur(18px);
+            background: rgba(255, 251, 245, 0.78);
+            border-bottom: 1px solid rgba(24, 33, 43, 0.08);
         }
+
         .nav-content {
-            max-width: 1400px;
+            width: min(1200px, calc(100% - 32px));
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 2rem;
+            gap: 20px;
+            padding: 18px 0;
         }
+
         .logo {
-            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.25rem;
+            color: var(--ink);
         }
+
+        .logo i {
+            color: var(--accent);
+        }
+
         .nav-links {
             display: flex;
-            gap: 2rem;
             align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
-        .nav-link {
-            color: #343a40;
+
+        .nav-link,
+        .btn-link {
             text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            color: var(--ink);
+            padding: 10px 14px;
+            border-radius: 999px;
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
-        .nav-link:hover {
-            background: #f8f9fa;
-            color: #667eea;
+
+        .nav-link:hover,
+        .btn-link:hover {
+            background: rgba(11, 110, 79, 0.08);
+            transform: translateY(-1px);
         }
+
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border: 0;
+            padding: 11px 16px;
+            border-radius: 999px;
+            font: inherit;
+            font-weight: 700;
+            color: #f5fbf7;
+            background: linear-gradient(135deg, var(--accent), var(--accent-deep));
             text-decoration: none;
-            display: inline-block;
+            cursor: pointer;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+
+        .page {
+            width: min(1200px, calc(100% - 32px));
+            margin: 32px auto 56px;
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 24px;
+            align-items: start;
         }
-        .d-flex {
-            display: flex;
+
+        .story,
+        .form-panel {
+            border-radius: 32px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
-        .align-items-center {
+
+        .story {
+            padding: 42px 34px;
+            background:
+                linear-gradient(165deg, rgba(8, 76, 61, 0.96), rgba(11, 110, 79, 0.88));
+            color: #f3fbf7;
+            position: relative;
+        }
+
+        .story::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.08);
+            transform: rotate(15deg);
+            right: -28px;
+            bottom: -34px;
+        }
+
+        .story .tag {
+            display: inline-flex;
             align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        .message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            text-align: center;
+
+        .story h1 {
+            margin: 20px 0 14px;
+            font-family: "Source Serif 4", Georgia, serif;
+            font-size: clamp(2.3rem, 4vw, 3.8rem);
+            line-height: 1;
         }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+        .story p {
+            margin: 0 0 26px;
+            color: rgba(243, 251, 247, 0.84);
         }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .story-list {
+            display: grid;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .story-item {
+            padding: 16px 18px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .story-item strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .form-panel {
+            background: var(--paper);
+            padding: 36px;
+            border: 1px solid rgba(255, 255, 255, 0.52);
+            backdrop-filter: blur(18px);
+        }
+
+        .form-panel h2 {
+            margin: 0 0 8px;
+            font-size: 2rem;
+        }
+
+        .form-panel p {
+            margin: 0 0 22px;
+            color: var(--muted);
+        }
+
+        .notice {
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            border: 1px solid transparent;
+            font-size: 0.95rem;
+        }
+
+        .notice-success {
+            background: rgba(11, 110, 79, 0.11);
+            color: #0a5641;
+            border-color: rgba(11, 110, 79, 0.18);
+        }
+
+        .notice-error {
+            background: rgba(185, 28, 28, 0.09);
+            color: #8c1d1d;
+            border-color: rgba(185, 28, 28, 0.14);
+        }
+
+        form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 0.94rem;
+            font-weight: 600;
+        }
+
+        .input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 16px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.94);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .input-wrap:focus-within {
+            border-color: rgba(11, 110, 79, 0.46);
+            box-shadow: 0 0 0 4px rgba(11, 110, 79, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-wrap i {
+            color: var(--warm);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 0;
+            outline: none;
+            background: transparent;
+            font: inherit;
+            color: var(--ink);
+        }
+
+        input {
+            padding: 16px 0;
+        }
+
+        textarea {
+            min-height: 160px;
+            resize: vertical;
+            padding: 16px 0;
+        }
+
+        .helper {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .submit {
+            border: 0;
+            border-radius: 18px;
+            padding: 16px 18px;
+            font: inherit;
+            font-weight: 700;
+            color: #f5fbf7;
+            background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 36px rgba(11, 110, 79, 0.22);
+        }
+
+        @media (max-width: 980px) {
+            .page {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-content {
+                width: calc(100% - 24px);
+            }
+
+            .page {
+                width: calc(100% - 24px);
+                margin-top: 18px;
+            }
+
+            .form-panel {
+                padding: 26px 20px;
+            }
+
+            .story {
+                padding: 32px 22px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-content">
-            <div class="logo">🔍 EligibilityHub</div>
+            <div class="logo">
+                <i class="fas fa-compass"></i>
+                <span>Eligibuddy</span>
+            </div>
             <div class="nav-links">
                 <a href="/" class="nav-link">Home</a>
-                <!-- Show Contact Form only for non-admin users -->
-                <a th:if="${!isAdmin}" href="/contact" class="nav-link">Contact Form</a>
-                <!-- Show View Contacts only for admin users -->
+                <a th:if="${!isAdmin}" href="/contact" class="nav-link">Contact</a>
                 <a th:if="${isAdmin}" href="/view-contacts" class="nav-link">View Contacts</a>
-                <!-- Show View Users only for admin users -->
                 <a th:if="${isAdmin}" href="/view-users" class="nav-link">View Users</a>
-                
-                <!-- Show login/register for anonymous users -->
-                <div th:if="${username == null}">
-                    <a href="/login" class="nav-link">Login</a>
+
+                <div th:if="${username == null}" style="display:flex; gap:10px; align-items:center;">
+                    <a href="/login" class="btn-link">Login</a>
                     <a href="/register" class="btn-primary">Register</a>
                 </div>
-                
-                <!-- Show user info and logout for authenticated users -->
-                <div th:if="${username != null}" class="d-flex align-items-center">
-                    <span class="nav-link" style="margin-right: 1rem;">
-                        <i class="fas fa-user me-2"></i>
-                        <span th:text="${username}">User</span>
-                    </span>
-                    <form th:action="@{/logout}" method="post" style="margin: 0;">
-                        <button type="submit" class="btn-primary" style="background: #dc3545; border: none;">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </button>
+
+                <div th:if="${username != null}" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <a href="/profile" class="nav-link" th:text="${username}">User</a>
+                    <form th:action="@{/logout}" method="post" style="margin:0;">
+                        <button type="submit" class="btn-primary">Logout</button>
                     </form>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="form-container">
-        <h1>Contact Us</h1>
-        
-        <div th:if="${message}" class="message success" th:text="${message}"></div>
-        <div th:if="${error}" class="message error" th:text="${error}"></div>
-        
-        <form method="POST" action="/contact">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
+    <main class="page">
+        <section class="story">
+            <div class="tag">
+                <i class="fas fa-headset"></i>
+                Reach support
             </div>
-            
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+            <h1>Send a message that can actually be actioned.</h1>
+            <p>Use a valid email and mobile number so the team can respond without guesswork. The form rejects malformed inputs on both the client and server side.</p>
+            <div class="story-list">
+                <div class="story-item">
+                    <strong>Email validation</strong>
+                    Invalid mailbox formats are rejected before the record is saved.
+                </div>
+                <div class="story-item">
+                    <strong>Phone validation</strong>
+                    The contact flow now accepts only valid 10-digit mobile numbers.
+                </div>
+                <div class="story-item">
+                    <strong>Cleaner admin data</strong>
+                    Submitted contacts include phone number details for follow-up.
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label for="message">Message:</label>
-                <textarea id="message" name="message" required></textarea>
-            </div>
-            
-            <button type="submit">Send Message</button>
-        </form>
-    </div>
+        </section>
+
+        <section class="form-panel">
+            <h2>Contact support</h2>
+            <p>Share your issue, request, or feedback. A valid mobile number is now required for follow-up.</p>
+
+            <div th:if="${message}" class="notice notice-success" th:text="${message}"></div>
+            <div th:if="${error}" class="notice notice-error" th:text="${error}"></div>
+
+            <form th:action="@{/contact}" th:object="${contact}" method="post">
+                <div class="grid">
+                    <div class="field">
+                        <label for="name">Full name</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="name" th:field="*{name}" pattern="[A-Za-z][A-Za-z\s.'-]{1,49}" title="Use letters, spaces, apostrophes, periods, or hyphens." required>
+                        </div>
+                        <span class="helper">Use your actual name so the admin can identify the request.</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="phoneNumber">Phone number</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" pattern="[6-9][0-9]{9}" inputmode="numeric" maxlength="10" title="Enter a valid 10-digit mobile number." required>
+                        </div>
+                        <span class="helper">Indian 10-digit mobile number format only.</span>
+                    </div>
+
+                    <div class="field full">
+                        <label for="email">Email address</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" th:field="*{email}" pattern="[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" title="Enter a valid email address." required>
+                        </div>
+                    </div>
+
+                    <div class="field full">
+                        <label for="message">Message</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-comment-dots" style="align-self:flex-start; padding-top:18px;"></i>
+                            <textarea id="message" th:field="*{message}" minlength="10" maxlength="1000" required></textarea>
+                        </div>
+                        <span class="helper">Keep it between 10 and 1000 characters.</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit">
+                    <i class="fas fa-paper-plane"></i>
+                    Send message
+                </button>
+            </form>
+        </section>
+    </main>
 </body>
-</html> 
+</html>

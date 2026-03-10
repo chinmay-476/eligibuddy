@@ -3,6 +3,7 @@ package com.example.demo.web;
 import com.example.demo.auth.UserService;
 import com.example.demo.contact.Contact;
 import com.example.demo.contact.ContactService;
+import com.example.demo.validation.InputValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;        
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,11 +54,14 @@ public class HelloController {
             model.addAttribute("username", null);
             model.addAttribute("isAdmin", false);
         }
+        if (!model.containsAttribute("contact")) {
+            model.addAttribute("contact", new Contact());
+        }
         return "contact";
     }
     
     @PostMapping("/contact")
-    public String saveContact(@ModelAttribute Contact contact, Model model) {
+    public String saveContact(@ModelAttribute("contact") Contact contact, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
@@ -66,37 +70,88 @@ public class HelloController {
         
         try {
             // Validate contact data
-            if (contact == null || contact.getName() == null || contact.getName().trim().isEmpty()) {
+            if (contact == null) {
+                model.addAttribute("error", "Contact details are required!");
+                model.addAttribute("username", auth.getName());
+                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", new Contact());
+                return "contact";
+            }
+
+            contact.setName(contact.getName() == null ? null : contact.getName().trim());
+            contact.setEmail(contact.getEmail() == null ? null : contact.getEmail().trim());
+            contact.setPhoneNumber(contact.getPhoneNumber() == null ? null : contact.getPhoneNumber().trim());
+            contact.setMessage(contact.getMessage() == null ? null : contact.getMessage().trim());
+
+            if (contact.getName() == null || contact.getName().isEmpty()) {
                 model.addAttribute("error", "Name is required!");
                 model.addAttribute("username", auth.getName());
                 model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
                 return "contact";
             }
             
-            if (contact.getEmail() == null || contact.getEmail().trim().isEmpty()) {
+            if (!InputValidationUtils.isValidName(contact.getName())) {
+                model.addAttribute("error", "Please enter a valid name.");
+                model.addAttribute("username", auth.getName());
+                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
+                return "contact";
+            }
+
+            if (contact.getEmail() == null || contact.getEmail().isEmpty()) {
                 model.addAttribute("error", "Email is required!");
                 model.addAttribute("username", auth.getName());
                 model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
+                return "contact";
+            }
+
+            if (!InputValidationUtils.isValidEmail(contact.getEmail())) {
+                model.addAttribute("error", "Please enter a valid email address.");
+                model.addAttribute("username", auth.getName());
+                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
+                return "contact";
+            }
+
+            if (contact.getPhoneNumber() == null || contact.getPhoneNumber().isEmpty()) {
+                model.addAttribute("error", "Phone number is required!");
+                model.addAttribute("username", auth.getName());
+                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
+                return "contact";
+            }
+
+            if (!InputValidationUtils.isValidPhoneNumber(contact.getPhoneNumber())) {
+                model.addAttribute("error", "Please enter a valid 10-digit mobile number.");
+                model.addAttribute("username", auth.getName());
+                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
                 return "contact";
             }
             
-            if (contact.getMessage() == null || contact.getMessage().trim().isEmpty()) {
+            if (contact.getMessage() == null || contact.getMessage().isEmpty()) {
                 model.addAttribute("error", "Message is required!");
                 model.addAttribute("username", auth.getName());
                 model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
                 return "contact";
             }
-            
-            // Trim whitespace
-            contact.setName(contact.getName().trim());
-            contact.setEmail(contact.getEmail().trim());
-            contact.setMessage(contact.getMessage().trim());
-            
+
+            if (contact.getMessage().length() < 10 || contact.getMessage().length() > 1000) {
+                model.addAttribute("error", "Message must be between 10 and 1000 characters.");
+                model.addAttribute("username", auth.getName());
+                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                model.addAttribute("contact", contact);
+                return "contact";
+            }
+
             contactService.saveContact(contact);
             model.addAttribute("message", "Message sent successfully!");
-            
             model.addAttribute("username", auth.getName());
             model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+            model.addAttribute("contact", new Contact());
             return "contact";
         } catch (Exception e) {
             System.err.println("Error saving contact: " + e.getMessage());
@@ -105,6 +160,7 @@ public class HelloController {
             
             model.addAttribute("username", auth.getName());
             model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+            model.addAttribute("contact", contact);
             return "contact";
         }
     }

@@ -1,5 +1,6 @@
 package com.example.demo.auth;
 
+import com.example.demo.validation.InputValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,15 +36,30 @@ public class AuthController {
                               @RequestParam String password,
                               @RequestParam String confirmPassword,
                               Model model) {
+
+        username = username == null ? null : username.trim();
+        email = email == null ? null : email.trim();
+        model.addAttribute("usernameValue", username == null ? "" : username);
+        model.addAttribute("emailValue", email == null ? "" : email);
         
         // Validate input
-        if (username == null || username.trim().isEmpty()) {
+        if (username == null || username.isEmpty()) {
             model.addAttribute("error", "Username is required!");
             return "register";
         }
+
+        if (!InputValidationUtils.isValidUsername(username)) {
+            model.addAttribute("error", "Username must start with a letter and be 3-20 characters using letters, numbers, or underscores.");
+            return "register";
+        }
         
-        if (email == null || email.trim().isEmpty()) {
+        if (email == null || email.isEmpty()) {
             model.addAttribute("error", "Email is required!");
+            return "register";
+        }
+
+        if (!InputValidationUtils.isValidEmail(email)) {
+            model.addAttribute("error", "Please enter a valid email address.");
             return "register";
         }
         
@@ -57,12 +73,12 @@ public class AuthController {
             return "register";
         }
         
-        if (password.length() < 6) {
-            model.addAttribute("error", "Password must be at least 6 characters long!");
+        if (!InputValidationUtils.isValidPassword(password)) {
+            model.addAttribute("error", "Password must be 8-64 characters and include uppercase, lowercase, and a number.");
             return "register";
         }
         
-        if (userService.registerUser(username.trim(), email.trim(), password)) {
+        if (userService.registerUser(username, email, password)) {
             model.addAttribute("success", "Registration successful! Please login with your credentials.");
             return "login";
         } else {
@@ -144,18 +160,31 @@ public class AuthController {
         }
         
         String currentUsername = auth.getName();
-        
-        if (userService.updateUserProfile(currentUsername, email, newUsername)) {
+        String trimmedEmail = email == null ? null : email.trim();
+        String trimmedUsername = newUsername == null ? null : newUsername.trim();
+
+        if (!InputValidationUtils.isValidUsername(trimmedUsername)) {
+            model.addAttribute("error", "Username must start with a letter and be 3-20 characters using letters, numbers, or underscores.");
+        } else if (!InputValidationUtils.isValidEmail(trimmedEmail)) {
+            model.addAttribute("error", "Please enter a valid email address.");
+        } else if (userService.updateUserProfile(currentUsername, trimmedEmail, trimmedUsername)) {
             model.addAttribute("success", "Profile updated successfully!");
         } else {
             model.addAttribute("error", "Failed to update profile. Username or email may already exist.");
         }
         
-        User user = userService.getUserByUsername(newUsername);
+        User user = userService.getUserByUsername(trimmedUsername);
         if (user != null) {
             model.addAttribute("user", user);
             model.addAttribute("username", user.getUsername());
             model.addAttribute("isAdmin", userService.isAdmin(user.getUsername()));
+        } else {
+            user = userService.getUserByUsername(currentUsername);
+            if (user != null) {
+                model.addAttribute("user", user);
+                model.addAttribute("username", user.getUsername());
+                model.addAttribute("isAdmin", userService.isAdmin(user.getUsername()));
+            }
         }
         
         return "profile";
@@ -176,8 +205,8 @@ public class AuthController {
         // Validate new password
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("error", "New passwords do not match!");
-        } else if (newPassword.length() < 6) {
-            model.addAttribute("error", "Password must be at least 6 characters long!");
+        } else if (!InputValidationUtils.isValidPassword(newPassword)) {
+            model.addAttribute("error", "Password must be 8-64 characters and include uppercase, lowercase, and a number.");
         } else if (userService.changePassword(username, currentPassword, newPassword)) {
             model.addAttribute("success", "Password changed successfully!");
         } else {

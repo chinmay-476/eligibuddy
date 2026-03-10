@@ -1,3 +1,14 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-17",
+            "path": "C:\\Users\\chinm\\.jdk\\jdk-17.0.16",
+            "default": true
+        }
+    ],
+    "terminal.integrated.env.windows": {
+        "JAVA_HOME": "C:\\Users\\chinm\\.jdk\\jdk-17.0.16",
+        "Path": "C:\\Users\\chinm\\.jdk\\jdk-17.0.16\\bin;${env:Path}"
+    }
 }
