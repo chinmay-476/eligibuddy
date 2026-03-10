@@ -430,6 +430,10 @@ function preloadEligibilityDatabase() {
                                 <i class="fas fa-users"></i>
                                 <span>${item.vacancies || 'Multiple'} positions</span>
                             </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Apply by: ${item.applicationDeadline || 'Date TBA'}</span>
+                            </div>
                         `;
                         break;
                     default:
@@ -562,6 +566,7 @@ function preloadEligibilityDatabase() {
                     return `
                         <p><strong>Salary:</strong> ${item.salary || 'Not specified'}</p>
                         <p><strong>Vacancies:</strong> ${item.vacancies || 'Multiple'}</p>
+                        <p><strong>Application Deadline:</strong> ${item.applicationDeadline || 'To be announced'}</p>
                         <p><strong>Type:</strong> ${item.type || 'Government'}</p>
                     `;
                 default:
@@ -639,6 +644,7 @@ function preloadEligibilityDatabase() {
                             case 'jobs':
                                 if (item.salary) content += `   Salary: ${item.salary}\n`;
                                 if (item.vacancies) content += `   Vacancies: ${item.vacancies}\n`;
+                                if (item.applicationDeadline) content += `   Application Deadline: ${item.applicationDeadline}\n`;
                                 break;
                         }
                         content += `\n`;

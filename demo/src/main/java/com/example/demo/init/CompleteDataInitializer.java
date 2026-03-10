@@ -48,89 +48,89 @@ public class CompleteDataInitializer implements CommandLineRunner {
     private void initializeScholarships() {
         // Merit-based Scholarships
         createScholarship("National Merit Scholarship", "For students with excellent academic performance across India", 
-            "Merit-based", "₹50,000 per year", LocalDate.of(2024, 3, 31),
+            "Merit-based", "₹50,000 per year", LocalDate.of(2026, 3, 31),
             "[\"12th\", \"Graduate\", \"Post Graduate\"]", "[\"0-100000\", \"100000-250000\"]", 
             "[\"General\", \"OBC\", \"SC\", \"ST\", \"EWS\"]", null, null, null, null, null);
             
         createScholarship("Inspire Scholarship (KVPY)", "Kishore Vaigyanik Protsahan Yojana for science students", 
-            "Merit-based", "₹5,000-7,000 per month", LocalDate.of(2024, 9, 15),
+            "Merit-based", "₹5,000-7,000 per month", LocalDate.of(2026, 9, 15),
             "[\"12th\", \"Graduate\"]", null, null, "[\"Science\", \"Engineering\", \"Medical\"]", null, null, 16, 25);
             
         createScholarship("Central Sector Scholarship", "Merit-based scholarship for college and university students", 
-            "Merit-based", "₹10,000-20,000 per year", LocalDate.of(2024, 10, 31),
+            "Merit-based", "₹10,000-20,000 per year", LocalDate.of(2026, 10, 31),
             "[\"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\", \"250000-500000\"]", 
             "[\"General\", \"OBC\", \"SC\", \"ST\", \"EWS\"]", null, null, null, null, null);
             
         // Category-based Scholarships
         createScholarship("SC/ST Excellence Scholarship", "Promoting higher education among SC/ST students", 
-            "Category-based", "₹75,000 per year", LocalDate.of(2024, 5, 30),
+            "Category-based", "₹75,000 per year", LocalDate.of(2026, 5, 30),
             "[\"10th\", \"12th\", \"Graduate\", \"Post Graduate\"]", "[\"0-100000\", \"100000-250000\", \"250000-500000\"]", 
             "[\"SC\", \"ST\"]", null, null, null, null, null);
             
         createScholarship("OBC Merit Scholarship", "Financial assistance for Other Backward Class students", 
-            "Category-based", "₹35,000 per year", LocalDate.of(2024, 6, 30),
+            "Category-based", "₹35,000 per year", LocalDate.of(2026, 6, 30),
             "[\"12th\", \"Graduate\", \"Post Graduate\"]", "[\"0-100000\", \"100000-250000\"]", "[\"OBC\"]", null, null, null, null, null);
             
         createScholarship("EWS Scholarship Scheme", "Support for Economically Weaker Section students", 
-            "Category-based", "₹40,000 per year", LocalDate.of(2024, 7, 15),
+            "Category-based", "₹40,000 per year", LocalDate.of(2026, 7, 15),
             "[\"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\", \"250000-500000\"]", "[\"EWS\"]", null, null, null, null, null);
             
         // Gender-based Scholarships
         createScholarship("Girl Child Education Fund", "Empowering girls through education funding", 
-            "Gender-based", "₹40,000 per year", LocalDate.of(2024, 6, 15),
+            "Gender-based", "₹40,000 per year", LocalDate.of(2026, 6, 15),
             "[\"10th\", \"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\"]", null, null, "[\"Female\"]", null, null, null);
             
         createScholarship("Women in STEM Scholarship", "Encouraging women to pursue science and technology", 
-            "Gender-based", "₹1,25,000 per year", LocalDate.of(2024, 4, 30),
+            "Gender-based", "₹1,25,000 per year", LocalDate.of(2026, 4, 30),
             "[\"12th\", \"Graduate\", \"Post Graduate\"]", null, null, "[\"Science\", \"Engineering\", \"Medical\"]", "[\"Female\"]", null, 17, 30);
             
         // Field-specific Scholarships
         createScholarship("Engineering Excellence Award", "For aspiring engineers with outstanding potential", 
-            "Field-specific", "₹1,00,000 per year", LocalDate.of(2024, 7, 31),
+            "Field-specific", "₹1,00,000 per year", LocalDate.of(2026, 7, 31),
             "[\"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\", \"250000-500000\"]", null, "[\"Engineering\"]", null, null, null, null);
             
         createScholarship("Medical Student Support Scheme", "Supporting future doctors and healthcare professionals", 
-            "Field-specific", "₹1,50,000 per year", LocalDate.of(2024, 8, 15),
+            "Field-specific", "₹1,50,000 per year", LocalDate.of(2026, 8, 15),
             "[\"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\"]", null, "[\"Medical\"]", null, null, null, null);
             
         createScholarship("Arts and Culture Scholarship", "Promoting arts, literature, and cultural studies", 
-            "Field-specific", "₹30,000 per year", LocalDate.of(2024, 9, 30),
+            "Field-specific", "₹30,000 per year", LocalDate.of(2026, 9, 30),
             "[\"12th\", \"Graduate\", \"Post Graduate\"]", null, null, "[\"Arts\"]", null, null, 16, 35);
             
         createScholarship("Agriculture Innovation Grant", "Supporting agricultural research and development", 
-            "Field-specific", "₹60,000 per year", LocalDate.of(2024, 11, 15),
+            "Field-specific", "₹60,000 per year", LocalDate.of(2026, 11, 15),
             "[\"Graduate\", \"Post Graduate\"]", null, null, "[\"Agriculture\"]", null, null, 20, 40);
             
         createScholarship("Law Students Excellence Award", "Supporting aspiring legal professionals", 
-            "Field-specific", "₹45,000 per year", LocalDate.of(2025, 1, 31),
+            "Field-specific", "₹45,000 per year", LocalDate.of(2027, 1, 31),
             "[\"Graduate\", \"Post Graduate\"]", null, null, "[\"Law\"]", null, null, 20, 35);
             
         // State-specific Scholarships
         createScholarship("Odisha Merit Scholarship", "State government scholarship for Odisha students", 
-            "State-specific", "₹15,000 per year", LocalDate.of(2024, 3, 15),
+            "State-specific", "₹15,000 per year", LocalDate.of(2026, 3, 15),
             "[\"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\"]", null, null, null, "[\"Odisha\"]", null, null);
             
         createScholarship("Maharashtra Talent Search", "Identifying and nurturing talent in Maharashtra", 
-            "State-specific", "₹12,000 per year", LocalDate.of(2024, 2, 28),
+            "State-specific", "₹12,000 per year", LocalDate.of(2026, 2, 28),
             "[\"10th\", \"12th\"]", null, null, null, null, "[\"Maharashtra\"]", 14, 20);
             
         // Minority Scholarships
         createScholarship("Muslim Minority Scholarship", "Educational support for Muslim community students", 
-            "Minority", "₹30,000 per year", LocalDate.of(2024, 4, 15),
+            "Minority", "₹30,000 per year", LocalDate.of(2026, 4, 15),
             "[\"10th\", \"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\"]", null, null, null, null, null, null);
             
         createScholarship("Christian Minority Education Fund", "Supporting Christian community students", 
-            "Minority", "₹25,000 per year", LocalDate.of(2024, 5, 31),
+            "Minority", "₹25,000 per year", LocalDate.of(2026, 5, 31),
             "[\"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\", \"250000-500000\"]", null, null, null, null, null, null);
             
         // Disability Scholarships
         createScholarship("Divyang Scholarship Scheme", "Supporting students with disabilities", 
-            "Special Needs", "₹50,000 per year", LocalDate.of(2024, 12, 31),
+            "Special Needs", "₹50,000 per year", LocalDate.of(2026, 12, 31),
             "[\"10th\", \"12th\", \"Graduate\", \"Post Graduate\"]", "[\"0-100000\", \"100000-250000\", \"250000-500000\"]", null, null, null, null, null, null);
             
         // Social Support Scholarships
         createScholarship("Widow's Children Scholarship", "Educational support for children of widowed mothers", 
-            "Social Support", "₹25,000 per year", LocalDate.of(2024, 8, 31),
+            "Social Support", "₹25,000 per year", LocalDate.of(2026, 8, 31),
             "[\"10th\", \"12th\", \"Graduate\"]", "[\"0-100000\", \"100000-250000\"]", null, null, null, null, null, null);
     }
     
@@ -259,7 +259,7 @@ public class CompleteDataInitializer implements CommandLineRunner {
     private void initializeExams() {
         // Civil Services Exams
         createExam("UPSC Civil Services Examination", "Premier examination for joining Indian Administrative Service", 
-            "Civil Services", "June 2024 (Prelims)", "₹100 (General), Free (SC/ST/Female)",
+            "Civil Services", "June 2026 (Prelims)", "₹100 (General), Free (SC/ST/Female)",
             "[\"Graduate\", \"Post Graduate\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 21, 32);
             
         createExam("State Public Service Commission", "State-level civil services examination", 
@@ -268,85 +268,85 @@ public class CompleteDataInitializer implements CommandLineRunner {
             
         // Staff Selection Commission
         createExam("SSC Combined Graduate Level (CGL)", "Recruitment for various Group B and C posts", 
-            "Staff Selection", "July 2024", "₹100 (General), Free (SC/ST/Female)",
+            "Staff Selection", "July 2026", "₹100 (General), Free (SC/ST/Female)",
             "[\"Graduate\", \"Post Graduate\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 32);
             
         createExam("SSC Combined Higher Secondary Level (CHSL)", "Recruitment for 10+2 level posts", 
-            "Staff Selection", "August 2024", "₹100 (General), Free (SC/ST/Female)",
+            "Staff Selection", "August 2026", "₹100 (General), Free (SC/ST/Female)",
             "[\"12th\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 27);
             
         createExam("SSC Multi Tasking Staff (MTS)", "Multi-tasking staff recruitment", 
-            "Staff Selection", "September 2024", "₹100 (General), Free (SC/ST/Female)",
+            "Staff Selection", "September 2026", "₹100 (General), Free (SC/ST/Female)",
             "[\"10th\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 25);
             
         // Banking Exams
         createExam("IBPS Bank PO", "Probationary Officer recruitment in public sector banks", 
-            "Banking", "October 2024", "₹175 (General), ₹100 (SC/ST)",
+            "Banking", "October 2026", "₹175 (General), ₹100 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", "[\"Commerce\", \"Management\", \"Arts\", \"Science\"]", null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 20, 30);
             
         createExam("IBPS Bank Clerk", "Clerical cadre recruitment in banks", 
-            "Banking", "December 2024", "₹175 (General), ₹100 (SC/ST)",
+            "Banking", "December 2026", "₹175 (General), ₹100 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 20, 28);
             
         createExam("SBI PO (Probationary Officer)", "Officer recruitment in State Bank of India", 
-            "Banking", "November 2024", "₹750 (General), ₹125 (SC/ST)",
+            "Banking", "November 2026", "₹750 (General), ₹125 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 21, 30);
             
         createExam("RBI Grade B Officer", "Reserve Bank of India Officer recruitment", 
-            "Banking", "March 2024", "₹850 (General), ₹100 (SC/ST)",
+            "Banking", "March 2026", "₹850 (General), ₹100 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", "[\"Commerce\", \"Management\", \"Economics\"]", null, null, 21, 30);
             
         // Railway Exams
         createExam("Railway Recruitment Board NTPC", "Non-Technical Popular Categories in Indian Railways", 
-            "Railway", "August 2024", "₹500 (General), ₹250 (SC/ST)",
+            "Railway", "August 2026", "₹500 (General), ₹250 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 33);
             
         createExam("RRB Group D", "Level-1 posts in Indian Railways", 
-            "Railway", "June 2024", "₹500 (General), ₹250 (SC/ST)",
+            "Railway", "June 2026", "₹500 (General), ₹250 (SC/ST)",
             "[\"10th\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 33);
             
         createExam("RRB Assistant Loco Pilot", "Technical posts in Indian Railways", 
-            "Railway", "July 2024", "₹500 (General), ₹250 (SC/ST)",
+            "Railway", "July 2026", "₹500 (General), ₹250 (SC/ST)",
             "[\"12th\", \"Diploma\"]", "[\"Engineering\"]", null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 28);
             
         // Engineering Entrance Exams
         createExam("GATE (Graduate Aptitude Test)", "For admission to PG programs and PSU recruitment", 
-            "Engineering", "February 2024", "₹1,850 (General), ₹925 (SC/ST/Female)",
+            "Engineering", "February 2026", "₹1,850 (General), ₹925 (SC/ST/Female)",
             "[\"Graduate\", \"Post Graduate\"]", "[\"Engineering\", \"Science\"]", null, null, 21, 35);
             
         createExam("JEE Main", "Joint Entrance Examination for engineering colleges", 
-            "Engineering", "April & May 2024", "₹1,000 (General), ₹500 (SC/ST)",
+            "Engineering", "April & May 2026", "₹1,000 (General), ₹500 (SC/ST)",
             "[\"12th\"]", "[\"Science\", \"Engineering\"]", null, null, 17, 25);
             
         createExam("JEE Advanced", "For admission to IITs", 
-            "Engineering", "May 2024", "₹2,800 (General), ₹1,400 (SC/ST)",
+            "Engineering", "May 2026", "₹2,800 (General), ₹1,400 (SC/ST)",
             "[\"12th\"]", "[\"Science\", \"Engineering\"]", null, null, 17, 22);
             
         // Medical Entrance Exams
         createExam("NEET (Medical Entrance)", "National eligibility entrance test for medical courses", 
-            "Medical", "May 2024", "₹1,700 (General), ₹1,000 (SC/ST/OBC)",
+            "Medical", "May 2026", "₹1,700 (General), ₹1,000 (SC/ST/OBC)",
             "[\"12th\"]", "[\"Medical\", \"Science\"]", null, "{\"SC\": 5, \"ST\": 5, \"OBC\": 5}", 17, 25);
             
         createExam("AIIMS MBBS Entrance", "All India Institute of Medical Sciences entrance", 
-            "Medical", "May 2024", "₹1,600 (General), ₹800 (SC/ST)",
+            "Medical", "May 2026", "₹1,600 (General), ₹800 (SC/ST)",
             "[\"12th\"]", "[\"Medical\", \"Science\"]", null, null, 17, 25);
             
         // Defense Exams
         createExam("NDA (National Defence Academy)", "Joint services training for Army, Navy, Air Force", 
-            "Defense", "April & September 2024", "₹100",
+            "Defense", "April & September 2026", "₹100",
             "[\"12th\"]", null, "[\"Male\"]", null, 16, 19);
             
         createExam("CDS (Combined Defence Services)", "Officer entry in Indian Armed Forces", 
-            "Defense", "February & November 2024", "₹200",
+            "Defense", "February & November 2026", "₹200",
             "[\"Graduate\"]", null, "[\"Male\", \"Female\"]", null, 19, 25);
             
         createExam("AFCAT (Air Force Common Admission Test)", "Officer entry in Indian Air Force", 
-            "Defense", "February & August 2024", "₹250",
+            "Defense", "February & August 2026", "₹250",
             "[\"Graduate\"]", null, "[\"Male\", \"Female\"]", null, 20, 24);
             
         // Teaching Exams
         createExam("CTET (Central Teacher Eligibility Test)", "Teaching eligibility for central government schools", 
-            "Teaching", "July 2024", "₹1,000 (One level), ₹1,200 (Both levels)",
+            "Teaching", "July 2026", "₹1,000 (One level), ₹1,200 (Both levels)",
             "[\"12th\", \"Graduate\"]", "[\"Teaching\", \"Arts\", \"Science\"]", null, null, 18, 35);
             
         createExam("UGC NET", "National eligibility test for lectureship", 
@@ -355,65 +355,65 @@ public class CompleteDataInitializer implements CommandLineRunner {
             
         // Law Exams
         createExam("CLAT (Common Law Admission Test)", "For admission to National Law Universities", 
-            "Law", "May 2024", "₹4,000 (General), ₹3,500 (SC/ST)",
+            "Law", "May 2026", "₹4,000 (General), ₹3,500 (SC/ST)",
             "[\"12th\", \"Graduate\"]", "[\"Law\", \"Arts\"]", null, null, 17, 30);
             
         // Management Exams
         createExam("CAT (Common Admission Test)", "For admission to IIMs and top B-schools", 
-            "Management", "November 2024", "₹2,300 (General), ₹1,150 (SC/ST)",
+            "Management", "November 2026", "₹2,300 (General), ₹1,150 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", "[\"Management\", \"Commerce\", \"Arts\", \"Science\"]", null, null, 20, 35);
             
         // Additional Exams from original data
         createExam("RBI Grade B Officer", "Reserve Bank of India Officer recruitment", 
-            "Banking", "March 2024", "₹850 (General), ₹100 (SC/ST)",
+            "Banking", "March 2026", "₹850 (General), ₹100 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", "[\"Commerce\", \"Management\", \"Economics\"]", null, null, 21, 30);
             
         createExam("Railway Recruitment Board NTPC", "Non-Technical Popular Categories in Indian Railways", 
-            "Railway", "August 2024", "₹500 (General), ₹250 (SC/ST)",
+            "Railway", "August 2026", "₹500 (General), ₹250 (SC/ST)",
             "[\"Graduate\", \"Post Graduate\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 33);
             
         createExam("RRB Group D", "Level-1 posts in Indian Railways", 
-            "Railway", "June 2024", "₹500 (General), ₹250 (SC/ST)",
+            "Railway", "June 2026", "₹500 (General), ₹250 (SC/ST)",
             "[\"10th\"]", null, null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 33);
             
         createExam("RRB Assistant Loco Pilot", "Technical posts in Indian Railways", 
-            "Railway", "July 2024", "₹500 (General), ₹250 (SC/ST)",
+            "Railway", "July 2026", "₹500 (General), ₹250 (SC/ST)",
             "[\"12th\", \"Diploma\"]", "[\"Engineering\"]", null, "{\"OBC\": 3, \"SC\": 5, \"ST\": 5}", 18, 28);
             
         createExam("GATE (Graduate Aptitude Test)", "For admission to PG programs and PSU recruitment", 
-            "Engineering", "February 2024", "₹1,850 (General), ₹925 (SC/ST/Female)",
+            "Engineering", "February 2026", "₹1,850 (General), ₹925 (SC/ST/Female)",
             "[\"Graduate\", \"Post Graduate\"]", "[\"Engineering\", \"Science\"]", null, null, 21, 35);
             
         createExam("JEE Main", "Joint Entrance Examination for engineering colleges", 
-            "Engineering", "April & May 2024", "₹1,000 (General), ₹500 (SC/ST)",
+            "Engineering", "April & May 2026", "₹1,000 (General), ₹500 (SC/ST)",
             "[\"12th\"]", "[\"Science\", \"Engineering\"]", null, null, 17, 25);
             
         createExam("JEE Advanced", "For admission to IITs", 
-            "Engineering", "May 2024", "₹2,800 (General), ₹1,400 (SC/ST)",
+            "Engineering", "May 2026", "₹2,800 (General), ₹1,400 (SC/ST)",
             "[\"12th\"]", "[\"Science\", \"Engineering\"]", null, null, 17, 22);
             
         createExam("NEET (Medical Entrance)", "National eligibility entrance test for medical courses", 
-            "Medical", "May 2024", "₹1,700 (General), ₹1,000 (SC/ST/OBC)",
+            "Medical", "May 2026", "₹1,700 (General), ₹1,000 (SC/ST/OBC)",
             "[\"12th\"]", "[\"Medical\", \"Science\"]", null, "{\"SC\": 5, \"ST\": 5, \"OBC\": 5}", 17, 25);
             
         createExam("AIIMS MBBS Entrance", "All India Institute of Medical Sciences entrance", 
-            "Medical", "May 2024", "₹1,600 (General), ₹800 (SC/ST)",
+            "Medical", "May 2026", "₹1,600 (General), ₹800 (SC/ST)",
             "[\"12th\"]", "[\"Medical\", \"Science\"]", null, null, 17, 25);
             
         createExam("NDA (National Defence Academy)", "Joint services training for Army, Navy, Air Force", 
-            "Defense", "April & September 2024", "₹100",
+            "Defense", "April & September 2026", "₹100",
             "[\"12th\"]", null, "[\"Male\"]", null, 16, 19);
             
         createExam("CDS (Combined Defence Services)", "Officer entry in Indian Armed Forces", 
-            "Defense", "February & November 2024", "₹200",
+            "Defense", "February & November 2026", "₹200",
             "[\"Graduate\"]", null, "[\"Male\", \"Female\"]", null, 19, 25);
             
         createExam("AFCAT (Air Force Common Admission Test)", "Officer entry in Indian Air Force", 
-            "Defense", "February & August 2024", "₹250",
+            "Defense", "February & August 2026", "₹250",
             "[\"Graduate\"]", null, "[\"Male\", \"Female\"]", null, 20, 24);
             
         createExam("CTET (Central Teacher Eligibility Test)", "Teaching eligibility for central government schools", 
-            "Teaching", "July 2024", "₹1,000 (One level), ₹1,200 (Both levels)",
+            "Teaching", "July 2026", "₹1,000 (One level), ₹1,200 (Both levels)",
             "[\"12th\", \"Graduate\"]", "[\"Teaching\", \"Arts\", \"Science\"]", null, null, 18, 35);
             
         createExam("UGC NET", "National eligibility test for lectureship", 
@@ -421,7 +421,7 @@ public class CompleteDataInitializer implements CommandLineRunner {
             "[\"Post Graduate\"]", "[\"Arts\", \"Science\", \"Commerce\"]", null, null, 18, 30);
             
         createExam("CLAT (Common Law Admission Test)", "For admission to National Law Universities", 
-            "Law", "May 2024", "₹4,000 (General), ₹3,500 (SC/ST)",
+            "Law", "May 2026", "₹4,000 (General), ₹3,500 (SC/ST)",
             "[\"12th\", \"Graduate\"]", "[\"Law\", \"Arts\"]", null, null, 17, 30);
     }
     
