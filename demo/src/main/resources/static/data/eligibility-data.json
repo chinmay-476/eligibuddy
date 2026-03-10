@@ -1,0 +1,2424 @@
+{
+  "scholarships": [
+    {
+      "name": "National Merit Scholarship",
+      "description": "For students with excellent academic performance across India",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate",
+          "Post Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ],
+        "category": [
+          "General",
+          "OBC",
+          "SC",
+          "ST",
+          "EWS"
+        ]
+      },
+      "amount": "₹50,000 per year",
+      "deadline": "March 31, 2025",
+      "type": "Merit-based"
+    },
+    {
+      "name": "Inspire Scholarship (KVPY)",
+      "description": "Kishore Vaigyanik Protsahan Yojana for science students",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "field": [
+          "Science",
+          "Engineering",
+          "Medical"
+        ],
+        "age": [
+          16,
+          25
+        ]
+      },
+      "amount": "₹5,000-7,000 per month",
+      "deadline": "September 15, 2025",
+      "type": "Merit-based"
+    },
+    {
+      "name": "Central Sector Scholarship",
+      "description": "Merit-based scholarship for college and university students",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ],
+        "category": [
+          "General",
+          "OBC",
+          "SC",
+          "ST",
+          "EWS"
+        ]
+      },
+      "amount": "₹10,000-20,000 per year",
+      "deadline": "October 31, 2025",
+      "type": "Merit-based"
+    },
+    {
+      "name": "SC/ST Excellence Scholarship",
+      "description": "Promoting higher education among SC/ST students",
+      "eligibility": {
+        "category": [
+          "SC",
+          "ST"
+        ],
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate",
+          "Post Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "amount": "₹75,000 per year",
+      "deadline": "May 30, 2025",
+      "type": "Category-based"
+    },
+    {
+      "name": "OBC Merit Scholarship",
+      "description": "Financial assistance for Other Backward Class students",
+      "eligibility": {
+        "category": [
+          "OBC"
+        ],
+        "qualification": [
+          "12th",
+          "Graduate",
+          "Post Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "amount": "₹35,000 per year",
+      "deadline": "June 30, 2025",
+      "type": "Category-based"
+    },
+    {
+      "name": "EWS Scholarship Scheme",
+      "description": "Support for Economically Weaker Section students",
+      "eligibility": {
+        "category": [
+          "EWS"
+        ],
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "amount": "₹40,000 per year",
+      "deadline": "July 15, 2025",
+      "type": "Category-based"
+    },
+    {
+      "name": "Girl Child Education Fund",
+      "description": "Empowering girls through education funding",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ],
+        "gender": [
+          "Female"
+        ]
+      },
+      "amount": "₹40,000 per year",
+      "deadline": "June 15, 2025",
+      "type": "Gender-based"
+    },
+    {
+      "name": "Women in STEM Scholarship",
+      "description": "Encouraging women to pursue science and technology",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate",
+          "Post Graduate"
+        ],
+        "field": [
+          "Science",
+          "Engineering",
+          "Medical"
+        ],
+        "gender": [
+          "Female"
+        ],
+        "age": [
+          17,
+          30
+        ]
+      },
+      "amount": "₹1,25,000 per year",
+      "deadline": "April 30, 2025",
+      "type": "Gender-based"
+    },
+    {
+      "name": "Widow's Children Scholarship",
+      "description": "Educational support for children of widowed mothers",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "amount": "₹25,000 per year",
+      "deadline": "August 31, 2025",
+      "type": "Social Support"
+    },
+    {
+      "name": "Engineering Excellence Award",
+      "description": "For aspiring engineers with outstanding potential",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "field": [
+          "Engineering"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "amount": "₹1,00,000 per year",
+      "deadline": "July 31, 2025",
+      "type": "Field-specific"
+    },
+    {
+      "name": "Medical Student Support Scheme",
+      "description": "Supporting future doctors and healthcare professionals",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "field": [
+          "Medical"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "amount": "₹1,50,000 per year",
+      "deadline": "August 15, 2025",
+      "type": "Field-specific"
+    },
+    {
+      "name": "Arts and Culture Scholarship",
+      "description": "Promoting arts, literature, and cultural studies",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate",
+          "Post Graduate"
+        ],
+        "field": [
+          "Arts"
+        ],
+        "age": [
+          16,
+          35
+        ]
+      },
+      "amount": "₹30,000 per year",
+      "deadline": "September 30, 2025",
+      "type": "Field-specific"
+    },
+    {
+      "name": "Agriculture Innovation Grant",
+      "description": "Supporting agricultural research and development",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "field": [
+          "Agriculture"
+        ],
+        "age": [
+          20,
+          40
+        ]
+      },
+      "amount": "₹60,000 per year",
+      "deadline": "November 15, 2025",
+      "type": "Field-specific"
+    },
+    {
+      "name": "Law Students Excellence Award",
+      "description": "Supporting aspiring legal professionals",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "field": [
+          "Law"
+        ],
+        "age": [
+          20,
+          35
+        ]
+      },
+      "amount": "₹45,000 per year",
+      "deadline": "January 31, 2025",
+      "type": "Field-specific"
+    },
+    {
+      "name": "Odisha Merit Scholarship",
+      "description": "State government scholarship for Odisha students",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "state": [
+          "Odisha"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "amount": "₹15,000 per year",
+      "deadline": "March 15, 2025",
+      "type": "State-specific"
+    },
+    {
+      "name": "Maharashtra Talent Search",
+      "description": "Identifying and nurturing talent in Maharashtra",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "state": [
+          "Maharashtra"
+        ],
+        "age": [
+          14,
+          20
+        ]
+      },
+      "amount": "₹12,000 per year",
+      "deadline": "February 28, 2025",
+      "type": "State-specific"
+    },
+    {
+      "name": "Muslim Minority Scholarship",
+      "description": "Educational support for Muslim community students",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "amount": "₹30,000 per year",
+      "deadline": "April 15, 2025",
+      "type": "Minority"
+    },
+    {
+      "name": "Christian Minority Education Fund",
+      "description": "Supporting Christian community students",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "amount": "₹25,000 per year",
+      "deadline": "May 31, 2025",
+      "type": "Minority"
+    },
+    {
+      "name": "Divyang Scholarship Scheme",
+      "description": "Supporting students with disabilities",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate",
+          "Post Graduate"
+        ],
+        "disability": [
+          "Yes"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "amount": "₹50,000 per year",
+      "deadline": "December 31, 2025",
+      "type": "Special Needs"
+    }
+  ],
+  "schemes": [
+    {
+      "name": "Pradhan Mantri Awas Yojana (Urban)",
+      "description": "Affordable housing scheme for urban economically weaker sections",
+      "eligibility": {
+        "age": [
+          25,
+          60
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "benefit": "₹2.5 Lakh subsidy + Low interest loan",
+      "deadline": "Ongoing",
+      "type": "Housing"
+    },
+    {
+      "name": "Pradhan Mantri Awas Yojana (Rural)",
+      "description": "Housing for All in rural areas",
+      "eligibility": {
+        "age": [
+          25,
+          65
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "benefit": "₹1.2 Lakh construction assistance",
+      "deadline": "Ongoing",
+      "type": "Housing"
+    },
+    {
+      "name": "Ayushman Bharat - PMJAY",
+      "description": "World's largest health insurance scheme for poor families",
+      "eligibility": {
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ],
+        "category": [
+          "SC",
+          "ST",
+          "OBC",
+          "EWS"
+        ]
+      },
+      "benefit": "₹5 Lakh health cover per family",
+      "deadline": "Ongoing",
+      "type": "Healthcare"
+    },
+    {
+      "name": "Pradhan Mantri Suraksha Bima Yojana",
+      "description": "Accident insurance scheme for all",
+      "eligibility": {
+        "age": [
+          18,
+          70
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "benefit": "₹2 Lakh accident insurance",
+      "deadline": "Ongoing",
+      "type": "Insurance"
+    },
+    {
+      "name": "Pradhan Mantri Jan Arogya Yojana",
+      "description": "Comprehensive healthcare coverage",
+      "eligibility": {
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ],
+        "category": [
+          "SC",
+          "ST",
+          "OBC",
+          "EWS"
+        ]
+      },
+      "benefit": "Free treatment up to ₹5 Lakh",
+      "deadline": "Ongoing",
+      "type": "Healthcare"
+    },
+    {
+      "name": "Pension Scheme for Senior Citizens",
+      "description": "Monthly pension for elderly citizens",
+      "eligibility": {
+        "age": [
+          60,
+          100
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "benefit": "₹3,000 per month",
+      "deadline": "Ongoing",
+      "type": "Social Security"
+    },
+    {
+      "name": "Widow Pension Scheme",
+      "description": "Financial support for widowed women",
+      "eligibility": {
+        "age": [
+          18,
+          80
+        ],
+        "gender": [
+          "Female"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "benefit": "₹1,500 per month",
+      "deadline": "Ongoing",
+      "type": "Social Security"
+    },
+    {
+      "name": "Disability Pension Scheme",
+      "description": "Monthly assistance for persons with disabilities",
+      "eligibility": {
+        "age": [
+          18,
+          80
+        ],
+        "disability": [
+          "Yes"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "benefit": "₹2,000 per month",
+      "deadline": "Ongoing",
+      "type": "Social Security"
+    },
+    {
+      "name": "Startup India Initiative",
+      "description": "Support ecosystem for nurturing innovation and startups",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          21,
+          45
+        ],
+        "field": [
+          "Management",
+          "Engineering",
+          "Commerce"
+        ]
+      },
+      "benefit": "Tax benefits, funding support, mentorship",
+      "deadline": "Ongoing",
+      "type": "Business"
+    },
+    {
+      "name": "Pradhan Mantri Mudra Yojana",
+      "description": "Micro-finance scheme for small businesses",
+      "eligibility": {
+        "age": [
+          18,
+          65
+        ],
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate"
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000",
+          "250000-500000"
+        ]
+      },
+      "benefit": "Loans from ₹50,000 to ₹10 Lakh",
+      "deadline": "Ongoing",
+      "type": "Finance"
+    },
+    {
+      "name": "Stand Up India Scheme",
+      "description": "Supporting SC/ST and women entrepreneurs",
+      "eligibility": {
+        "age": [
+          18,
+          65
+        ],
+        "category": [
+          "SC",
+          "ST"
+        ],
+        "gender": [
+          "Female"
+        ]
+      },
+      "benefit": "₹10 Lakh to ₹1 Crore loan",
+      "deadline": "Ongoing",
+      "type": "Business"
+    },
+    {
+      "name": "Prime Minister Employment Generation Programme",
+      "description": "Setting up micro enterprises for employment generation",
+      "eligibility": {
+        "age": [
+          18,
+          55
+        ],
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate"
+        ]
+      },
+      "benefit": "Up to ₹25 Lakh project cost",
+      "deadline": "Ongoing",
+      "type": "Employment"
+    },
+    {
+      "name": "Skill India Mission",
+      "description": "Training programs for skill development",
+      "eligibility": {
+        "age": [
+          15,
+          45
+        ],
+        "qualification": [
+          "Below 10th",
+          "10th",
+          "12th"
+        ]
+      },
+      "benefit": "Free training + certificate + job assistance",
+      "deadline": "Ongoing",
+      "type": "Skill Development"
+    },
+    {
+      "name": "Pradhan Mantri Kaushal Vikas Yojana",
+      "description": "Recognition of Prior Learning and skill certification",
+      "eligibility": {
+        "age": [
+          15,
+          45
+        ],
+        "qualification": [
+          "Below 10th",
+          "10th",
+          "12th",
+          "Graduate"
+        ]
+      },
+      "benefit": "Free skill training + ₹8,000 incentive",
+      "deadline": "Ongoing",
+      "type": "Skill Development"
+    },
+    {
+      "name": "Pradhan Mantri Kisan Samman Nidhi",
+      "description": "Income support for small and marginal farmers",
+      "eligibility": {
+        "age": [
+          18,
+          70
+        ],
+        "qualification": [
+          "Below 10th",
+          "10th",
+          "12th"
+        ]
+      },
+      "benefit": "₹6,000 per year in 3 installments",
+      "deadline": "Ongoing",
+      "type": "Agriculture"
+    },
+    {
+      "name": "Pradhan Mantri Fasal Bima Yojana",
+      "description": "Crop insurance scheme for farmers",
+      "eligibility": {
+        "age": [
+          18,
+          70
+        ],
+        "qualification": [
+          "Below 10th",
+          "10th",
+          "12th",
+          "Graduate"
+        ]
+      },
+      "benefit": "Crop insurance at subsidized rates",
+      "deadline": "Ongoing",
+      "type": "Agriculture"
+    },
+    {
+      "name": "Samagra Shiksha Abhiyan",
+      "description": "Holistic education from pre-school to Class XII",
+      "eligibility": {
+        "age": [
+          3,
+          18
+        ],
+        "income": [
+          "0-100000",
+          "100000-250000"
+        ]
+      },
+      "benefit": "Free education, books, uniforms",
+      "deadline": "Ongoing",
+      "type": "Education"
+    },
+    {
+      "name": "Mid Day Meal Scheme",
+      "description": "Nutritional support to school children",
+      "eligibility": {
+        "age": [
+          6,
+          14
+        ],
+        "qualification": [
+          "Below 10th"
+        ]
+      },
+      "benefit": "Free nutritious meals",
+      "deadline": "Ongoing",
+      "type": "Education"
+    }
+  ],
+  "exams": [
+    {
+      "name": "UPSC Civil Services Examination",
+      "description": "Premier examination for joining Indian Administrative Service",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          21,
+          32
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "June 2025 (Prelims)",
+      "applicationFee": "₹100 (General), Free (SC/ST/Female)",
+      "type": "Civil Services"
+    },
+    {
+      "name": "State Public Service Commission",
+      "description": "State-level civil services examination",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          21,
+          40
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "Various dates by state",
+      "applicationFee": "₹150-500",
+      "type": "Civil Services"
+    },
+    {
+      "name": "SSC Combined Graduate Level (CGL)",
+      "description": "Recruitment for various Group B and C posts",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          18,
+          32
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "July 2025",
+      "applicationFee": "₹100 (General), Free (SC/ST/Female)",
+      "type": "Staff Selection"
+    },
+    {
+      "name": "SSC Combined Higher Secondary Level (CHSL)",
+      "description": "Recruitment for 10+2 level posts",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "age": [
+          18,
+          27
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "August 2025",
+      "applicationFee": "₹100 (General), Free (SC/ST/Female)",
+      "type": "Staff Selection"
+    },
+    {
+      "name": "SSC Multi Tasking Staff (MTS)",
+      "description": "Multi-tasking staff recruitment",
+      "eligibility": {
+        "qualification": [
+          "10th"
+        ],
+        "age": [
+          18,
+          25
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "September 2025",
+      "applicationFee": "₹100 (General), Free (SC/ST/Female)",
+      "type": "Staff Selection"
+    },
+    {
+      "name": "IBPS Bank PO",
+      "description": "Probationary Officer recruitment in public sector banks",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          20,
+          30
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        },
+        "field": [
+          "Commerce",
+          "Management",
+          "Arts",
+          "Science"
+        ]
+      },
+      "examDate": "October 2025",
+      "applicationFee": "₹175 (General), ₹100 (SC/ST)",
+      "type": "Banking"
+    },
+    {
+      "name": "IBPS Bank Clerk",
+      "description": "Clerical cadre recruitment in banks",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          20,
+          28
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "December 2025",
+      "applicationFee": "₹175 (General), ₹100 (SC/ST)",
+      "type": "Banking"
+    },
+    {
+      "name": "SBI PO (Probationary Officer)",
+      "description": "Officer recruitment in State Bank of India",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          21,
+          30
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "November 2025",
+      "applicationFee": "₹750 (General), ₹125 (SC/ST)",
+      "type": "Banking"
+    },
+    {
+      "name": "RBI Grade B Officer",
+      "description": "Reserve Bank of India Officer recruitment",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          21,
+          30
+        ],
+        "field": [
+          "Commerce",
+          "Management",
+          "Economics"
+        ]
+      },
+      "examDate": "March 2025",
+      "applicationFee": "₹850 (General), ₹100 (SC/ST)",
+      "type": "Banking"
+    },
+    {
+      "name": "Railway Recruitment Board NTPC",
+      "description": "Non-Technical Popular Categories in Indian Railways",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          18,
+          33
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "August 2025",
+      "applicationFee": "₹500 (General), ₹250 (SC/ST)",
+      "type": "Railway"
+    },
+    {
+      "name": "RRB Group D",
+      "description": "Level-1 posts in Indian Railways",
+      "eligibility": {
+        "qualification": [
+          "10th"
+        ],
+        "age": [
+          18,
+          33
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "June 2025",
+      "applicationFee": "₹500 (General), ₹250 (SC/ST)",
+      "type": "Railway"
+    },
+    {
+      "name": "RRB Assistant Loco Pilot",
+      "description": "Technical posts in Indian Railways",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Diploma"
+        ],
+        "age": [
+          18,
+          28
+        ],
+        "field": [
+          "Engineering"
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "examDate": "July 2025",
+      "applicationFee": "₹500 (General), ₹250 (SC/ST)",
+      "type": "Railway"
+    },
+    {
+      "name": "GATE (Graduate Aptitude Test)",
+      "description": "For admission to PG programs and PSU recruitment",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "field": [
+          "Engineering",
+          "Science"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "examDate": "February 2025",
+      "applicationFee": "₹1,850 (General), ₹925 (SC/ST/Female)",
+      "type": "Engineering"
+    },
+    {
+      "name": "JEE Main",
+      "description": "Joint Entrance Examination for engineering colleges",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "field": [
+          "Science",
+          "Engineering"
+        ],
+        "age": [
+          17,
+          25
+        ]
+      },
+      "examDate": "April & May 2025",
+      "applicationFee": "₹1,000 (General), ₹500 (SC/ST)",
+      "type": "Engineering"
+    },
+    {
+      "name": "JEE Advanced",
+      "description": "For admission to IITs",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "field": [
+          "Science",
+          "Engineering"
+        ],
+        "age": [
+          17,
+          22
+        ]
+      },
+      "examDate": "May 2025",
+      "applicationFee": "₹2,800 (General), ₹1,400 (SC/ST)",
+      "type": "Engineering"
+    },
+    {
+      "name": "NEET (Medical Entrance)",
+      "description": "National eligibility entrance test for medical courses",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "field": [
+          "Medical",
+          "Science"
+        ],
+        "age": [
+          17,
+          25
+        ],
+        "ageRelaxation": {
+          "SC": 5,
+          "ST": 5,
+          "OBC": 5
+        }
+      },
+      "examDate": "May 2025",
+      "applicationFee": "₹1,700 (General), ₹1,000 (SC/ST/OBC)",
+      "type": "Medical"
+    },
+    {
+      "name": "AIIMS MBBS Entrance",
+      "description": "All India Institute of Medical Sciences entrance",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "field": [
+          "Medical",
+          "Science"
+        ],
+        "age": [
+          17,
+          25
+        ]
+      },
+      "examDate": "May 2025",
+      "applicationFee": "₹1,600 (General), ₹800 (SC/ST)",
+      "type": "Medical"
+    },
+    {
+      "name": "NDA (National Defence Academy)",
+      "description": "Joint services training for Army, Navy, Air Force",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "age": [
+          16,
+          19
+        ],
+        "gender": [
+          "Male"
+        ]
+      },
+      "examDate": "April & September 2025",
+      "applicationFee": "₹100",
+      "type": "Defense"
+    },
+    {
+      "name": "CDS (Combined Defence Services)",
+      "description": "Officer entry in Indian Armed Forces",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          19,
+          25
+        ],
+        "gender": [
+          "Male",
+          "Female"
+        ]
+      },
+      "examDate": "February & November 2025",
+      "applicationFee": "₹200",
+      "type": "Defense"
+    },
+    {
+      "name": "AFCAT (Air Force Common Admission Test)",
+      "description": "Officer entry in Indian Air Force",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          20,
+          24
+        ],
+        "gender": [
+          "Male",
+          "Female"
+        ]
+      },
+      "examDate": "February & August 2025",
+      "applicationFee": "₹250",
+      "type": "Defense"
+    },
+    {
+      "name": "CTET (Central Teacher Eligibility Test)",
+      "description": "Teaching eligibility for central government schools",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "age": [
+          18,
+          35
+        ],
+        "field": [
+          "Teaching",
+          "Arts",
+          "Science"
+        ]
+      },
+      "examDate": "July 2025",
+      "applicationFee": "₹1,000 (One level), ₹1,200 (Both levels)",
+      "type": "Teaching"
+    },
+    {
+      "name": "UGC NET",
+      "description": "National eligibility test for lectureship",
+      "eligibility": {
+        "qualification": [
+          "Post Graduate"
+        ],
+        "age": [
+          18,
+          30
+        ],
+        "field": [
+          "Arts",
+          "Science",
+          "Commerce"
+        ]
+      },
+      "examDate": "Multiple sessions",
+      "applicationFee": "₹1,150 (General), ₹600 (SC/ST)",
+      "type": "Teaching"
+    },
+    {
+      "name": "CLAT (Common Law Admission Test)",
+      "description": "For admission to National Law Universities",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "age": [
+          17,
+          30
+        ],
+        "field": [
+          "Law",
+          "Arts"
+        ]
+      },
+      "examDate": "May 2025",
+      "applicationFee": "₹4,000 (General), ₹3,500 (SC/ST)",
+      "type": "Law"
+    },
+    {
+      "name": "CAT (Common Admission Test)",
+      "description": "For admission to IIMs and top B-schools",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          20,
+          35
+        ],
+        "field": [
+          "Management",
+          "Commerce",
+          "Arts",
+          "Science"
+        ]
+      },
+      "examDate": "November 2025",
+      "applicationFee": "₹2,300 (General), ₹1,150 (SC/ST)",
+      "type": "Management"
+    }
+  ],
+  "jobs": [
+    {
+      "name": "State Police Constable",
+      "description": "Constable recruitment in state police forces",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          25
+        ],
+        "gender": [
+          "Male",
+          "Female"
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹25,000 - ₹35,000 per month",
+      "vacancies": "10,000+ (varies by state)",
+      "type": "Law Enforcement"
+    },
+    {
+      "name": "Sub Inspector (SI) Police",
+      "description": "Sub Inspector recruitment in state police",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          21,
+          28
+        ],
+        "gender": [
+          "Male",
+          "Female"
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹35,000 - ₹50,000 per month",
+      "vacancies": "5,000+ (varies by state)",
+      "type": "Law Enforcement"
+    },
+    {
+      "name": "Central Reserve Police Force (CRPF)",
+      "description": "Paramilitary force recruitment",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          25
+        ],
+        "gender": [
+          "Male",
+          "Female"
+        ]
+      },
+      "salary": "₹25,000 - ₹40,000 per month",
+      "vacancies": "15,000+",
+      "type": "Law Enforcement"
+    },
+    {
+      "name": "Border Security Force (BSF)",
+      "description": "Border guarding force recruitment",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          25
+        ],
+        "gender": [
+          "Male",
+          "Female"
+        ]
+      },
+      "salary": "₹25,000 - ₹40,000 per month",
+      "vacancies": "8,000+",
+      "type": "Law Enforcement"
+    },
+    {
+      "name": "Primary School Teacher (TGT)",
+      "description": "Teaching positions in government primary schools",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "age": [
+          18,
+          35
+        ],
+        "field": [
+          "Teaching",
+          "Arts",
+          "Science"
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹35,000 - ₹50,000 per month",
+      "vacancies": "25,000+ (varies by state)",
+      "type": "Education"
+    },
+    {
+      "name": "Post Graduate Teacher (PGT)",
+      "description": "Senior secondary school teaching positions",
+      "eligibility": {
+        "qualification": [
+          "Post Graduate"
+        ],
+        "age": [
+          21,
+          40
+        ],
+        "field": [
+          "Teaching",
+          "Arts",
+          "Science",
+          "Commerce"
+        ]
+      },
+      "salary": "₹45,000 - ₹65,000 per month",
+      "vacancies": "15,000+",
+      "type": "Education"
+    },
+    {
+      "name": "Assistant Professor",
+      "description": "College and university teaching positions",
+      "eligibility": {
+        "qualification": [
+          "Post Graduate",
+          "PhD"
+        ],
+        "age": [
+          21,
+          40
+        ],
+        "field": [
+          "Teaching",
+          "Arts",
+          "Science",
+          "Commerce",
+          "Engineering"
+        ]
+      },
+      "salary": "₹57,700 - ₹1,82,400 per month",
+      "vacancies": "5,000+",
+      "type": "Education"
+    },
+    {
+      "name": "Anganwadi Worker",
+      "description": "Child care and development worker",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          35
+        ],
+        "gender": [
+          "Female"
+        ]
+      },
+      "salary": "₹8,000 - ₹15,000 per month",
+      "vacancies": "50,000+",
+      "type": "Social Work"
+    },
+    {
+      "name": "Government Clerk (Multi-tasking)",
+      "description": "Clerical positions in various government departments",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "age": [
+          18,
+          28
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹18,000 - ₹30,000 per month",
+      "vacancies": "50,000+ (various departments)",
+      "type": "Administrative"
+    },
+    {
+      "name": "Lower Division Clerk (LDC)",
+      "description": "Entry-level clerical positions",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "age": [
+          18,
+          27
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "25,000+",
+      "type": "Administrative"
+    },
+    {
+      "name": "Upper Division Clerk (UDC)",
+      "description": "Senior clerical positions",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          18,
+          30
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "15,000+",
+      "type": "Administrative"
+    },
+    {
+      "name": "Section Officer",
+      "description": "Middle management positions in government",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          21,
+          30
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹44,900 - ₹1,42,400 per month",
+      "vacancies": "5,000+",
+      "type": "Administrative"
+    },
+    {
+      "name": "Junior Engineer (Civil)",
+      "description": "Civil engineering positions in public works",
+      "eligibility": {
+        "qualification": [
+          "Diploma",
+          "Graduate"
+        ],
+        "field": [
+          "Engineering"
+        ],
+        "age": [
+          18,
+          30
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹40,000 - ₹60,000 per month",
+      "vacancies": "8,000+",
+      "type": "Engineering"
+    },
+    {
+      "name": "Junior Engineer (Electrical)",
+      "description": "Electrical engineering positions",
+      "eligibility": {
+        "qualification": [
+          "Diploma",
+          "Graduate"
+        ],
+        "field": [
+          "Engineering"
+        ],
+        "age": [
+          18,
+          30
+        ]
+      },
+      "salary": "₹40,000 - ₹60,000 per month",
+      "vacancies": "6,000+",
+      "type": "Engineering"
+    },
+    {
+      "name": "Junior Engineer (Mechanical)",
+      "description": "Mechanical engineering positions",
+      "eligibility": {
+        "qualification": [
+          "Diploma",
+          "Graduate"
+        ],
+        "field": [
+          "Engineering"
+        ],
+        "age": [
+          18,
+          30
+        ]
+      },
+      "salary": "₹40,000 - ₹60,000 per month",
+      "vacancies": "5,000+",
+      "type": "Engineering"
+    },
+    {
+      "name": "Assistant Engineer",
+      "description": "Senior technical positions in government",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "field": [
+          "Engineering"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹56,100 - ₹1,77,500 per month",
+      "vacancies": "3,000+",
+      "type": "Engineering"
+    },
+    {
+      "name": "Technical Assistant",
+      "description": "Technical support roles in laboratories",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Diploma"
+        ],
+        "field": [
+          "Science",
+          "Engineering"
+        ],
+        "age": [
+          18,
+          28
+        ]
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "4,000+",
+      "type": "Technical"
+    },
+    {
+      "name": "Bank Clerk (IBPS)",
+      "description": "Clerical positions in nationalized banks",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          20,
+          28
+        ],
+        "field": [
+          "Commerce",
+          "Arts",
+          "Science"
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹30,000 - ₹45,000 per month",
+      "vacancies": "12,000+",
+      "type": "Banking"
+    },
+    {
+      "name": "Bank Probationary Officer",
+      "description": "Officer positions in public sector banks",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "age": [
+          20,
+          30
+        ],
+        "field": [
+          "Commerce",
+          "Management"
+        ]
+      },
+      "salary": "₹50,000 - ₹75,000 per month",
+      "vacancies": "8,000+",
+      "type": "Banking"
+    },
+    {
+      "name": "Insurance Agent (LIC)",
+      "description": "Life Insurance Corporation agent positions",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "age": [
+          18,
+          55
+        ]
+      },
+      "salary": "₹15,000 - ₹40,000 per month (Commission based)",
+      "vacancies": "20,000+",
+      "type": "Insurance"
+    },
+    {
+      "name": "Accounts Officer",
+      "description": "Financial management positions",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "field": [
+          "Commerce"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹44,900 - ₹1,42,400 per month",
+      "vacancies": "3,000+",
+      "type": "Finance"
+    },
+    {
+      "name": "Staff Nurse",
+      "description": "Nursing positions in government hospitals",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Diploma"
+        ],
+        "field": [
+          "Medical"
+        ],
+        "age": [
+          18,
+          30
+        ],
+        "gender": [
+          "Female",
+          "Male"
+        ]
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "15,000+",
+      "type": "Healthcare"
+    },
+    {
+      "name": "Pharmacist",
+      "description": "Pharmacy positions in hospitals",
+      "eligibility": {
+        "qualification": [
+          "Diploma",
+          "Graduate"
+        ],
+        "field": [
+          "Medical"
+        ],
+        "age": [
+          18,
+          32
+        ]
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "5,000+",
+      "type": "Healthcare"
+    },
+    {
+      "name": "Medical Officer",
+      "description": "Doctor positions in government hospitals",
+      "eligibility": {
+        "qualification": [
+          "Graduate",
+          "Post Graduate"
+        ],
+        "field": [
+          "Medical"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹56,100 - ₹1,77,500 per month",
+      "vacancies": "8,000+",
+      "type": "Healthcare"
+    },
+    {
+      "name": "Lab Technician",
+      "description": "Laboratory technician positions",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Diploma"
+        ],
+        "field": [
+          "Science",
+          "Medical"
+        ],
+        "age": [
+          18,
+          30
+        ]
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "6,000+",
+      "type": "Healthcare"
+    },
+    {
+      "name": "ASHA Worker",
+      "description": "Accredited Social Health Activist",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          45
+        ],
+        "gender": [
+          "Female"
+        ]
+      },
+      "salary": "₹5,000 - ₹12,000 per month",
+      "vacancies": "30,000+",
+      "type": "Healthcare"
+    },
+    {
+      "name": "Forest Guard",
+      "description": "Protection and conservation of forest resources",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          25
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹20,000 - ₹35,000 per month",
+      "vacancies": "3,000+",
+      "type": "Forest Department"
+    },
+    {
+      "name": "Forest Ranger",
+      "description": "Senior forest protection officer",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          21,
+          30
+        ],
+        "field": [
+          "Science",
+          "Agriculture"
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "1,500+",
+      "type": "Forest Department"
+    },
+    {
+      "name": "Wildlife Inspector",
+      "description": "Wildlife protection and conservation",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "field": [
+          "Science"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹44,900 - ₹1,42,400 per month",
+      "vacancies": "800+",
+      "type": "Environment"
+    },
+    {
+      "name": "Group D Railway Employee",
+      "description": "Level-1 posts in Indian Railways",
+      "eligibility": {
+        "qualification": [
+          "10th"
+        ],
+        "age": [
+          18,
+          33
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹18,000 - ₹56,900 per month",
+      "vacancies": "1,03,769",
+      "type": "Railway"
+    },
+    {
+      "name": "Assistant Loco Pilot",
+      "description": "Train operation technical posts",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Diploma"
+        ],
+        "field": [
+          "Engineering"
+        ],
+        "age": [
+          18,
+          28
+        ]
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "26,502",
+      "type": "Railway"
+    },
+    {
+      "name": "Station Master",
+      "description": "Railway station management",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          18,
+          33
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "5,000+",
+      "type": "Railway"
+    },
+    {
+      "name": "Ticket Collector (TTE)",
+      "description": "Train ticket examination",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          18,
+          33
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "8,000+",
+      "type": "Railway"
+    },
+    {
+      "name": "Postman/Mail Guard",
+      "description": "Mail delivery and handling",
+      "eligibility": {
+        "qualification": [
+          "10th"
+        ],
+        "age": [
+          18,
+          27
+        ],
+        "ageRelaxation": {
+          "OBC": 3,
+          "SC": 5,
+          "ST": 5
+        }
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "10,000+",
+      "type": "Postal"
+    },
+    {
+      "name": "Postal Assistant/Sorting Assistant",
+      "description": "Mail sorting and assistance",
+      "eligibility": {
+        "qualification": [
+          "12th"
+        ],
+        "age": [
+          18,
+          27
+        ]
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "8,000+",
+      "type": "Postal"
+    },
+    {
+      "name": "Defense Civilian Employee",
+      "description": "Civilian positions in defense establishments",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th",
+          "Graduate"
+        ],
+        "age": [
+          18,
+          35
+        ]
+      },
+      "salary": "₹18,000 - ₹56,900 per month",
+      "vacancies": "15,000+",
+      "type": "Defense Civilian"
+    },
+    {
+      "name": "Tradesman (Defense)",
+      "description": "Skilled technical positions in defense",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          25
+        ]
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "8,000+",
+      "type": "Defense Civilian"
+    },
+    {
+      "name": "Agriculture Extension Officer",
+      "description": "Agricultural development and farmer assistance",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "field": [
+          "Agriculture"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "5,000+",
+      "type": "Agriculture"
+    },
+    {
+      "name": "Village Development Officer",
+      "description": "Rural development programs",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          21,
+          40
+        ]
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "8,000+",
+      "type": "Rural Development"
+    },
+    {
+      "name": "Krishi Sahayak",
+      "description": "Agricultural assistant",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "field": [
+          "Agriculture",
+          "Science"
+        ],
+        "age": [
+          18,
+          30
+        ]
+      },
+      "salary": "₹15,000 - ₹30,000 per month",
+      "vacancies": "10,000+",
+      "type": "Agriculture"
+    },
+    {
+      "name": "Court Clerk",
+      "description": "Administrative support in courts",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          18,
+          35
+        ],
+        "field": [
+          "Law",
+          "Arts"
+        ]
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "3,000+",
+      "type": "Legal"
+    },
+    {
+      "name": "Public Prosecutor",
+      "description": "Government legal representation",
+      "eligibility": {
+        "qualification": [
+          "Post Graduate"
+        ],
+        "field": [
+          "Law"
+        ],
+        "age": [
+          25,
+          45
+        ]
+      },
+      "salary": "₹56,100 - ₹1,77,500 per month",
+      "vacancies": "1,000+",
+      "type": "Legal"
+    },
+    {
+      "name": "Safai Karmachari",
+      "description": "Municipal cleaning and sanitation",
+      "eligibility": {
+        "qualification": [
+          "Below 10th",
+          "10th"
+        ],
+        "age": [
+          18,
+          35
+        ]
+      },
+      "salary": "₹12,000 - ₹25,000 per month",
+      "vacancies": "50,000+",
+      "type": "Municipal"
+    },
+    {
+      "name": "Municipal Inspector",
+      "description": "Municipal administration and inspection",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "2,000+",
+      "type": "Municipal"
+    },
+    {
+      "name": "Government Driver",
+      "description": "Driving positions in government departments",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          35
+        ]
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "15,000+",
+      "type": "Transport"
+    },
+    {
+      "name": "Bus Conductor",
+      "description": "Public transport conductor",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          35
+        ]
+      },
+      "salary": "₹15,000 - ₹30,000 per month",
+      "vacancies": "8,000+",
+      "type": "Transport"
+    },
+    {
+      "name": "Food Inspector",
+      "description": "Food safety and quality inspection",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "field": [
+          "Science"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "2,000+",
+      "type": "Food Safety"
+    },
+    {
+      "name": "Fair Price Shop Dealer",
+      "description": "Public distribution system management",
+      "eligibility": {
+        "qualification": [
+          "10th",
+          "12th"
+        ],
+        "age": [
+          18,
+          45
+        ]
+      },
+      "salary": "₹10,000 - ₹25,000 per month",
+      "vacancies": "20,000+",
+      "type": "Civil Supplies"
+    },
+    {
+      "name": "Sports Coach",
+      "description": "Government sports coaching positions",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "1,500+",
+      "type": "Sports"
+    },
+    {
+      "name": "Physical Training Instructor",
+      "description": "Physical education in schools",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "3,000+",
+      "type": "Education"
+    },
+    {
+      "name": "Veterinary Assistant",
+      "description": "Animal healthcare support",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Diploma"
+        ],
+        "field": [
+          "Science"
+        ],
+        "age": [
+          18,
+          30
+        ]
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "4,000+",
+      "type": "Animal Husbandry"
+    },
+    {
+      "name": "Fisheries Development Officer",
+      "description": "Fisheries sector development",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "field": [
+          "Science"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹35,400 - ₹1,12,400 per month",
+      "vacancies": "1,000+",
+      "type": "Fisheries"
+    },
+    {
+      "name": "Statistical Investigator",
+      "description": "Data collection and statistical analysis",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "field": [
+          "Commerce",
+          "Science"
+        ],
+        "age": [
+          18,
+          30
+        ]
+      },
+      "salary": "₹25,500 - ₹81,100 per month",
+      "vacancies": "2,000+",
+      "type": "Statistics"
+    },
+    {
+      "name": "Computer Operator",
+      "description": "Data entry and computer operations",
+      "eligibility": {
+        "qualification": [
+          "12th",
+          "Graduate"
+        ],
+        "age": [
+          18,
+          30
+        ]
+      },
+      "salary": "₹19,900 - ₹63,200 per month",
+      "vacancies": "10,000+",
+      "type": "IT Support"
+    },
+    {
+      "name": "Junior Programmer",
+      "description": "Software development in government",
+      "eligibility": {
+        "qualification": [
+          "Graduate"
+        ],
+        "field": [
+          "Science",
+          "Engineering"
+        ],
+        "age": [
+          21,
+          35
+        ]
+      },
+      "salary": "₹44,900 - ₹1,42,400 per month",
+      "vacancies": "3,000+",
+      "type": "IT"
+    },
+    {
+      "name": "Peon/Attendant",
+      "description": "Office support and maintenance",
+      "eligibility": {
+        "qualification": [
+          "Below 10th",
+          "10th"
+        ],
+        "age": [
+          18,
+          27
+        ]
+      },
+      "salary": "₹18,000 - ₹56,900 per month",
+      "vacancies": "25,000+",
+      "type": "Support Staff"
+    },
+    {
+      "name": "Chowkidar/Watchman",
+      "description": "Security and watch duties",
+      "eligibility": {
+        "qualification": [
+          "Below 10th",
+          "10th"
+        ],
+        "age": [
+          18,
+          35
+        ]
+      },
+      "salary": "₹15,000 - ₹30,000 per month",
+      "vacancies": "20,000+",
+      "type": "Security"
+    },
+    {
+      "name": "Mali/Gardener",
+      "description": "Gardening and landscaping",
+      "eligibility": {
+        "qualification": [
+          "Below 10th",
+          "10th"
+        ],
+        "age": [
+          18,
+          35
+        ]
+      },
+      "salary": "₹15,000 - ₹25,000 per month",
+      "vacancies": "5,000+",
+      "type": "Maintenance"
+    }
+  ]
+}

@@ -20,7 +20,7 @@ public class SecurityConfig {
 		http
 			.csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity, but you can enable it later
 			.authorizeHttpRequests(authz -> authz
-				.requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/test-auth", "/debug-users", "/users-info").permitAll()
+				.requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/data/**", "/test-auth", "/debug-users", "/users-info").permitAll()
 				.requestMatchers("/contact").authenticated()
 				.requestMatchers("/profile", "/profile/**").authenticated()
 				.requestMatchers("/view-contacts", "/view-users", "/manage-scholarships", "/manage-schemes").hasRole("ADMIN")
@@ -28,7 +28,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.PUT, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.DELETE, "/api/scholarships/**", "/api/schemes/**", "/api/exams/**", "/api/jobs/**").hasRole("ADMIN")
-				.requestMatchers("/api/gemini/**").permitAll()
+				.requestMatchers("/api/chat/**").authenticated()
 				.anyRequest().authenticated() // Changed from permitAll() to authenticated()
 			)
 			.formLogin(form -> form

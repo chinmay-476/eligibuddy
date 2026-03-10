@@ -199,6 +199,16 @@
             transform: translateY(-1px);
         }
 
+        .input-wrap.invalid {
+            border-color: rgba(185, 28, 28, 0.42);
+            box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.08);
+        }
+
+        .input-wrap.valid {
+            border-color: rgba(15, 118, 110, 0.34);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.08);
+        }
+
         .input-wrap i {
             color: var(--accent);
         }
@@ -335,6 +345,7 @@
                         <input type="text" id="username" name="username" th:value="${usernameValue}" pattern="[A-Za-z][A-Za-z0-9_]{2,19}" title="Start with a letter and use 3-20 letters, numbers, or underscores." autocomplete="username" required>
                     </span>
                     <span class="helper">Example: chinmay_01</span>
+                    <span id="usernameStatus" class="status" aria-live="polite"></span>
                 </label>
 
                 <label class="field" for="email">
@@ -346,6 +357,7 @@
                         <i class="fas fa-envelope"></i>
                         <input type="email" id="email" name="email" th:value="${emailValue}" pattern="[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" title="Enter a valid email address." autocomplete="email" required>
                     </span>
+                    <span id="emailStatus" class="status" aria-live="polite"></span>
                 </label>
 
                 <label class="field" for="password">
@@ -358,6 +370,7 @@
                         <input type="password" id="password" name="password" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@#$%^&+=!?._-]{8,64}" title="Use 8-64 characters with uppercase, lowercase, and a number." autocomplete="new-password" required>
                     </span>
                     <span class="helper">Uppercase, lowercase, and one number are required.</span>
+                    <span id="registerPasswordStatus" class="status" aria-live="polite"></span>
                 </label>
 
                 <label class="field" for="confirmPassword">
@@ -369,7 +382,7 @@
                         <i class="fas fa-shield-alt"></i>
                         <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" required>
                     </span>
-                    <span id="passwordStatus" class="status"></span>
+                    <span id="passwordStatus" class="status" aria-live="polite"></span>
                 </label>
 
                 <button type="submit" class="submit" id="submitBtn">
@@ -386,32 +399,161 @@
     </div>
 
     <script>
+        const registerForm = document.getElementById('registerForm');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirmPassword');
         const submitBtn = document.getElementById('submitBtn');
+        const usernameStatus = document.getElementById('usernameStatus');
+        const emailStatus = document.getElementById('emailStatus');
+        const registerPasswordStatus = document.getElementById('registerPasswordStatus');
         const passwordStatus = document.getElementById('passwordStatus');
 
-        function updatePasswordStatus() {
-            if (!confirmPasswordInput.value) {
-                passwordStatus.textContent = '';
-                passwordStatus.className = 'status';
-                submitBtn.disabled = false;
-                return;
+        const usernameRegex = /^[A-Za-z][A-Za-z0-9_]{2,19}$/;
+        const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@#$%^&+=!?._-]{8,64}$/;
+
+        function setFieldState(input, statusElement, type, message) {
+            const wrapper = input.closest('.input-wrap');
+            wrapper.classList.remove('invalid', 'valid');
+            statusElement.className = 'status';
+            statusElement.textContent = '';
+            input.removeAttribute('aria-invalid');
+
+            if (!message) {
+                return true;
             }
 
-            if (passwordInput.value === confirmPasswordInput.value) {
-                passwordStatus.textContent = 'Passwords match.';
-                passwordStatus.className = 'status success';
+            if (type === 'error') {
+                wrapper.classList.add('invalid');
+                statusElement.classList.add('error');
+                input.setAttribute('aria-invalid', 'true');
+            } else if (type === 'success') {
+                wrapper.classList.add('valid');
+                statusElement.classList.add('success');
+            }
+
+            statusElement.textContent = message;
+            return type !== 'error';
+        }
+
+        function validateUsername(showFeedback) {
+            const value = usernameInput.value.trim();
+
+            if (!value) {
+                return showFeedback
+                    ? setFieldState(usernameInput, usernameStatus, 'error', 'Username is required.')
+                    : setFieldState(usernameInput, usernameStatus, '', '');
+            }
+
+            if (!usernameRegex.test(value)) {
+                return setFieldState(usernameInput, usernameStatus, 'error', 'Start with a letter and use 3-20 letters, numbers, or underscores.');
+            }
+
+            return setFieldState(usernameInput, usernameStatus, 'success', 'Username looks good.');
+        }
+
+        function validateEmail(showFeedback) {
+            const value = emailInput.value.trim();
+
+            if (!value) {
+                return showFeedback
+                    ? setFieldState(emailInput, emailStatus, 'error', 'Email address is required.')
+                    : setFieldState(emailInput, emailStatus, '', '');
+            }
+
+            if (!emailRegex.test(value)) {
+                return setFieldState(emailInput, emailStatus, 'error', 'Enter a valid email address.');
+            }
+
+            return setFieldState(emailInput, emailStatus, 'success', 'Email format looks valid.');
+        }
+
+        function validatePassword(showFeedback) {
+            const value = passwordInput.value;
+
+            if (!value) {
+                return showFeedback
+                    ? setFieldState(passwordInput, registerPasswordStatus, 'error', 'Password is required.')
+                    : setFieldState(passwordInput, registerPasswordStatus, '', '');
+            }
+
+            if (!passwordRegex.test(value)) {
+                return setFieldState(passwordInput, registerPasswordStatus, 'error', 'Use 8-64 characters with uppercase, lowercase, and one number.');
+            }
+
+            return setFieldState(passwordInput, registerPasswordStatus, 'success', 'Password meets the strength rule.');
+        }
+
+        function validateConfirmPassword(showFeedback) {
+            const value = confirmPasswordInput.value;
+
+            if (!value) {
                 submitBtn.disabled = false;
-            } else {
-                passwordStatus.textContent = 'Passwords do not match.';
-                passwordStatus.className = 'status error';
+                return showFeedback
+                    ? setFieldState(confirmPasswordInput, passwordStatus, 'error', 'Please confirm your password.')
+                    : setFieldState(confirmPasswordInput, passwordStatus, '', '');
+            }
+
+            if (passwordInput.value !== value) {
                 submitBtn.disabled = true;
+                return setFieldState(confirmPasswordInput, passwordStatus, 'error', 'Passwords do not match.');
+            }
+
+            submitBtn.disabled = false;
+            return setFieldState(confirmPasswordInput, passwordStatus, 'success', 'Passwords match.');
+        }
+
+        function validateFieldOnBlur(input, validator) {
+            input.dataset.touched = 'true';
+            validator(true);
+        }
+
+        function validateTouchedField(input, validator) {
+            if (input.dataset.touched === 'true') {
+                validator(true);
             }
         }
 
-        passwordInput.addEventListener('input', updatePasswordStatus);
-        confirmPasswordInput.addEventListener('input', updatePasswordStatus);
+        usernameInput.addEventListener('blur', () => validateFieldOnBlur(usernameInput, validateUsername));
+        usernameInput.addEventListener('input', () => validateTouchedField(usernameInput, validateUsername));
+
+        emailInput.addEventListener('blur', () => validateFieldOnBlur(emailInput, validateEmail));
+        emailInput.addEventListener('input', () => validateTouchedField(emailInput, validateEmail));
+
+        passwordInput.addEventListener('blur', () => {
+            validateFieldOnBlur(passwordInput, validatePassword);
+            validateTouchedField(confirmPasswordInput, validateConfirmPassword);
+        });
+        passwordInput.addEventListener('input', () => {
+            validateTouchedField(passwordInput, validatePassword);
+            validateTouchedField(confirmPasswordInput, validateConfirmPassword);
+        });
+
+        confirmPasswordInput.addEventListener('blur', () => validateFieldOnBlur(confirmPasswordInput, validateConfirmPassword));
+        confirmPasswordInput.addEventListener('input', () => validateTouchedField(confirmPasswordInput, validateConfirmPassword));
+
+        registerForm.addEventListener('submit', (event) => {
+            usernameInput.dataset.touched = 'true';
+            emailInput.dataset.touched = 'true';
+            passwordInput.dataset.touched = 'true';
+            confirmPasswordInput.dataset.touched = 'true';
+
+            const usernameValid = validateUsername(true);
+            const emailValid = validateEmail(true);
+            const passwordValid = validatePassword(true);
+            const confirmValid = validateConfirmPassword(true);
+
+            if (!usernameValid || !emailValid || !passwordValid || !confirmValid) {
+                event.preventDefault();
+                const firstInvalid = [usernameInput, emailInput, passwordInput, confirmPasswordInput]
+                    .find((input) => input.getAttribute('aria-invalid') === 'true');
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                }
+            }
+        });
     </script>
 </body>
 </html>

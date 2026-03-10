@@ -1,0 +1,412 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+    <th:block th:fragment="loadingOverlay">
+        <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Analyzing Your Eligibility</div>
+                    <div class="loading-subtext">Please wait while we find the best opportunities for you...</div>
+                </div>
+            </div>
+    </th:block>
+
+    <th:block th:fragment="navbar">
+        <!-- Navigation -->
+            <nav class="navbar" id="navbar">
+                <div class="nav-content">
+                    <div class="logo">
+                        <i class="fas fa-search"></i>
+                        Eligibuddy
+                    </div>
+                    <div class="nav-links">
+                        <a href="/" class="nav-link">Home</a>
+                        <!-- Show Contact Form only for non-admin users -->
+                        <a th:if="${!isAdmin}" href="/contact" class="nav-link">Contact Form</a>
+                        <!-- Show View Contacts only for admin users -->
+                        <a th:if="${isAdmin}" href="/view-contacts" class="nav-link">View Contacts</a>
+                        <!-- Show View Users only for admin users -->
+                        <a th:if="${isAdmin}" href="/view-users" class="nav-link">View Users</a>
+                        <a th:if="${isAdmin}" href="/manage-scholarships" class="nav-link">Manage Scholarships</a>
+                        <a th:if="${isAdmin}" href="/manage-schemes" class="nav-link">Manage Schemes</a>
+
+                        <!-- Show login/register for anonymous users -->
+                        <div th:if="${username == null}">
+                            <a href="/login" class="nav-link">Login</a>
+                            <a href="/register" class="btn-primary">Register</a>
+                        </div>
+
+                        <!-- Show user info and logout for authenticated users -->
+                        <div th:if="${username != null}" class="d-flex align-items-center">
+                            <a href="/profile" class="nav-link" style="margin-right: 1rem;">
+                                <i class="fas fa-user me-2"></i>
+                                <span th:text="${username}">User</span>
+                            </a>
+                            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                                <button type="submit" class="btn-primary" style="background: #dc3545; border: none;">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+    </th:block>
+
+    <th:block th:fragment="mainContent">
+        <!-- Main Container -->
+            <div class="main-container">
+                <!-- Hero Section -->
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1>Find Your Perfect Opportunity</h1>
+                        <p>Discover scholarships, government schemes, competitive exams, and job opportunities tailored specifically for you with our advanced AI-powered eligibility checker.</p>
+
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <span class="feature-icon">🎓</span>
+                                <div class="feature-title">10,000+ Scholarships</div>
+                                <div class="feature-desc">From merit-based to need-based funding opportunities</div>
+                            </div>
+                            <div class="feature-card">
+                                <span class="feature-icon">🏛️</span>
+                                <div class="feature-title">500+ Gov Schemes</div>
+                                <div class="feature-desc">Central and state government programs</div>
+                            </div>
+                            <div class="feature-card">
+                                <span class="feature-icon">📝</span>
+                                <div class="feature-title">200+ Exams</div>
+                                <div class="feature-desc">Competitive exams across all fields</div>
+                            </div>
+                            <div class="feature-card">
+                                <span class="feature-icon">💼</span>
+                                <div class="feature-title">1000+ Jobs</div>
+                                <div class="feature-desc">Government and PSU opportunities</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <div class="form-header">
+                        <h2>Check Your Eligibility</h2>
+                        <p>Fill in your details to get personalized recommendations</p>
+                    </div>
+
+                    <div class="success-message" id="successMessage">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Eligibility check completed successfully!</span>
+                    </div>
+
+                    <form id="eligibilityForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required placeholder="Enter first name">
+                                <span class="input-icon">👤</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" required placeholder="Enter last name">
+                            </div>
+                            <div class="form-group">
+                                <label for="age">Age *</label>
+                                <input type="number" id="age" name="age" required min="1" max="100" placeholder="Your age">
+                                <span class="input-icon">🎂</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender *</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="">Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State *</label>
+                                <select id="state" name="state" required>
+                                    <option value="">Select your state</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Assam">Assam</option>
+                                    <option value="Bihar">Bihar</option>
+                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Haryana">Haryana</option>
+                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Kerala">Kerala</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Odisha">Odisha</option>
+                                    <option value="Punjab">Punjab</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="West Bengal">West Bengal</option>
+                                </select>
+                                <span class="input-icon">📍</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="district">District</label>
+                                <input type="text" id="district" name="district" placeholder="Enter your district">
+                            </div>
+                            <div class="form-group">
+                                <label for="qualification">Highest Qualification *</label>
+                                <select id="qualification" name="qualification" required>
+                                    <option value="">Select qualification</option>
+                                    <option value="Below 10th">Below 10th</option>
+                                    <option value="10th">10th Standard</option>
+                                    <option value="12th">12th Standard</option>
+                                    <option value="Diploma">Diploma</option>
+                                    <option value="Graduate">Graduate</option>
+                                    <option value="Post Graduate">Post Graduate</option>
+                                    <option value="PhD">PhD</option>
+                                </select>
+                                <span class="input-icon">🎓</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category *</label>
+                                <select id="category" name="category" required>
+                                    <option value="">Select category</option>
+                                    <option value="General">General</option>
+                                    <option value="SC">SC (Scheduled Caste)</option>
+                                    <option value="ST">ST (Scheduled Tribe)</option>
+                                    <option value="OBC">OBC (Other Backward Class)</option>
+                                    <option value="EWS">EWS (Economically Weaker Section)</option>
+                                </select>
+                                <span class="input-icon">📋</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="income">Annual Family Income *</label>
+                                <select id="income" name="income" required>
+                                    <option value="">Select income range</option>
+                                    <option value="0-100000">Below ₹1 Lakh</option>
+                                    <option value="100000-250000">₹1-2.5 Lakh</option>
+                                    <option value="250000-500000">₹2.5-5 Lakh</option>
+                                    <option value="500000-800000">₹5-8 Lakh</option>
+                                    <option value="800000-1500000">₹8-15 Lakh</option>
+                                    <option value="1500000+">Above ₹15 Lakh</option>
+                                </select>
+                                <span class="input-icon">💰</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="your.email@example.com">
+                                <span class="input-icon">📧</span>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div class="advanced-options">
+                            <button type="button" class="advanced-toggle" onclick="toggleAdvanced()">
+                                <i class="fas fa-cogs"></i>
+                                Advanced Options 
+                                <span id="advancedIcon"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="advanced-content" id="advancedContent">
+                                <div class="form-grid" style="margin-top: 1rem;">
+                                    <div class="form-group">
+                                        <label for="field">Field of Interest</label>
+                                        <select id="field" name="field">
+                                            <option value="">Select field</option>
+                                            <option value="Engineering">Engineering</option>
+                                            <option value="Medical">Medical</option>
+                                            <option value="Arts">Arts</option>
+                                            <option value="Commerce">Commerce</option>
+                                            <option value="Science">Science</option>
+                                            <option value="Law">Law</option>
+                                            <option value="Management">Management</option>
+                                            <option value="Agriculture">Agriculture</option>
+                                            <option value="Teaching">Teaching</option>
+                                            <option value="Research">Research</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="disability">Person with Disability</label>
+                                        <select id="disability" name="disability">
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <label style="display: block; margin: 1rem 0 0.5rem 0; font-weight: 600;">Preferences:</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="scholarships" name="preferences" value="scholarships" checked>
+                                        <label for="scholarships">🎓 Scholarships</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="schemes" name="preferences" value="schemes" checked>
+                                        <label for="schemes">🏛️ Government Schemes</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="exams" name="preferences" value="exams" checked>
+                                        <label for="exams">📝 Competitive Exams</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="jobs" name="preferences" value="jobs" checked>
+                                        <label for="jobs">💼 Government Jobs</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="submit-section">
+                            <button type="button" class="submit-btn" id="submitBtn" onclick="checkAuthentication()">
+                                <i class="fas fa-search"></i>
+                                <span id="buttonText">Analyze My Eligibility</span>
+                            </button>
+                            <p class="login-required" id="loginRequired" style="display: none; color: #dc3545; font-size: 0.9rem; margin-top: 0.5rem;">
+                                <i class="fas fa-lock"></i> Login required to access this feature
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    </th:block>
+
+    <th:block th:fragment="resultsSection">
+        <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <div class="results-title">
+                        <i class="fas fa-chart-line"></i>
+                        Your Eligibility Results
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn-white" onclick="downloadPDF()">
+                            <i class="fas fa-download"></i>
+                            Download PDF
+                        </button>
+                        <button class="btn-white" onclick="printResults()">
+                            <i class="fas fa-print"></i>
+                            Print
+                        </button>
+                        <button class="btn-white" onclick="shareResults()">
+                            <i class="fas fa-share"></i>
+                            Share
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results-stats" id="resultsStats">
+                    <div class="stat-card">
+                        <span class="stat-icon">🎓</span>
+                        <span class="stat-number" id="scholarshipCount">0</span>
+                        <span class="stat-label">Scholarships Available</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">🏛️</span>
+                        <span class="stat-number" id="schemeCount">0</span>
+                        <span class="stat-label">Government Schemes</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">📝</span>
+                        <span class="stat-number" id="examCount">0</span>
+                        <span class="stat-label">Competitive Exams</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">💼</span>
+                        <span class="stat-number" id="jobCount">0</span>
+                        <span class="stat-label">Job Opportunities</span>
+                    </div>
+                </div>
+
+                <div class="results-content">
+                    <div class="filter-bar" id="filterBar">
+                        <button class="filter-btn active" type="button" data-filter="all" onclick="filterResults('all')">
+                            <i class="fas fa-globe"></i> All Results
+                        </button>
+                        <button class="filter-btn" type="button" data-filter="scholarships" onclick="filterResults('scholarships')">
+                            <i class="fas fa-graduation-cap"></i> Scholarships
+                        </button>
+                        <button class="filter-btn" type="button" data-filter="schemes" onclick="filterResults('schemes')">
+                            <i class="fas fa-university"></i> Gov Schemes
+                        </button>
+                        <button class="filter-btn" type="button" data-filter="exams" onclick="filterResults('exams')">
+                            <i class="fas fa-file-alt"></i> Exams
+                        </button>
+                        <button class="filter-btn" type="button" data-filter="jobs" onclick="filterResults('jobs')">
+                            <i class="fas fa-briefcase"></i> Jobs
+                        </button>
+                    </div>
+
+                    <div class="results-grid" id="resultsGrid">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+    </th:block>
+
+    <th:block th:fragment="chatbotWidget">
+        <!-- Eligibuddy assistant widget -->
+            <button class="gemini-fab" id="geminiToggle" type="button" title="Open your Eligibuddy assistant" aria-label="Open Eligibuddy assistant"></button>
+
+            <div class="gemini-chat-widget" id="geminiWidget">
+                <div class="gemini-chat-header">
+                    <h3>Eligibuddy Assistant</h3>
+                    <button class="gemini-minimize-btn" id="minimizeChat" title="Minimize">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+
+                <div class="project-context-panel">
+                    <button class="context-toggle" onclick="toggleContext()">
+                        <i class="fas fa-info-circle"></i>
+                        How I help
+                        <i class="fas fa-chevron-down" id="contextIcon"></i>
+                    </button>
+                    <div class="context-details" id="contextDetails">
+                        <strong>Your Eligibuddy context</strong><br>
+                        I use your latest eligibility form details, your current matches, and recent chat history to answer follow-up questions and suggest the next step.
+                    </div>
+                </div>
+
+                <div class="gemini-chat-messages" id="geminiMessages">
+                    <div class="gemini-message ai">
+                        Hi! Tell me what you want to find, and I will help you understand your matches, the details to fill in, and the next step to take.
+                    </div>
+                </div>
+
+                <div class="gemini-quick-actions">
+                    <button class="quick-action-btn" onclick="askQuickQuestion('How do I get the best matches for my profile?')">
+                        Better Matches
+                    </button>
+                    <button class="quick-action-btn" onclick="askQuickQuestion('Which scholarships or schemes should I check first?')">
+                        What To Open
+                    </button>
+                    <button class="quick-action-btn" onclick="askQuickQuestion('What details should I fill in before I run the analysis?')">
+                        Fill Details
+                    </button>
+                    <button class="quick-action-btn" onclick="askQuickQuestion('Explain my current results and what I should do next.')">
+                        Next Step
+                    </button>
+                </div>
+
+                <div class="gemini-loading" id="geminiLoading">
+                    <div class="gemini-typing-indicator">
+                        <div class="gemini-typing-dot"></div>
+                        <div class="gemini-typing-dot"></div>
+                        <div class="gemini-typing-dot"></div>
+                    </div>
+                </div>
+
+                <div class="gemini-chat-input">
+                    <input 
+                        type="text" 
+                        class="gemini-input-field" 
+                        id="geminiInput" 
+                        placeholder="Ask about your scholarships, schemes, exams, or jobs..."
+                        maxlength="500"
+                    >
+                    <button class="gemini-send-btn" id="geminiSend" title="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+    </th:block>
+</th:block>
