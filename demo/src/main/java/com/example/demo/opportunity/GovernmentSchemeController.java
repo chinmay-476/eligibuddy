@@ -1,17 +1,34 @@
 package com.example.demo.opportunity;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.example.demo.config.MongoSequenceService;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/schemes")
 public class GovernmentSchemeController {
-    
-    @Autowired
-    private GovernmentSchemeRepository schemeRepository;
+
+    private static final String SCHEME_SEQUENCE = "government_schemes_sequence";
+
+    private final GovernmentSchemeRepository schemeRepository;
+    private final MongoSequenceService mongoSequenceService;
+    private final OpportunityCriteriaNormalizer criteriaNormalizer;
+
+    public GovernmentSchemeController(
+            GovernmentSchemeRepository schemeRepository,
+            MongoSequenceService mongoSequenceService,
+            OpportunityCriteriaNormalizer criteriaNormalizer
+    ) {
+        this.schemeRepository = schemeRepository;
+        this.mongoSequenceService = mongoSequenceService;
+        this.criteriaNormalizer = criteriaNormalizer;
+    }
     
     @GetMapping
     public ResponseEntity<List<GovernmentScheme>> getAllSchemes() {
@@ -25,18 +42,18 @@ public class GovernmentSchemeController {
     }
 
     @GetMapping("/admin/{id}")
-    public ResponseEntity<GovernmentScheme> getSchemeByIdForAdmin(@PathVariable Long id) {
+    public ResponseEntity<GovernmentScheme> getSchemeByIdForAdmin(@PathVariable @NonNull Long id) {
         return schemeRepository.findById(id)
                    .map(ResponseEntity::ok)
                    .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<GovernmentScheme> getSchemeById(@PathVariable Long id) {
-        Optional<GovernmentScheme> scheme = schemeRepository.findById(id)
-                .filter(GovernmentScheme::isActive);
-        return scheme.map(ResponseEntity::ok)
-                   .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<GovernmentScheme> getSchemeById(@PathVariable @NonNull Long id) {
+        return schemeRepository.findById(id)
+                .filter(GovernmentScheme::isActive)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/active")
@@ -58,60 +75,66 @@ public class GovernmentSchemeController {
     }
     
     @PostMapping
-    public ResponseEntity<GovernmentScheme> createScheme(@RequestBody GovernmentScheme scheme) {
+    public ResponseEntity<GovernmentScheme> createScheme(@RequestBody @Nullable GovernmentScheme scheme) {
         normalizeScheme(scheme);
         if (isInvalidScheme(scheme)) {
             return ResponseEntity.badRequest().build();
         }
-        scheme.setActive(true);
-        GovernmentScheme savedScheme = schemeRepository.save(scheme);
+        GovernmentScheme validScheme = Objects.requireNonNull(scheme);
+        validScheme.setId(mongoSequenceService.generateSequence(SCHEME_SEQUENCE));
+        validScheme.setActive(true);
+        if (validScheme.getCreatedAt() == null) {
+            validScheme.setCreatedAt(LocalDate.now());
+        }
+        GovernmentScheme savedScheme = schemeRepository.save(validScheme);
         return ResponseEntity.ok(savedScheme);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<GovernmentScheme> updateScheme(@PathVariable Long id, @RequestBody GovernmentScheme scheme) {
+    public ResponseEntity<GovernmentScheme> updateScheme(@PathVariable @NonNull Long id, @RequestBody @Nullable GovernmentScheme scheme) {
         Optional<GovernmentScheme> existingScheme = schemeRepository.findById(id);
         if (existingScheme.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         normalizeScheme(scheme);
         if (isInvalidScheme(scheme)) {
             return ResponseEntity.badRequest().build();
         }
-        GovernmentScheme existing = existingScheme.get();
-        scheme.setId(id);
-        scheme.setActive(existing.isActive());
-        scheme.setCreatedAt(existing.getCreatedAt());
-        GovernmentScheme updatedScheme = schemeRepository.save(scheme);
+
+        GovernmentScheme existing = existingScheme.orElseThrow();
+        GovernmentScheme validScheme = Objects.requireNonNull(scheme);
+        validScheme.setId(id);
+        validScheme.setActive(existing.isActive());
+        validScheme.setCreatedAt(existing.getCreatedAt());
+        GovernmentScheme updatedScheme = schemeRepository.save(validScheme);
         return ResponseEntity.ok(updatedScheme);
     }
     
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<GovernmentScheme> deactivateScheme(@PathVariable Long id) {
-        Optional<GovernmentScheme> schemeOpt = schemeRepository.findById(id);
-        if (schemeOpt.isPresent()) {
-            GovernmentScheme scheme = schemeOpt.get();
-            scheme.setActive(false);
-            GovernmentScheme updatedScheme = schemeRepository.save(scheme);
-            return ResponseEntity.ok(updatedScheme);
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<GovernmentScheme> deactivateScheme(@PathVariable @NonNull Long id) {
+        return schemeRepository.findById(id)
+                .map(scheme -> {
+                    scheme.setActive(false);
+                    GovernmentScheme updatedScheme = schemeRepository.save(scheme);
+                    return ResponseEntity.ok(updatedScheme);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/activate")
-    public ResponseEntity<GovernmentScheme> activateScheme(@PathVariable Long id) {
-        Optional<GovernmentScheme> schemeOpt = schemeRepository.findById(id);
-        if (schemeOpt.isPresent()) {
-            GovernmentScheme scheme = schemeOpt.get();
-            scheme.setActive(true);
-            GovernmentScheme updatedScheme = schemeRepository.save(scheme);
-            return ResponseEntity.ok(updatedScheme);
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<GovernmentScheme> activateScheme(@PathVariable @NonNull Long id) {
+        return schemeRepository.findById(id)
+                .map(scheme -> {
+                    scheme.setActive(true);
+                    GovernmentScheme updatedScheme = schemeRepository.save(scheme);
+                    return ResponseEntity.ok(updatedScheme);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteScheme(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteScheme(@PathVariable @NonNull Long id) {
         if (!schemeRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -119,7 +142,7 @@ public class GovernmentSchemeController {
         return ResponseEntity.ok().build();
     }
 
-    private void normalizeScheme(GovernmentScheme scheme) {
+    private void normalizeScheme(@Nullable GovernmentScheme scheme) {
         if (scheme == null) {
             return;
         }
@@ -128,16 +151,16 @@ public class GovernmentSchemeController {
         scheme.setType(trimToNull(scheme.getType()));
         scheme.setBenefit(trimToNull(scheme.getBenefit()));
         scheme.setDeadline(trimToNull(scheme.getDeadline()));
-        scheme.setQualificationCriteria(trimToNull(scheme.getQualificationCriteria()));
-        scheme.setIncomeCriteria(trimToNull(scheme.getIncomeCriteria()));
-        scheme.setCategoryCriteria(trimToNull(scheme.getCategoryCriteria()));
-        scheme.setFieldCriteria(trimToNull(scheme.getFieldCriteria()));
-        scheme.setGenderCriteria(trimToNull(scheme.getGenderCriteria()));
-        scheme.setStateCriteria(trimToNull(scheme.getStateCriteria()));
-        scheme.setDisabilityCriteria(trimToNull(scheme.getDisabilityCriteria()));
+        scheme.setQualificationCriteria(criteriaNormalizer.normalizeListCriteria(scheme.getQualificationCriteria()));
+        scheme.setIncomeCriteria(criteriaNormalizer.normalizeListCriteria(scheme.getIncomeCriteria()));
+        scheme.setCategoryCriteria(criteriaNormalizer.normalizeListCriteria(scheme.getCategoryCriteria()));
+        scheme.setFieldCriteria(criteriaNormalizer.normalizeListCriteria(scheme.getFieldCriteria()));
+        scheme.setGenderCriteria(criteriaNormalizer.normalizeListCriteria(scheme.getGenderCriteria()));
+        scheme.setStateCriteria(criteriaNormalizer.normalizeListCriteria(scheme.getStateCriteria()));
+        scheme.setDisabilityCriteria(criteriaNormalizer.normalizeListCriteria(scheme.getDisabilityCriteria()));
     }
 
-    private boolean isInvalidScheme(GovernmentScheme scheme) {
+    private boolean isInvalidScheme(@Nullable GovernmentScheme scheme) {
         return scheme == null
                 || scheme.getName() == null
                 || scheme.getType() == null
@@ -150,7 +173,8 @@ public class GovernmentSchemeController {
         return minAge != null && maxAge != null && minAge > maxAge;
     }
 
-    private String trimToNull(String value) {
+    @Nullable
+    private String trimToNull(@Nullable String value) {
         if (value == null) {
             return null;
         }

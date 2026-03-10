@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eligibuddy Developer Guide</title>
+    <meta name="description" content="Public web documentation for Eligibuddy developers.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="page-backdrop" aria-hidden="true">
+        <div class="orb orb-one"></div>
+        <div class="orb orb-two"></div>
+        <div class="grid-wash"></div>
+    </div>
+
+    <header class="topbar">
+        <a class="brand" href="#hero">
+            <span class="brand-mark">E</span>
+            <span>
+                <strong>Eligibuddy</strong>
+                <small>Developer Guide</small>
+            </span>
+        </a>
+        <div class="topbar-actions">
+            <label class="search-shell" for="doc-search">
+                <span>Search</span>
+                <input id="doc-search" type="search" placeholder="Find routes, env vars, pages, packages">
+            </label>
+            <a id="repo-link" class="ghost-button" href="#" target="_blank" rel="noreferrer">Repository</a>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <section id="hero" class="hero-panel">
+            <div class="hero-copy" id="hero-copy"></div>
+            <aside class="hero-rail">
+                <div class="publish-card" id="publish-card"></div>
+                <div class="quick-facts" id="quick-facts"></div>
+            </aside>
+        </section>
+
+        <section class="content-layout">
+            <aside class="sidebar">
+                <div class="sidebar-card">
+                    <p class="sidebar-label">Guide map</p>
+                    <nav id="section-nav" class="section-nav" aria-label="Developer guide sections"></nav>
+                </div>
+            </aside>
+            <div id="doc-sections" class="doc-sections"></div>
+        </section>
+    </main>
+
+    <script src="./app.js" defer></script>
+</body>
+</html>

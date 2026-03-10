@@ -1,28 +1,40 @@
 package com.example.demo.contact;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.config.MongoSequenceService;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContactService {
-    
-    @Autowired
-    private ContactRepository contactRepository;
+
+    private static final String CONTACT_SEQUENCE = "contacts_sequence";
+
+    private final ContactRepository contactRepository;
+    private final MongoSequenceService mongoSequenceService;
+
+    public ContactService(ContactRepository contactRepository, MongoSequenceService mongoSequenceService) {
+        this.contactRepository = contactRepository;
+        this.mongoSequenceService = mongoSequenceService;
+    }
     
     public List<Contact> getAllContacts() {
         return contactRepository.findAll();
     }
     
-    public Contact saveContact(Contact contact) {
+    public Contact saveContact(@NonNull Contact contact) {
+        if (contact.getId() == null) {
+            contact.setId(mongoSequenceService.generateSequence(CONTACT_SEQUENCE));
+        }
         return contactRepository.save(contact);
     }
     
-    public Contact getContactById(Long id) {
-        return contactRepository.findById(id).orElse(null);
+    public Optional<Contact> getContactById(@NonNull Long id) {
+        return contactRepository.findById(id);
     }
     
-    public void deleteContact(Long id) {
+    public void deleteContact(@NonNull Long id) {
         contactRepository.deleteById(id);
     }
     

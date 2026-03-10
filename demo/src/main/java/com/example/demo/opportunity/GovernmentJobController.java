@@ -1,17 +1,34 @@
 package com.example.demo.opportunity;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.config.MongoSequenceService;
+import java.time.LocalDate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/jobs")
 public class GovernmentJobController {
-    
-    @Autowired
-    private GovernmentJobRepository jobRepository;
+
+    private static final String JOB_SEQUENCE = "government_jobs_sequence";
+
+    private final GovernmentJobRepository jobRepository;
+    private final MongoSequenceService mongoSequenceService;
+    private final OpportunityCriteriaNormalizer criteriaNormalizer;
+
+    public GovernmentJobController(
+            GovernmentJobRepository jobRepository,
+            MongoSequenceService mongoSequenceService,
+            OpportunityCriteriaNormalizer criteriaNormalizer
+    ) {
+        this.jobRepository = jobRepository;
+        this.mongoSequenceService = mongoSequenceService;
+        this.criteriaNormalizer = criteriaNormalizer;
+    }
     
     @GetMapping
     public ResponseEntity<List<GovernmentJob>> getAllJobs() {
@@ -25,18 +42,18 @@ public class GovernmentJobController {
     }
 
     @GetMapping("/admin/{id}")
-    public ResponseEntity<GovernmentJob> getJobByIdForAdmin(@PathVariable Long id) {
+    public ResponseEntity<GovernmentJob> getJobByIdForAdmin(@PathVariable @NonNull Long id) {
         return jobRepository.findById(id)
                  .map(ResponseEntity::ok)
                  .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<GovernmentJob> getJobById(@PathVariable Long id) {
-        Optional<GovernmentJob> job = jobRepository.findById(id)
-                .filter(GovernmentJob::isActive);
-        return job.map(ResponseEntity::ok)
-                 .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<GovernmentJob> getJobById(@PathVariable @NonNull Long id) {
+        return jobRepository.findById(id)
+                .filter(GovernmentJob::isActive)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/active")
@@ -58,60 +75,66 @@ public class GovernmentJobController {
     }
     
     @PostMapping
-    public ResponseEntity<GovernmentJob> createJob(@RequestBody GovernmentJob job) {
+    public ResponseEntity<GovernmentJob> createJob(@RequestBody @Nullable GovernmentJob job) {
         normalizeJob(job);
         if (isInvalidJob(job)) {
             return ResponseEntity.badRequest().build();
         }
-        job.setActive(true);
-        GovernmentJob savedJob = jobRepository.save(job);
+        GovernmentJob validJob = Objects.requireNonNull(job);
+        validJob.setId(mongoSequenceService.generateSequence(JOB_SEQUENCE));
+        validJob.setActive(true);
+        if (validJob.getCreatedAt() == null) {
+            validJob.setCreatedAt(LocalDate.now());
+        }
+        GovernmentJob savedJob = jobRepository.save(validJob);
         return ResponseEntity.ok(savedJob);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<GovernmentJob> updateJob(@PathVariable Long id, @RequestBody GovernmentJob job) {
+    public ResponseEntity<GovernmentJob> updateJob(@PathVariable @NonNull Long id, @RequestBody @Nullable GovernmentJob job) {
         Optional<GovernmentJob> existingJob = jobRepository.findById(id);
         if (existingJob.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         normalizeJob(job);
         if (isInvalidJob(job)) {
             return ResponseEntity.badRequest().build();
         }
-        GovernmentJob existing = existingJob.get();
-        job.setId(id);
-        job.setActive(existing.isActive());
-        job.setCreatedAt(existing.getCreatedAt());
-        GovernmentJob updatedJob = jobRepository.save(job);
+
+        GovernmentJob existing = existingJob.orElseThrow();
+        GovernmentJob validJob = Objects.requireNonNull(job);
+        validJob.setId(id);
+        validJob.setActive(existing.isActive());
+        validJob.setCreatedAt(existing.getCreatedAt());
+        GovernmentJob updatedJob = jobRepository.save(validJob);
         return ResponseEntity.ok(updatedJob);
     }
     
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<GovernmentJob> deactivateJob(@PathVariable Long id) {
-        Optional<GovernmentJob> jobOpt = jobRepository.findById(id);
-        if (jobOpt.isPresent()) {
-            GovernmentJob job = jobOpt.get();
-            job.setActive(false);
-            GovernmentJob updatedJob = jobRepository.save(job);
-            return ResponseEntity.ok(updatedJob);
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<GovernmentJob> deactivateJob(@PathVariable @NonNull Long id) {
+        return jobRepository.findById(id)
+                .map(job -> {
+                    job.setActive(false);
+                    GovernmentJob updatedJob = jobRepository.save(job);
+                    return ResponseEntity.ok(updatedJob);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/activate")
-    public ResponseEntity<GovernmentJob> activateJob(@PathVariable Long id) {
-        Optional<GovernmentJob> jobOpt = jobRepository.findById(id);
-        if (jobOpt.isPresent()) {
-            GovernmentJob job = jobOpt.get();
-            job.setActive(true);
-            GovernmentJob updatedJob = jobRepository.save(job);
-            return ResponseEntity.ok(updatedJob);
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<GovernmentJob> activateJob(@PathVariable @NonNull Long id) {
+        return jobRepository.findById(id)
+                .map(job -> {
+                    job.setActive(true);
+                    GovernmentJob updatedJob = jobRepository.save(job);
+                    return ResponseEntity.ok(updatedJob);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteJob(@PathVariable @NonNull Long id) {
         if (!jobRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -119,7 +142,7 @@ public class GovernmentJobController {
         return ResponseEntity.ok().build();
     }
 
-    private void normalizeJob(GovernmentJob job) {
+    private void normalizeJob(@Nullable GovernmentJob job) {
         if (job == null) {
             return;
         }
@@ -128,13 +151,14 @@ public class GovernmentJobController {
         job.setType(trimToNull(job.getType()));
         job.setSalary(trimToNull(job.getSalary()));
         job.setVacancies(trimToNull(job.getVacancies()));
-        job.setQualificationCriteria(trimToNull(job.getQualificationCriteria()));
-        job.setFieldCriteria(trimToNull(job.getFieldCriteria()));
-        job.setGenderCriteria(trimToNull(job.getGenderCriteria()));
-        job.setAgeRelaxationCriteria(trimToNull(job.getAgeRelaxationCriteria()));
+        job.setApplicationDeadline(trimToNull(job.getApplicationDeadline()));
+        job.setQualificationCriteria(criteriaNormalizer.normalizeListCriteria(job.getQualificationCriteria()));
+        job.setFieldCriteria(criteriaNormalizer.normalizeListCriteria(job.getFieldCriteria()));
+        job.setGenderCriteria(criteriaNormalizer.normalizeListCriteria(job.getGenderCriteria()));
+        job.setAgeRelaxationCriteria(criteriaNormalizer.normalizeMapCriteria(job.getAgeRelaxationCriteria()));
     }
 
-    private boolean isInvalidJob(GovernmentJob job) {
+    private boolean isInvalidJob(@Nullable GovernmentJob job) {
         return job == null
                 || job.getName() == null
                 || job.getType() == null
@@ -147,7 +171,8 @@ public class GovernmentJobController {
         return minAge != null && maxAge != null && minAge > maxAge;
     }
 
-    private String trimToNull(String value) {
+    @Nullable
+    private String trimToNull(@Nullable String value) {
         if (value == null) {
             return null;
         }

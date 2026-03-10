@@ -1,0 +1,407 @@
+{
+  "meta": {
+    "eyebrow": "Public web reference",
+    "title": "Eligibuddy Developer Guide",
+    "summary": "A standalone, publish-ready reference for developers working on Eligibuddy. This guide reflects the current MongoDB-backed Spring Boot application and the Ollama-based assistant flow verified on March 11, 2026.",
+    "repoUrl": "https://github.com/chinmay-476/eligibuddy",
+    "primaryActionLabel": "Open setup guide",
+    "secondaryActionLabel": "Publish on GitHub Pages",
+    "highlights": [
+      "Spring Boot 3.5.11",
+      "MongoDB + Compass friendly",
+      "Thymeleaf + modular frontend",
+      "Ollama local assistant"
+    ]
+  },
+  "publish": {
+    "title": "Designed to live outside the app",
+    "description": "This documentation site belongs at repository root under /docs, not inside the Spring project. That keeps the product code separate and makes GitHub Pages deployment straightforward.",
+    "points": [
+      "Host the guide from the repository root /docs folder",
+      "Keep the Spring Boot app unchanged under /demo",
+      "Push to GitHub and publish with Pages for a public developer reference"
+    ],
+    "expectedUrl": "https://chinmay-476.github.io/eligibuddy/"
+  },
+  "quickFacts": [
+    { "label": "Java baseline", "value": "Java 17" },
+    { "label": "Spring Boot version", "value": "3.5.11" },
+    { "label": "Primary database", "value": "MongoDB" },
+    { "label": "Assistant provider", "value": "Local Ollama" },
+    { "label": "Admin data modules", "value": "4 CRUD panels" },
+    { "label": "Verified seed snapshot", "value": "57 / 54 / 72 / 174" }
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "eyebrow": "Context",
+      "title": "What Eligibuddy currently is",
+      "intro": "Eligibuddy helps users discover scholarships, government schemes, competitive exams, and government jobs from a single interface. The app combines account-based access, admin CRUD tools, eligibility matching, and a contextual assistant.",
+      "tags": ["product", "scope", "current state"],
+      "cards": [
+        {
+          "title": "Main user outcome",
+          "body": "A signed-in user can fill their eligibility profile, review matches, and ask the assistant what to prioritize next.",
+          "bullets": [
+            "Landing page shows opportunities across four modules",
+            "Contact and profile flows are protected behind login",
+            "Assistant responds with user-facing guidance, not developer-mode output"
+          ]
+        },
+        {
+          "title": "Main admin outcome",
+          "body": "An admin can manage scholarships, schemes, exams, and jobs through dedicated pages and backend CRUD APIs.",
+          "bullets": [
+            "Create, update, deactivate, activate, and delete are supported",
+            "Admin pages can access inactive records",
+            "Public lists only return active records"
+          ]
+        },
+        {
+          "title": "Current storage model",
+          "body": "The app now runs on MongoDB and can be inspected directly in MongoDB Compass.",
+          "bullets": [
+            "Numeric IDs are preserved through a database sequence collection",
+            "Opportunity data is seeded from a JSON dataset on first run",
+            "Users, contacts, and all opportunity types are stored in Mongo collections"
+          ]
+        }
+      ],
+      "notes": [
+        "Verified against a local MongoDB server on March 11, 2026.",
+        "Seed snapshot counts mean scholarships=57, schemes=54, exams=72, jobs=174."
+      ]
+    },
+    {
+      "id": "architecture",
+      "eyebrow": "Architecture",
+      "title": "Runtime shape and code boundaries",
+      "intro": "The current codebase is split by responsibility under com.example.demo. The frontend is modularized and pulls live data from backend APIs rather than relying on a static in-page dataset.",
+      "tags": ["packages", "flow", "modules"],
+      "cards": [
+        {
+          "title": "Web and page layer",
+          "body": "Thymeleaf templates render login, register, profile, contact, landing page, and admin manager pages.",
+          "bullets": [
+            "Main page route is handled by HelloController",
+            "Admin page routes include /manage-scholarships, /manage-schemes, /manage-exams, and /manage-jobs",
+            "Frontend logic is loaded from static CSS and JS assets"
+          ]
+        },
+        {
+          "title": "API layer",
+          "body": "REST controllers expose the opportunity modules and the assistant endpoint.",
+          "bullets": [
+            "Opportunity controllers live under com.example.demo.opportunity",
+            "Assistant endpoint lives under /api/chat",
+            "Public GET and admin-only writes are enforced in SecurityConfig"
+          ]
+        },
+        {
+          "title": "Persistence layer",
+          "body": "Spring Data Mongo repositories back users, contacts, and all opportunity entities.",
+          "bullets": [
+            "MongoRepository replaces JPA repositories",
+            "DatabaseSequence stores next numeric values",
+            "CompleteDataInitializer seeds collections from static/data/eligibility-data.json when empty"
+          ]
+        }
+      ],
+      "table": {
+        "label": "Package map",
+        "title": "Core package responsibilities",
+        "note": "Paths are relative to demo/src/main/java/com/example/demo.",
+        "columns": ["Package", "Purpose", "Examples"],
+        "rows": [
+          ["code:auth", "Authentication, registration, user loading, seed users", "code:AuthController, UserService, CustomUserDetailsService"],
+          ["code:web", "MVC page routes and contact form flow", "code:HelloController"],
+          ["code:contact", "Contact model, repository, and save/list service", "code:Contact, ContactService"],
+          ["code:opportunity", "Scholarship, scheme, exam, and job APIs plus repositories", "code:ScholarshipController, GovernmentJobRepository"],
+          ["code:ai", "Assistant chat controller, Ollama integration, fallback continuity", "code:AssistantChatController, OllamaChatService"],
+          ["code:config", "Security, password encoding, Mongo sequence utilities", "code:SecurityConfig, MongoSequenceService"],
+          ["code:init", "Startup data seeding from the eligibility JSON dataset", "code:CompleteDataInitializer"]
+        ]
+      }
+    },
+    {
+      "id": "setup",
+      "eyebrow": "Setup",
+      "title": "Local developer setup",
+      "intro": "Use Java 17, a local MongoDB server, and an optional local Ollama instance if you want assistant responses beyond the fallback mode.",
+      "tags": ["bootstrap", "run", "local dev"],
+      "steps": [
+        {
+          "title": "Start MongoDB locally",
+          "body": "Run MongoDB on port 27017. MongoDB Compass can connect to the same server and inspect the eligibuddy database."
+        },
+        {
+          "title": "Use Java 17 for this repo",
+          "body": "Do not use Java 8 for this project. The app compiles and runs against Java 17.",
+          "note": "If you also work on an Android Java 8 project, keep a workspace-specific VS Code JDK override."
+        },
+        {
+          "title": "Run the Spring app from /demo",
+          "body": "The first startup seeds Mongo collections if they are empty and prints the local URL in the terminal."
+        },
+        {
+          "title": "Optionally start Ollama",
+          "body": "If Ollama is available at the configured base URL, the assistant uses it. Otherwise the app falls back to contextual responses."
+        }
+      ],
+      "codeSamples": [
+        {
+          "label": "Windows PowerShell",
+          "title": "Run the app",
+          "code": ".\\mvnw.cmd spring-boot:run",
+          "note": "Execute this inside the demo directory."
+        },
+        {
+          "label": "macOS or Linux",
+          "title": "Run the app",
+          "code": "./mvnw spring-boot:run",
+          "note": "Execute this inside the demo directory."
+        },
+        {
+          "label": "Verification",
+          "title": "Compile without tests",
+          "code": ".\\mvnw.cmd -DskipTests compile",
+          "note": "Useful for quick verification after frontend or controller changes."
+        }
+      ]
+    },
+    {
+      "id": "configuration",
+      "eyebrow": "Configuration",
+      "title": "Environment and runtime configuration",
+      "intro": "Runtime configuration is split between application.yml and application.properties. MongoDB and Ollama are both configurable through environment variables.",
+      "tags": ["env vars", "ports", "runtime"],
+      "table": {
+        "label": "Environment variables",
+        "title": "Key runtime settings",
+        "note": "Defaults reflect the current local-first developer setup.",
+        "columns": ["Key", "Default", "Where used", "Purpose"],
+        "rows": [
+          ["code:MONGODB_URI", "code:mongodb://localhost:27017/eligibuddy", "code:application.yml", "Primary database connection string"],
+          ["code:OLLAMA_BASE_URL", "code:http://localhost:11434", "code:application.yml + application.properties", "Ollama HTTP endpoint"],
+          ["code:OLLAMA_MODEL", "code:llama3.2:3b", "code:application.yml + application.properties", "Default local LLM model"],
+          ["code:OLLAMA_TIMEOUT_SECONDS", "code:45", "code:application.yml + application.properties", "Assistant request timeout"],
+          ["code:server.port", "code:8080", "code:application.yml", "HTTP port for the Spring app"]
+        ]
+      },
+      "notes": [
+        "Mongo auto-index creation is enabled.",
+        "Thymeleaf template caching is disabled for easier local iteration."
+      ]
+    },
+    {
+      "id": "security",
+      "eyebrow": "Security",
+      "title": "Access model and current protections",
+      "intro": "Security rules are centralized in SecurityConfig. The current model is strict enough for admin CRUD separation, but there are still development shortcuts you should review before a production launch.",
+      "tags": ["auth", "roles", "review before prod"],
+      "table": {
+        "label": "Access matrix",
+        "title": "Who can reach what",
+        "note": "This reflects the verified routing behavior on March 11, 2026.",
+        "columns": ["Area", "Access", "Notes"],
+        "rows": [
+          ["code:/, /login, /register, /css/**, /js/**, /images/**, /data/**", "Public", "Landing page and static assets are open"],
+          ["code:/contact, /profile/**", "Authenticated user", "Login is required"],
+          ["code:/view-contacts, /view-users, /manage-*", "Admin only", "Admin panel access is role-protected"],
+          ["code:GET /api/scholarships/**, /api/schemes/**, /api/exams/**, /api/jobs/**", "Public", "Public read endpoints return active records only"],
+          ["code:POST/PUT/DELETE on opportunity APIs", "Admin only", "Write operations are blocked for normal users"],
+          ["code:/api/chat/**", "Authenticated user", "Assistant can only open after login"]
+        ]
+      },
+      "checklist": [
+        "Restrict or remove the /cleanup route before production.",
+        "Replace seeded default credentials for public deployment.",
+        "Review CSRF strategy because CSRF is currently disabled."
+      ]
+    },
+    {
+      "id": "admin",
+      "eyebrow": "Admin workflows",
+      "title": "How admin CRUD is expected to behave",
+      "intro": "The admin pages and controllers were aligned so all four opportunity modules behave consistently. This is the baseline you should preserve when extending the panel.",
+      "tags": ["crud", "admin panel", "consistency"],
+      "cards": [
+        {
+          "title": "Scholarships",
+          "body": "Uses ScholarshipController plus ScholarshipService. IDs and createdAt are preserved on update.",
+          "bullets": [
+            "Public reads show only active records",
+            "Admin can fetch inactive records through admin endpoints",
+            "Activate and deactivate are explicit endpoints"
+          ]
+        },
+        {
+          "title": "Schemes and exams",
+          "body": "Both controllers normalize input, validate required fields, and preserve active state during updates.",
+          "bullets": [
+            "Admin/all endpoints expose full datasets for dashboards",
+            "Type and search endpoints stay public and active-only",
+            "Bad payloads return HTTP 400"
+          ]
+        },
+        {
+          "title": "Jobs",
+          "body": "Jobs now support an applicationDeadline field in both the API and the admin UI.",
+          "bullets": [
+            "Manage jobs page includes add, edit, activate, deactivate, and delete",
+            "Frontend opportunity cards display the application deadline",
+            "Live data comes from the backend, not a baked-in template list"
+          ]
+        }
+      ],
+      "notes": [
+        "Verified CRUD cycle: create, update, deactivate, reactivate, and delete all succeeded for scholarships, schemes, exams, and jobs.",
+        "Admin pages should keep using the admin-only list endpoints if you need inactive rows for editing."
+      ]
+    },
+    {
+      "id": "apis",
+      "eyebrow": "API reference",
+      "title": "Public and admin API map",
+      "intro": "This is the high-level route map developers typically need when wiring UI features or testing with Postman.",
+      "tags": ["rest", "controllers", "testing"],
+      "apiGroups": [
+        {
+          "label": "Opportunity module",
+          "title": "Scholarships",
+          "intro": "Controller: ScholarshipController. Public reads use active records; admin writes require ADMIN.",
+          "endpoints": [
+            { "method": "GET", "path": "/api/scholarships", "access": "Public", "purpose": "List active scholarships" },
+            { "method": "GET", "path": "/api/scholarships/{id}", "access": "Public", "purpose": "Read one active scholarship" },
+            { "method": "GET", "path": "/api/scholarships/admin/all", "access": "Admin", "purpose": "List all scholarships including inactive" },
+            { "method": "GET", "path": "/api/scholarships/admin/{id}", "access": "Admin", "purpose": "Read one scholarship regardless of active state" },
+            { "method": "POST", "path": "/api/scholarships", "access": "Admin", "purpose": "Create scholarship" },
+            { "method": "PUT", "path": "/api/scholarships/{id}", "access": "Admin", "purpose": "Update scholarship" },
+            { "method": "PUT", "path": "/api/scholarships/{id}/deactivate", "access": "Admin", "purpose": "Deactivate scholarship" },
+            { "method": "PUT", "path": "/api/scholarships/{id}/activate", "access": "Admin", "purpose": "Reactivate scholarship" },
+            { "method": "DELETE", "path": "/api/scholarships/{id}", "access": "Admin", "purpose": "Delete scholarship" }
+          ]
+        },
+        {
+          "label": "Opportunity module",
+          "title": "Schemes, exams, and jobs",
+          "intro": "The three remaining opportunity controllers follow the same shape as scholarships, with admin/all and admin/{id} endpoints for the panel.",
+          "endpoints": [
+            { "method": "GET", "path": "/api/schemes | /api/exams | /api/jobs", "access": "Public", "purpose": "List active records by module" },
+            { "method": "GET", "path": "/api/*/{id}", "access": "Public", "purpose": "Read one active record" },
+            { "method": "GET", "path": "/api/*/admin/all", "access": "Admin", "purpose": "List all records including inactive" },
+            { "method": "GET", "path": "/api/*/admin/{id}", "access": "Admin", "purpose": "Read one record for editing" },
+            { "method": "POST", "path": "/api/*", "access": "Admin", "purpose": "Create record" },
+            { "method": "PUT", "path": "/api/*/{id}", "access": "Admin", "purpose": "Update record" },
+            { "method": "PUT", "path": "/api/*/{id}/deactivate", "access": "Admin", "purpose": "Deactivate record" },
+            { "method": "PUT", "path": "/api/*/{id}/activate", "access": "Admin", "purpose": "Reactivate record" },
+            { "method": "DELETE", "path": "/api/*/{id}", "access": "Admin", "purpose": "Delete record" }
+          ]
+        },
+        {
+          "label": "Assistant module",
+          "title": "Chat endpoint",
+          "intro": "Controller: AssistantChatController. This endpoint is authenticated and keeps short session history for continuity.",
+          "endpoints": [
+            { "method": "POST", "path": "/api/chat", "access": "Authenticated user", "purpose": "Send a chat message plus current page context" }
+          ]
+        }
+      ],
+      "codeSamples": [
+        {
+          "label": "Example payload",
+          "title": "Assistant request body",
+          "code": "{\n  \"message\": \"What should I apply to first?\",\n  \"context\": {\n    \"profile\": {\n      \"age\": 21,\n      \"qualification\": \"Graduate\",\n      \"state\": \"Odisha\",\n      \"category\": \"OBC\"\n    },\n    \"results\": {\n      \"scholarships\": 8,\n      \"schemes\": 5,\n      \"exams\": 4,\n      \"jobs\": 6,\n      \"currentFilter\": \"scholarships\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "eyebrow": "Data model",
+      "title": "MongoDB collections and seed strategy",
+      "intro": "The app seeds opportunity records from a JSON file and stores operational data in MongoDB. MongoDB Compass is useful for inspection, but the source of truth is the database server itself.",
+      "tags": ["mongodb", "seed", "collections"],
+      "table": {
+        "label": "Mongo collections",
+        "title": "Current storage layout",
+        "note": "Counts reflect a verified local run on March 11, 2026 after seeding.",
+        "columns": ["Collection", "Purpose", "Verified count"],
+        "rows": [
+          ["code:users", "Application users including seeded admin and user accounts", "2"],
+          ["code:contacts", "Stored contact form submissions", "0"],
+          ["code:scholarships", "Scholarship opportunity records", "57"],
+          ["code:government_schemes", "Government scheme records", "54"],
+          ["code:competitive_exams", "Competitive exam records", "72"],
+          ["code:government_jobs", "Government job records", "174"],
+          ["code:database_sequences", "Next numeric values for Mongo-backed IDs", "5"]
+        ]
+      },
+      "notes": [
+        "The seed file lives at demo/src/main/resources/static/data/eligibility-data.json.",
+        "CompleteDataInitializer only seeds a module collection if that collection is empty.",
+        "Numeric IDs are generated by incrementing documents in database_sequences."
+      ]
+    },
+    {
+      "id": "assistant",
+      "eyebrow": "AI assistant",
+      "title": "Ollama integration and continuity behavior",
+      "intro": "The chatbot is no longer a public Gemini helper. It is a logged-in Eligibuddy assistant that speaks to users about their current opportunities and can fall back gracefully if Ollama is unavailable.",
+      "tags": ["ollama", "fallback", "context"],
+      "cards": [
+        { "title": "Login requirement", "body": "The assistant only renders for authenticated users and the backend rejects anonymous chat requests." },
+        { "title": "Context flow", "body": "The frontend sends current profile details and result counts with each message so follow-up questions stay grounded." },
+        { "title": "Fallback strategy", "body": "If Ollama fails or times out, the app generates a contextual fallback response instead of failing the chat interaction." }
+      ],
+      "checklist": [
+        "Keep prompts user-centric and action-oriented.",
+        "Do not invent counts or opportunity details that are not in context.",
+        "Keep session history short so chat stays relevant and bounded."
+      ]
+    },
+    {
+      "id": "deploy",
+      "eyebrow": "Deployment",
+      "title": "Application deployment checklist",
+      "intro": "Use this before treating the app as deployment-ready beyond local or classroom use.",
+      "tags": ["release", "hardening", "ops"],
+      "checklist": [
+        "Set a production-grade MongoDB URI instead of the local default.",
+        "Replace seeded development credentials and stop printing them at startup.",
+        "Audit the /cleanup route and remove it or restrict it to ADMIN.",
+        "Review CSRF policy, session management, and logging verbosity.",
+        "Verify Ollama availability or define the expected fallback-only behavior.",
+        "Smoke-test all four admin modules against the target database."
+      ]
+    },
+    {
+      "id": "publish",
+      "eyebrow": "Public docs",
+      "title": "How to publish this guide on the web",
+      "intro": "This site is designed for GitHub Pages. Because it lives under /docs, it stays separate from the Spring Boot app and can be published as a static site.",
+      "tags": ["github pages", "public reference"],
+      "steps": [
+        {
+          "title": "Push the repository with the /docs folder",
+          "body": "The public guide assets should remain at repository root under docs/ so GitHub Pages can serve them directly."
+        },
+        {
+          "title": "Enable GitHub Pages",
+          "body": "In the GitHub repository settings, enable Pages. If you keep the included workflow, use GitHub Actions as the source."
+        },
+        {
+          "title": "Share the Pages URL",
+          "body": "The guide becomes a clean public developer reference without mixing docs into the Spring app templates."
+        }
+      ],
+      "codeSamples": [
+        {
+          "label": "Expected location",
+          "title": "Public docs folder",
+          "code": "docs/\n  index.html\n  styles.css\n  app.js\n  data/developer-guide.json",
+          "note": "This is intentionally outside demo/."
+        }
+      ]
+    }
+  ]
+}

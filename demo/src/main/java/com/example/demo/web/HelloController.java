@@ -4,32 +4,35 @@ import com.example.demo.auth.UserService;
 import com.example.demo.contact.Contact;
 import com.example.demo.contact.ContactService;
 import com.example.demo.validation.InputValidationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;        
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @Controller
 public class HelloController {
-    
-    @Autowired
-    private ContactService contactService;
-    
-    @Autowired
-    private UserService userService;
+
+    private final ContactService contactService;
+    private final UserService userService;
+
+    public HelloController(ContactService contactService, UserService userService) {
+        this.contactService = contactService;
+        this.userService = userService;
+    }
     
     @GetMapping("/")
     public String home(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
-        } else {
-            model.addAttribute("username", null);
-            model.addAttribute("isAdmin", false);
-        }
+        getAuthenticatedUsername().ifPresentOrElse(
+                username -> populateUserContext(model, username),
+                () -> {
+                    model.addAttribute("username", null);
+                    model.addAttribute("isAdmin", false);
+                }
+        );
         return "frontend";  
     }
     
@@ -37,7 +40,7 @@ public class HelloController {
     @ResponseBody
     public String testAuth() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+        if (isAuthenticated(auth)) {
             return "Authenticated as: " + auth.getName() + ", Authorities: " + auth.getAuthorities();
         } else {
             return "Not authenticated";
@@ -46,14 +49,13 @@ public class HelloController {
     
     @GetMapping("/contact")
     public String contactForm(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
-        } else {
-            model.addAttribute("username", null);
-            model.addAttribute("isAdmin", false);
-        }
+        getAuthenticatedUsername().ifPresentOrElse(
+                username -> populateUserContext(model, username),
+                () -> {
+                    model.addAttribute("username", null);
+                    model.addAttribute("isAdmin", false);
+                }
+        );
         if (!model.containsAttribute("contact")) {
             model.addAttribute("contact", new Contact());
         }
@@ -61,96 +63,87 @@ public class HelloController {
     }
     
     @PostMapping("/contact")
-    public String saveContact(@ModelAttribute("contact") Contact contact, Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+    public String saveContact(@ModelAttribute("contact") @Nullable Contact contact, Model model) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
-        
+
+        String username = authenticatedUsername.orElseThrow();
+
         try {
             // Validate contact data
             if (contact == null) {
                 model.addAttribute("error", "Contact details are required!");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", new Contact());
                 return "contact";
             }
 
-            contact.setName(contact.getName() == null ? null : contact.getName().trim());
-            contact.setEmail(contact.getEmail() == null ? null : contact.getEmail().trim());
-            contact.setPhoneNumber(contact.getPhoneNumber() == null ? null : contact.getPhoneNumber().trim());
-            contact.setMessage(contact.getMessage() == null ? null : contact.getMessage().trim());
+            contact.setName(trimToNull(contact.getName()));
+            contact.setEmail(trimToNull(contact.getEmail()));
+            contact.setPhoneNumber(trimToNull(contact.getPhoneNumber()));
+            contact.setMessage(trimToNull(contact.getMessage()));
 
             if (contact.getName() == null || contact.getName().isEmpty()) {
                 model.addAttribute("error", "Name is required!");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
             
             if (!InputValidationUtils.isValidName(contact.getName())) {
                 model.addAttribute("error", "Please enter a valid name.");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
 
             if (contact.getEmail() == null || contact.getEmail().isEmpty()) {
                 model.addAttribute("error", "Email is required!");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
 
             if (!InputValidationUtils.isValidEmail(contact.getEmail())) {
                 model.addAttribute("error", "Please enter a valid email address.");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
 
             if (contact.getPhoneNumber() == null || contact.getPhoneNumber().isEmpty()) {
                 model.addAttribute("error", "Phone number is required!");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
 
             if (!InputValidationUtils.isValidPhoneNumber(contact.getPhoneNumber())) {
                 model.addAttribute("error", "Please enter a valid 10-digit mobile number.");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
             
             if (contact.getMessage() == null || contact.getMessage().isEmpty()) {
                 model.addAttribute("error", "Message is required!");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
 
             if (contact.getMessage().length() < 10 || contact.getMessage().length() > 1000) {
                 model.addAttribute("error", "Message must be between 10 and 1000 characters.");
-                model.addAttribute("username", auth.getName());
-                model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+                populateUserContext(model, username);
                 model.addAttribute("contact", contact);
                 return "contact";
             }
 
             contactService.saveContact(contact);
             model.addAttribute("message", "Message sent successfully!");
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+            populateUserContext(model, username);
             model.addAttribute("contact", new Contact());
             return "contact";
         } catch (Exception e) {
@@ -158,8 +151,7 @@ public class HelloController {
             e.printStackTrace();
             model.addAttribute("error", "Error saving contact. Please try again.");
             
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", userService.isAdmin(auth.getName()));
+            populateUserContext(model, username);
             model.addAttribute("contact", contact);
             return "contact";
         }
@@ -167,48 +159,44 @@ public class HelloController {
     
     @GetMapping("/view-contacts")
     public String viewContacts(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
-        
-        if (!userService.isAdmin(auth.getName())) {
+
+        String username = authenticatedUsername.orElseThrow();
+        if (!userService.isAdmin(username)) {
             return "redirect:/";
         }
         
         try {
             model.addAttribute("contacts", contactService.getAllContacts());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         } catch (Exception e) {
             model.addAttribute("error", "Error: " + e.getMessage());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         }
         return "view_contacts";
     }
     
     @GetMapping("/view-users")
     public String viewUsers(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
-        
-        if (!userService.isAdmin(auth.getName())) {
+
+        String username = authenticatedUsername.orElseThrow();
+        if (!userService.isAdmin(username)) {
             return "redirect:/";
         }
         
         try {
             model.addAttribute("users", userService.getAllUsers());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         } catch (Exception e) {
             model.addAttribute("error", "Error: " + e.getMessage());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         }
         return "view_users";
     }
@@ -229,94 +217,114 @@ public class HelloController {
     
     @GetMapping("/manage-scholarships")
     public String manageScholarships(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
-        
-        if (!userService.isAdmin(auth.getName())) {
+
+        String username = authenticatedUsername.orElseThrow();
+        if (!userService.isAdmin(username)) {
             return "redirect:/";
         }
         
         try {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         } catch (Exception e) {
             model.addAttribute("error", "Error: " + e.getMessage());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         }
         return "manage_scholarships";
     }
 
     @GetMapping("/manage-schemes")
     public String manageSchemes(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
 
-        if (!userService.isAdmin(auth.getName())) {
+        String username = authenticatedUsername.orElseThrow();
+        if (!userService.isAdmin(username)) {
             return "redirect:/";
         }
 
         try {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         } catch (Exception e) {
             model.addAttribute("error", "Error: " + e.getMessage());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         }
         return "manage_schemes";
     }
 
     @GetMapping("/manage-exams")
     public String manageExams(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
 
-        if (!userService.isAdmin(auth.getName())) {
+        String username = authenticatedUsername.orElseThrow();
+        if (!userService.isAdmin(username)) {
             return "redirect:/";
         }
 
         try {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         } catch (Exception e) {
             model.addAttribute("error", "Error: " + e.getMessage());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         }
         return "manage_exams";
     }
 
     @GetMapping("/manage-jobs")
     public String manageJobs(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
 
-        if (!userService.isAdmin(auth.getName())) {
+        String username = authenticatedUsername.orElseThrow();
+        if (!userService.isAdmin(username)) {
             return "redirect:/";
         }
 
         try {
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         } catch (Exception e) {
             model.addAttribute("error", "Error: " + e.getMessage());
-            model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", true);
+            populateUserContext(model, username);
         }
         return "manage_jobs";
+    }
+
+    private Optional<String> getAuthenticatedUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!isAuthenticated(authentication)) {
+            return Optional.empty();
+        }
+        return Optional.of(authentication.getName());
+    }
+
+    private boolean isAuthenticated(Authentication authentication) {
+        return authentication != null
+                && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName());
+    }
+
+    private void populateUserContext(Model model, String username) {
+        model.addAttribute("username", username);
+        model.addAttribute("isAdmin", userService.isAdmin(username));
+    }
+
+    @Nullable
+    private String trimToNull(@Nullable String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
 

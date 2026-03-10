@@ -182,29 +182,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="qualificationCriteria" class="form-label">Qualifications (JSON array)</label>
-                                    <input type="text" class="form-control" id="qualificationCriteria" placeholder='["12th","Graduate"]'>
+                                    <label for="qualificationCriteria" class="form-label">Qualifications</label>
+                                    <input type="text" class="form-control" id="qualificationCriteria" placeholder="12th, Graduate">
+                                    <div class="form-text">Add one or more qualifications separated by commas.</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="incomeCriteria" class="form-label">Income (JSON array)</label>
-                                    <input type="text" class="form-control" id="incomeCriteria" placeholder='["0-100000","100000-250000"]'>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="categoryCriteria" class="form-label">Category (JSON array)</label>
-                                    <input type="text" class="form-control" id="categoryCriteria" placeholder='["General","OBC","SC","ST"]'>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="fieldCriteria" class="form-label">Field (JSON array)</label>
-                                    <input type="text" class="form-control" id="fieldCriteria" placeholder='["Engineering","Medical"]'>
+                                    <label for="incomeCriteria" class="form-label">Income Ranges</label>
+                                    <input type="text" class="form-control" id="incomeCriteria" placeholder="0-100000, 100000-250000">
+                                    <div class="form-text">Use comma-separated ranges exactly like the home form values.</div>
                                 </div>
                             </div>
                         </div>
@@ -212,14 +199,33 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="genderCriteria" class="form-label">Gender (JSON array)</label>
-                                    <input type="text" class="form-control" id="genderCriteria" placeholder='["Female"]'>
+                                    <label for="categoryCriteria" class="form-label">Categories</label>
+                                    <input type="text" class="form-control" id="categoryCriteria" placeholder="General, OBC, SC, ST">
+                                    <div class="form-text">Example: General, OBC, SC, ST, EWS.</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="disabilityCriteria" class="form-label">Disability (JSON array)</label>
-                                    <input type="text" class="form-control" id="disabilityCriteria" placeholder='["Yes"]'>
+                                    <label for="fieldCriteria" class="form-label">Fields</label>
+                                    <input type="text" class="form-control" id="fieldCriteria" placeholder="Engineering, Medical">
+                                    <div class="form-text">Enter academic or interest fields separated by commas.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="genderCriteria" class="form-label">Gender</label>
+                                    <input type="text" class="form-control" id="genderCriteria" placeholder="Female">
+                                    <div class="form-text">Example: Female or Male, Female.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="disabilityCriteria" class="form-label">Disability</label>
+                                    <input type="text" class="form-control" id="disabilityCriteria" placeholder="Yes">
+                                    <div class="form-text">Use Yes or No, or add multiple values separated by commas.</div>
                                 </div>
                             </div>
                         </div>
@@ -257,6 +263,54 @@
         document.addEventListener('DOMContentLoaded', function () {
             loadSchemes();
         });
+
+        function parseCriteriaList(value) {
+            if (!value) {
+                return [];
+            }
+
+            if (Array.isArray(value)) {
+                return value.map(item => String(item).trim()).filter(Boolean);
+            }
+
+            if (typeof value !== 'string') {
+                return [];
+            }
+
+            const trimmedValue = value.trim();
+            if (!trimmedValue) {
+                return [];
+            }
+
+            try {
+                if (trimmedValue.startsWith('[')) {
+                    const parsed = JSON.parse(trimmedValue);
+                    if (Array.isArray(parsed)) {
+                        return parsed.map(item => String(item).trim()).filter(Boolean);
+                    }
+                }
+            } catch (error) {
+                console.warn('Falling back to comma parsing for criteria value:', value, error);
+            }
+
+            return trimmedValue
+                .split(/[,\n]/)
+                .map(item => item.trim())
+                .filter(Boolean);
+        }
+
+        function formatCriteriaForInput(value) {
+            return parseCriteriaList(value).join(', ');
+        }
+
+        function readCriteriaInput(id) {
+            const values = parseCriteriaList(document.getElementById(id).value);
+            return values.length ? values.join(', ') : null;
+        }
+
+        function isValidSchemeDeadline(value) {
+            return /^ongoing$/i.test(value) || /^\d{2}\/\d{2}\/\d{4}$/.test(value);
+        }
 
         async function loadSchemes() {
             try {
@@ -327,12 +381,12 @@
                     document.getElementById('type').value = scheme.type;
                     document.getElementById('benefit').value = scheme.benefit;
                     document.getElementById('deadline').value = scheme.deadline;
-                    document.getElementById('qualificationCriteria').value = scheme.qualificationCriteria || '';
-                    document.getElementById('incomeCriteria').value = scheme.incomeCriteria || '';
-                    document.getElementById('categoryCriteria').value = scheme.categoryCriteria || '';
-                    document.getElementById('fieldCriteria').value = scheme.fieldCriteria || '';
-                    document.getElementById('genderCriteria').value = scheme.genderCriteria || '';
-                    document.getElementById('disabilityCriteria').value = scheme.disabilityCriteria || '';
+                    document.getElementById('qualificationCriteria').value = formatCriteriaForInput(scheme.qualificationCriteria);
+                    document.getElementById('incomeCriteria').value = formatCriteriaForInput(scheme.incomeCriteria);
+                    document.getElementById('categoryCriteria').value = formatCriteriaForInput(scheme.categoryCriteria);
+                    document.getElementById('fieldCriteria').value = formatCriteriaForInput(scheme.fieldCriteria);
+                    document.getElementById('genderCriteria').value = formatCriteriaForInput(scheme.genderCriteria);
+                    document.getElementById('disabilityCriteria').value = formatCriteriaForInput(scheme.disabilityCriteria);
                     document.getElementById('minAge').value = scheme.minAge || '';
                     document.getElementById('maxAge').value = scheme.maxAge || '';
                     schemeModal.show();
@@ -344,18 +398,24 @@
         }
 
         async function saveScheme() {
+            const deadline = document.getElementById('deadline').value.trim();
+            if (deadline && !isValidSchemeDeadline(deadline)) {
+                alert('Deadline must be Ongoing or in DD/MM/YYYY format.');
+                return;
+            }
+
             const formData = {
                 name: document.getElementById('name').value,
                 description: document.getElementById('description').value,
                 type: document.getElementById('type').value,
                 benefit: document.getElementById('benefit').value,
-                deadline: document.getElementById('deadline').value,
-                qualificationCriteria: document.getElementById('qualificationCriteria').value,
-                incomeCriteria: document.getElementById('incomeCriteria').value,
-                categoryCriteria: document.getElementById('categoryCriteria').value,
-                fieldCriteria: document.getElementById('fieldCriteria').value,
-                genderCriteria: document.getElementById('genderCriteria').value,
-                disabilityCriteria: document.getElementById('disabilityCriteria').value,
+                deadline: deadline,
+                qualificationCriteria: readCriteriaInput('qualificationCriteria'),
+                incomeCriteria: readCriteriaInput('incomeCriteria'),
+                categoryCriteria: readCriteriaInput('categoryCriteria'),
+                fieldCriteria: readCriteriaInput('fieldCriteria'),
+                genderCriteria: readCriteriaInput('genderCriteria'),
+                disabilityCriteria: readCriteriaInput('disabilityCriteria'),
                 minAge: document.getElementById('minAge').value ? parseInt(document.getElementById('minAge').value) : null,
                 maxAge: document.getElementById('maxAge').value ? parseInt(document.getElementById('maxAge').value) : null,
                 active: currentSchemeId ? currentSchemeActive : true

@@ -1,19 +1,24 @@
 package com.example.demo.auth;
 
 import com.example.demo.validation.InputValidationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.Optional;
 
 @Controller
 public class AuthController {
-    
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
     
     @GetMapping("/login")
     public String loginPage(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -37,8 +42,8 @@ public class AuthController {
                               @RequestParam String confirmPassword,
                               Model model) {
 
-        username = username == null ? null : username.trim();
-        email = email == null ? null : email.trim();
+        username = trimToNull(username);
+        email = trimToNull(email);
         model.addAttribute("usernameValue", username == null ? "" : username);
         model.addAttribute("emailValue", email == null ? "" : email);
         
@@ -135,18 +140,12 @@ public class AuthController {
     
     @GetMapping("/profile")
     public String profilePage(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
-        
-        User user = userService.getUserByUsername(auth.getName());
-        if (user != null) {
-            model.addAttribute("user", user);
-            model.addAttribute("username", user.getUsername());
-            model.addAttribute("isAdmin", userService.isAdmin(user.getUsername()));
-        }
-        
+
+        populateProfileModel(model, authenticatedUsername.orElseThrow());
         return "profile";
     }
     
@@ -154,14 +153,14 @@ public class AuthController {
     public String updateProfile(@RequestParam String email, 
                                @RequestParam String newUsername,
                                Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
-        
-        String currentUsername = auth.getName();
-        String trimmedEmail = email == null ? null : email.trim();
-        String trimmedUsername = newUsername == null ? null : newUsername.trim();
+
+        String currentUsername = authenticatedUsername.orElseThrow();
+        String trimmedEmail = trimToNull(email);
+        String trimmedUsername = trimToNull(newUsername);
 
         if (!InputValidationUtils.isValidUsername(trimmedUsername)) {
             model.addAttribute("error", "Username must start with a letter and be 3-20 characters using letters, numbers, or underscores.");
@@ -172,21 +171,15 @@ public class AuthController {
         } else {
             model.addAttribute("error", "Failed to update profile. Username or email may already exist.");
         }
-        
-        User user = userService.getUserByUsername(trimmedUsername);
-        if (user != null) {
-            model.addAttribute("user", user);
-            model.addAttribute("username", user.getUsername());
-            model.addAttribute("isAdmin", userService.isAdmin(user.getUsername()));
-        } else {
-            user = userService.getUserByUsername(currentUsername);
-            if (user != null) {
-                model.addAttribute("user", user);
-                model.addAttribute("username", user.getUsername());
-                model.addAttribute("isAdmin", userService.isAdmin(user.getUsername()));
-            }
-        }
-        
+
+        userService.getUserByUsername(trimmedUsername)
+                .or(() -> userService.getUserByUsername(currentUsername))
+                .ifPresent(user -> {
+                    model.addAttribute("user", user);
+                    model.addAttribute("username", user.getUsername());
+                    model.addAttribute("isAdmin", userService.isAdmin(user.getUsername()));
+                });
+
         return "profile";
     }
     
@@ -195,12 +188,12 @@ public class AuthController {
                                 @RequestParam String newPassword,
                                 @RequestParam String confirmPassword,
                                 Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+        Optional<String> authenticatedUsername = getAuthenticatedUsername();
+        if (authenticatedUsername.isEmpty()) {
             return "redirect:/login";
         }
-        
-        String username = auth.getName();
+
+        String username = authenticatedUsername.orElseThrow();
         
         // Validate new password
         if (!newPassword.equals(confirmPassword)) {
@@ -213,14 +206,35 @@ public class AuthController {
             model.addAttribute("error", "Current password is incorrect!");
         }
         
-        User user = userService.getUserByUsername(username);
-        if (user != null) {
+        populateProfileModel(model, username);
+        return "profile";
+    }
+
+    private Optional<String> getAuthenticatedUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            return Optional.empty();
+        }
+        return Optional.of(authentication.getName());
+    }
+
+    private void populateProfileModel(Model model, String username) {
+        userService.getUserByUsername(username).ifPresent(user -> {
             model.addAttribute("user", user);
             model.addAttribute("username", user.getUsername());
             model.addAttribute("isAdmin", userService.isAdmin(user.getUsername()));
+        });
+    }
+
+    @Nullable
+    private String trimToNull(@Nullable String value) {
+        if (value == null) {
+            return null;
         }
-        
-        return "profile";
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 } 
 

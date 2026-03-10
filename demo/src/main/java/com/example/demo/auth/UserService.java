@@ -1,19 +1,29 @@
 package com.example.demo.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.config.MongoSequenceService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private static final String USER_SEQUENCE = "users_sequence";
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final MongoSequenceService mongoSequenceService;
+
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            MongoSequenceService mongoSequenceService
+    ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.mongoSequenceService = mongoSequenceService;
+    }
     
     public boolean registerUser(String username, String email, String password) {
         System.out.println("Attempting to register user: " + username + " with email: " + email);
@@ -29,6 +39,7 @@ public class UserService {
         }
         
         User user = new User();
+        user.setId(mongoSequenceService.generateSequence(USER_SEQUENCE));
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
@@ -49,8 +60,9 @@ public class UserService {
     }
     
     public boolean isAdmin(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        return user.isPresent() && user.get().getRole() == User.Role.ADMIN;
+        return userRepository.findByUsername(username)
+                .map(user -> user.getRole() == User.Role.ADMIN)
+                .orElse(false);
     }
     
     public List<User> getAllUsers() {
@@ -106,8 +118,8 @@ public class UserService {
         }
     }
     
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 } 
 

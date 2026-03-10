@@ -1,11 +1,11 @@
 package com.example.demo.opportunity;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import java.util.List;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CompetitiveExamRepository extends JpaRepository<CompetitiveExam, Long> {
+public interface CompetitiveExamRepository extends MongoRepository<CompetitiveExam, Long> {
     
     // Find all active exams
     List<CompetitiveExam> findByActiveTrue();

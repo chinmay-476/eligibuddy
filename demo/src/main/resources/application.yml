@@ -4,25 +4,10 @@ server:
 spring:
   application:
     name: demo
-  profiles:
-    active: h2
-  datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: 
-    driver-class-name: org.h2.Driver
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        format_sql: true
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/eligibuddy}
+      auto-index-creation: true
   thymeleaf:
     cache: false
 
@@ -31,29 +16,10 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
     com.example.demo: DEBUG
-    org.hibernate.SQL: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: INFO
 
 # Local Ollama assistant configuration
 ollama:
   base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
   model: ${OLLAMA_MODEL:llama3.2:3b}
   timeout-seconds: ${OLLAMA_TIMEOUT_SECONDS:45}
-
----
-# MySQL Configuration (uncomment to use)
-# spring:
-#   profiles:
-#     active: mysql
-#   datasource:
-#     url: jdbc:mysql://localhost:3306/contactdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
-#     username: ${DB_USERNAME:root}
-#     password: ${DB_PASSWORD:chin1987}
-#     driver-class-name: com.mysql.cj.jdbc.Driver
-#   jpa:
-#     hibernate:
-#       ddl-auto: update
-#     show-sql: true
-#     properties:
-#       hibernate:
-#         dialect: org.hibernate.dialect.MySQLDialect
-#         format_sql: true

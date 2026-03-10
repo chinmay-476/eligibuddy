@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +29,7 @@ public class OllamaChatService {
         @Value("${ollama.model:llama3.2:3b}") String model,
         @Value("${ollama.timeout-seconds:45}") long timeoutSeconds
     ) {
-        this.webClient = webClientBuilder.baseUrl(baseUrl).build();
+        this.webClient = webClientBuilder.baseUrl(Objects.requireNonNull(baseUrl, "ollama.base-url must not be null")).build();
         this.model = model;
         this.timeout = Duration.ofSeconds(timeoutSeconds);
     }
@@ -51,7 +52,7 @@ public class OllamaChatService {
 
         JsonNode response = webClient.post()
             .uri("/api/chat")
-            .contentType(MediaType.APPLICATION_JSON)
+            .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
             .bodyValue(requestBody)
             .retrieve()
             .bodyToMono(JsonNode.class)

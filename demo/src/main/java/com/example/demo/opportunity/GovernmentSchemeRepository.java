@@ -1,11 +1,11 @@
 package com.example.demo.opportunity;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import java.util.List;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
 @Repository
-public interface GovernmentSchemeRepository extends JpaRepository<GovernmentScheme, Long> {
+public interface GovernmentSchemeRepository extends MongoRepository<GovernmentScheme, Long> {
     
     // Find all active schemes
     List<GovernmentScheme> findByActiveTrue();

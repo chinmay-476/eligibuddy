@@ -1,4 +1,9 @@
-const ELIGIBILITY_DATA_URL = '/data/eligibility-data.json';
+const OPPORTUNITY_API_URLS = {
+    scholarships: '/api/scholarships',
+    schemes: '/api/schemes',
+    exams: '/api/exams',
+    jobs: '/api/jobs'
+};
 
 let eligibilityDatabase = null;
 let eligibilityDatabasePromise = null;
@@ -19,12 +24,19 @@ function delay(ms) {
 }
 
 async function loadEligibilityDatabase() {
-    const response = await fetch(ELIGIBILITY_DATA_URL, { cache: 'no-store' });
-    if (!response.ok) {
-        throw new Error(`Failed to load eligibility data (${response.status})`);
-    }
+    const responses = await Promise.all(
+        Object.entries(OPPORTUNITY_API_URLS).map(async ([category, url]) => {
+            const response = await fetch(url, { cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error(`Failed to load ${category} data (${response.status})`);
+            }
 
-    eligibilityDatabase = await response.json();
+            const items = await response.json();
+            return [category, items.map((item) => transformOpportunityItem(category, item))];
+        })
+    );
+
+    eligibilityDatabase = Object.fromEntries(responses);
     return eligibilityDatabase;
 }
 
@@ -46,6 +58,192 @@ function ensureEligibilityDatabaseLoaded() {
 function preloadEligibilityDatabase() {
     ensureEligibilityDatabaseLoaded().catch((error) => {
         console.error('Failed to preload eligibility data:', error);
+    });
+}
+
+function transformOpportunityItem(category, item) {
+    switch (category) {
+        case 'scholarships':
+            return {
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                amount: item.amount,
+                deadline: formatDateForDisplay(item.deadline),
+                type: item.type,
+                eligibility: {
+                    qualification: parseJsonValue(item.qualificationCriteria),
+                    income: parseJsonValue(item.incomeCriteria),
+                    category: parseJsonValue(item.categoryCriteria),
+                    field: parseJsonValue(item.fieldCriteria),
+                    gender: parseJsonValue(item.genderCriteria),
+                    state: parseJsonValue(item.stateCriteria),
+                    age: toAgeRange(item.minAge, item.maxAge)
+                }
+            };
+        case 'schemes':
+            return {
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                benefit: item.benefit,
+                deadline: item.deadline,
+                type: item.type,
+                eligibility: {
+                    qualification: parseJsonValue(item.qualificationCriteria),
+                    income: parseJsonValue(item.incomeCriteria),
+                    category: parseJsonValue(item.categoryCriteria),
+                    field: parseJsonValue(item.fieldCriteria),
+                    gender: parseJsonValue(item.genderCriteria),
+                    state: parseJsonValue(item.stateCriteria),
+                    disability: parseJsonValue(item.disabilityCriteria),
+                    age: toAgeRange(item.minAge, item.maxAge)
+                }
+            };
+        case 'exams':
+            return {
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                examDate: item.examDate,
+                applicationFee: item.applicationFee,
+                type: item.type,
+                eligibility: {
+                    qualification: parseJsonValue(item.qualificationCriteria),
+                    field: parseJsonValue(item.fieldCriteria),
+                    gender: parseJsonValue(item.genderCriteria),
+                    ageRelaxation: parseMapValue(item.ageRelaxationCriteria),
+                    age: toAgeRange(item.minAge, item.maxAge)
+                }
+            };
+        case 'jobs':
+            return {
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                salary: item.salary,
+                vacancies: item.vacancies,
+                applicationDeadline: formatDateForDisplay(item.applicationDeadline) || item.applicationDeadline,
+                type: item.type,
+                eligibility: {
+                    qualification: parseJsonValue(item.qualificationCriteria),
+                    field: parseJsonValue(item.fieldCriteria),
+                    gender: parseJsonValue(item.genderCriteria),
+                    ageRelaxation: parseMapValue(item.ageRelaxationCriteria),
+                    age: toAgeRange(item.minAge, item.maxAge)
+                }
+            };
+        default:
+            return item;
+    }
+}
+
+function parseJsonValue(value) {
+    if (Array.isArray(value)) {
+        const normalizedItems = value
+            .map((item) => String(item || '').trim())
+            .filter((item) => item !== '');
+        return normalizedItems.length > 0 ? normalizedItems : null;
+    }
+
+    if (value && typeof value === 'object') {
+        return value;
+    }
+
+    if (!value || typeof value !== 'string') {
+        return null;
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+        return null;
+    }
+
+    try {
+        if (trimmedValue.startsWith('[') || trimmedValue.startsWith('{')) {
+            const parsedValue = JSON.parse(trimmedValue);
+            if (Array.isArray(parsedValue)) {
+                const normalizedItems = parsedValue
+                    .map((item) => String(item || '').trim())
+                    .filter((item) => item !== '');
+                return normalizedItems.length > 0 ? normalizedItems : null;
+            }
+            return parsedValue && typeof parsedValue === 'object' ? parsedValue : null;
+        }
+    } catch (error) {
+        console.warn('Failed to parse JSON criteria:', value, error);
+    }
+
+    const normalizedItems = trimmedValue
+        .split(/[,\n]/)
+        .map((item) => item.trim())
+        .filter((item) => item !== '');
+
+    return normalizedItems.length > 0 ? normalizedItems : null;
+}
+
+function parseMapValue(value) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return Object.fromEntries(
+            Object.entries(value).map(([key, mapValue]) => [String(key).trim(), Number(mapValue) || 0])
+        );
+    }
+
+    if (!value || typeof value !== 'string') {
+        return null;
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+        return null;
+    }
+
+    try {
+        if (trimmedValue.startsWith('{')) {
+            const parsedValue = JSON.parse(trimmedValue);
+            if (parsedValue && typeof parsedValue === 'object' && !Array.isArray(parsedValue)) {
+                return Object.fromEntries(
+                    Object.entries(parsedValue).map(([key, mapValue]) => [String(key).trim(), Number(mapValue) || 0])
+                );
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to parse map criteria:', value, error);
+    }
+
+    const parsedEntries = trimmedValue
+        .split(/[,\n]/)
+        .map((entry) => entry.trim())
+        .filter((entry) => entry !== '')
+        .map((entry) => entry.split(/[:=]/, 2))
+        .filter((parts) => parts.length === 2)
+        .map(([key, rawValue]) => [key.trim(), Number(rawValue.trim())])
+        .filter(([key, mapValue]) => key !== '' && Number.isFinite(mapValue));
+
+    return parsedEntries.length > 0 ? Object.fromEntries(parsedEntries) : null;
+}
+
+function toAgeRange(minAge, maxAge) {
+    if (minAge == null || maxAge == null) {
+        return null;
+    }
+    return [minAge, maxAge];
+}
+
+function formatDateForDisplay(value) {
+    if (!value || typeof value !== 'string') {
+        return value;
+    }
+
+    const normalizedValue = /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value;
+    const parsedDate = new Date(normalizedValue);
+    if (Number.isNaN(parsedDate.getTime())) {
+        return value;
+    }
+    return parsedDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
 }
 
@@ -204,6 +402,16 @@ function preloadEligibilityDatabase() {
                     return false;
                 }
 
+                // Check state eligibility
+                if (eligibility.state && Array.isArray(eligibility.state) && userData.state && !eligibility.state.includes(userData.state)) {
+                    return false;
+                }
+
+                // Check disability eligibility
+                if (eligibility.disability && Array.isArray(eligibility.disability) && userData.disability && !eligibility.disability.includes(userData.disability)) {
+                    return false;
+                }
+
                 return true;
             } catch (error) {
                 console.error('Error checking eligibility:', error);
@@ -345,7 +553,7 @@ function preloadEligibilityDatabase() {
                 }
                 
                 const details = getItemDetails(item, category);
-                const itemName = item.name.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                const itemId = String(item.id ?? item.name).replace(/'/g, "\\'").replace(/"/g, '\\"');
                 
                 return `
                     <div class="opportunity-card">
@@ -360,10 +568,10 @@ function preloadEligibilityDatabase() {
                             ${details}
                         </div>
                         <div class="opportunity-actions">
-                            <button class="btn-sm btn-outline" onclick="viewDetails('${itemName}', '${category}')">
+                            <button class="btn-sm btn-outline" onclick="viewDetails('${itemId}', '${category}')">
                                 <i class="fas fa-info-circle"></i> View Details
                             </button>
-                            <button class="btn-sm btn-outline" onclick="applyNow('${itemName}', '${category}')">
+                            <button class="btn-sm btn-outline" onclick="applyNow('${itemId}', '${category}')">
                                 <i class="fas fa-external-link-alt"></i> Apply Now
                             </button>
                         </div>
@@ -492,17 +700,20 @@ function preloadEligibilityDatabase() {
         }
 
         // Action handlers
-        function viewDetails(itemName, category) {
-            // Find the item in the database
-            const item = eligibilityDatabase[category].find(i => i.name === itemName);
+        function findOpportunityById(itemId, category) {
+            return eligibilityDatabase?.[category]?.find((item) => String(item.id ?? item.name) === String(itemId)) || null;
+        }
+
+        function viewDetails(itemId, category) {
+            const item = findOpportunityById(itemId, category);
             if (item) {
-                // Create a modal or detailed view
                 showDetailModal(item, category);
             }
         }
 
-        function applyNow(itemName, category) {
-            // In a real application, this would redirect to the application portal
+        function applyNow(itemId, category) {
+            const item = findOpportunityById(itemId, category);
+            const itemName = item?.name || 'this opportunity';
             alert(`Redirecting to application portal for: ${itemName}`);
         }
 
@@ -522,7 +733,7 @@ function preloadEligibilityDatabase() {
                             ${getDetailedInfo(item, category)}
                         </div>
                         <div class="modal-footer">
-                            <button class="btn-primary" onclick="applyNow('${item.name}', '${category}')">
+                            <button class="btn-primary" onclick="applyNow('${String(item.id ?? item.name).replace(/'/g, "\\'").replace(/"/g, '\\"')}', '${category}')">
                                 Apply Now
                             </button>
                             <button class="btn-white" onclick="closeModal()">

@@ -1,17 +1,27 @@
 package com.example.demo.opportunity;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/scholarships")
 public class ScholarshipController {
-    
-    @Autowired
-    private ScholarshipService scholarshipService;
+
+    private final ScholarshipService scholarshipService;
+    private final OpportunityCriteriaNormalizer criteriaNormalizer;
+
+    public ScholarshipController(
+            ScholarshipService scholarshipService,
+            OpportunityCriteriaNormalizer criteriaNormalizer
+    ) {
+        this.scholarshipService = scholarshipService;
+        this.criteriaNormalizer = criteriaNormalizer;
+    }
     
     @GetMapping
     public ResponseEntity<List<Scholarship>> getAllScholarships() {
@@ -25,18 +35,18 @@ public class ScholarshipController {
     }
 
     @GetMapping("/admin/{id}")
-    public ResponseEntity<Scholarship> getScholarshipByIdForAdmin(@PathVariable Long id) {
+    public ResponseEntity<Scholarship> getScholarshipByIdForAdmin(@PathVariable @NonNull Long id) {
         return scholarshipService.getScholarshipById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Scholarship> getScholarshipById(@PathVariable Long id) {
-        Optional<Scholarship> scholarship = scholarshipService.getScholarshipById(id)
-                .filter(Scholarship::isActive);
-        return scholarship.map(ResponseEntity::ok)
-                        .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Scholarship> getScholarshipById(@PathVariable @NonNull Long id) {
+        return scholarshipService.getScholarshipById(id)
+                .filter(Scholarship::isActive)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
     
     @GetMapping("/type/{type}")
@@ -64,42 +74,46 @@ public class ScholarshipController {
     }
     
     @PostMapping
-    public ResponseEntity<Scholarship> createScholarship(@RequestBody Scholarship scholarship) {
+    public ResponseEntity<Scholarship> createScholarship(@RequestBody @Nullable Scholarship scholarship) {
         normalizeScholarship(scholarship);
         if (isInvalidScholarship(scholarship)) {
             return ResponseEntity.badRequest().build();
         }
-        scholarship.setActive(true);
-        Scholarship savedScholarship = scholarshipService.saveScholarship(scholarship);
+        Scholarship validScholarship = Objects.requireNonNull(scholarship);
+        validScholarship.setActive(true);
+        Scholarship savedScholarship = scholarshipService.saveScholarship(validScholarship);
         return ResponseEntity.ok(savedScholarship);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Scholarship> updateScholarship(@PathVariable Long id, @RequestBody Scholarship scholarship) {
+    public ResponseEntity<Scholarship> updateScholarship(@PathVariable @NonNull Long id, @RequestBody @Nullable Scholarship scholarship) {
         Optional<Scholarship> existingScholarship = scholarshipService.getScholarshipById(id);
-        if (existingScholarship.isPresent()) {
-            normalizeScholarship(scholarship);
-            if (isInvalidScholarship(scholarship)) {
-                return ResponseEntity.badRequest().build();
-            }
-            Scholarship existing = existingScholarship.get();
-            scholarship.setId(id);
-            scholarship.setActive(existing.isActive());
-            scholarship.setCreatedAt(existing.getCreatedAt());
-            Scholarship updatedScholarship = scholarshipService.saveScholarship(scholarship);
-            return ResponseEntity.ok(updatedScholarship);
+        if (existingScholarship.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        normalizeScholarship(scholarship);
+        if (isInvalidScholarship(scholarship)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Scholarship existing = existingScholarship.orElseThrow();
+        Scholarship validScholarship = Objects.requireNonNull(scholarship);
+        validScholarship.setId(id);
+        validScholarship.setActive(existing.isActive());
+        validScholarship.setCreatedAt(existing.getCreatedAt());
+        Scholarship updatedScholarship = scholarshipService.saveScholarship(validScholarship);
+        return ResponseEntity.ok(updatedScholarship);
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteScholarship(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteScholarship(@PathVariable @NonNull Long id) {
         scholarshipService.deleteScholarship(id);
         return ResponseEntity.ok().build();
     }
     
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateScholarship(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivateScholarship(@PathVariable @NonNull Long id) {
         if (scholarshipService.getScholarshipById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -108,7 +122,7 @@ public class ScholarshipController {
     }
 
     @PutMapping("/{id}/activate")
-    public ResponseEntity<Void> activateScholarship(@PathVariable Long id) {
+    public ResponseEntity<Void> activateScholarship(@PathVariable @NonNull Long id) {
         if (scholarshipService.getScholarshipById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -116,7 +130,7 @@ public class ScholarshipController {
         return ResponseEntity.ok().build();
     }
 
-    private void normalizeScholarship(Scholarship scholarship) {
+    private void normalizeScholarship(@Nullable Scholarship scholarship) {
         if (scholarship == null) {
             return;
         }
@@ -124,15 +138,15 @@ public class ScholarshipController {
         scholarship.setDescription(trimToNull(scholarship.getDescription()));
         scholarship.setType(trimToNull(scholarship.getType()));
         scholarship.setAmount(trimToNull(scholarship.getAmount()));
-        scholarship.setQualificationCriteria(trimToNull(scholarship.getQualificationCriteria()));
-        scholarship.setIncomeCriteria(trimToNull(scholarship.getIncomeCriteria()));
-        scholarship.setCategoryCriteria(trimToNull(scholarship.getCategoryCriteria()));
-        scholarship.setFieldCriteria(trimToNull(scholarship.getFieldCriteria()));
-        scholarship.setGenderCriteria(trimToNull(scholarship.getGenderCriteria()));
-        scholarship.setStateCriteria(trimToNull(scholarship.getStateCriteria()));
+        scholarship.setQualificationCriteria(criteriaNormalizer.normalizeListCriteria(scholarship.getQualificationCriteria()));
+        scholarship.setIncomeCriteria(criteriaNormalizer.normalizeListCriteria(scholarship.getIncomeCriteria()));
+        scholarship.setCategoryCriteria(criteriaNormalizer.normalizeListCriteria(scholarship.getCategoryCriteria()));
+        scholarship.setFieldCriteria(criteriaNormalizer.normalizeListCriteria(scholarship.getFieldCriteria()));
+        scholarship.setGenderCriteria(criteriaNormalizer.normalizeListCriteria(scholarship.getGenderCriteria()));
+        scholarship.setStateCriteria(criteriaNormalizer.normalizeListCriteria(scholarship.getStateCriteria()));
     }
 
-    private boolean isInvalidScholarship(Scholarship scholarship) {
+    private boolean isInvalidScholarship(@Nullable Scholarship scholarship) {
         return scholarship == null
                 || scholarship.getName() == null
                 || scholarship.getType() == null
@@ -145,7 +159,8 @@ public class ScholarshipController {
         return minAge != null && maxAge != null && minAge > maxAge;
     }
 
-    private String trimToNull(String value) {
+    @Nullable
+    private String trimToNull(@Nullable String value) {
         if (value == null) {
             return null;
         }

@@ -1,12 +1,12 @@
 package com.example.demo.ai;
 
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class AssistantFallbackService {
@@ -213,7 +213,8 @@ public class AssistantFallbackService {
         return "";
     }
 
-    private String detectTopic(String message) {
+    @Nullable
+    private String detectTopic(@Nullable String message) {
         String text = message == null ? "" : message.toLowerCase(Locale.ENGLISH);
         if (containsAny(text, "scholarship", "scholarships", "grant", "grants", "fellowship")) {
             return "scholarships";

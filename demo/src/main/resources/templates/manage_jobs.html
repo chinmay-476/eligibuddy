@@ -104,7 +104,7 @@
             <div class="console-table-header">
                 <div>
                     <h2>Government jobs</h2>
-                    <p>Manage open roles, salary ranges, vacancies, and eligibility JSON from one admin console.</p>
+                    <p>Manage open roles, salary ranges, vacancies, and eligibility rules from one admin console.</p>
                 </div>
                 <button class="console-button" style="background: linear-gradient(135deg, #4a6325, #293918);" onclick="showAddJobModal()">
                     <i class="fas fa-plus"></i>
@@ -126,6 +126,7 @@
                             <th>Type</th>
                             <th>Salary</th>
                             <th>Vacancies</th>
+                            <th>Apply By</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -192,17 +193,24 @@
                             </div>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="applicationDeadline" class="form-label">Application Deadline</label>
+                            <input type="text" class="form-control" id="applicationDeadline" placeholder="March 15, 2027 or Ongoing">
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="qualificationCriteria" class="form-label">Qualifications (JSON array)</label>
-                                    <input type="text" class="form-control" id="qualificationCriteria" placeholder='["12th","Graduate"]'>
+                                    <label for="qualificationCriteria" class="form-label">Qualifications</label>
+                                    <input type="text" class="form-control" id="qualificationCriteria" placeholder="12th, Graduate">
+                                    <div class="form-text">Add one or more qualifications separated by commas.</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="fieldCriteria" class="form-label">Fields (JSON array)</label>
-                                    <input type="text" class="form-control" id="fieldCriteria" placeholder='["Engineering","Commerce"]'>
+                                    <label for="fieldCriteria" class="form-label">Fields</label>
+                                    <input type="text" class="form-control" id="fieldCriteria" placeholder="Engineering, Commerce">
+                                    <div class="form-text">Enter academic or interest fields separated by commas.</div>
                                 </div>
                             </div>
                         </div>
@@ -210,14 +218,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="genderCriteria" class="form-label">Gender (JSON array)</label>
-                                    <input type="text" class="form-control" id="genderCriteria" placeholder='["Male","Female"]'>
+                                    <label for="genderCriteria" class="form-label">Gender</label>
+                                    <input type="text" class="form-control" id="genderCriteria" placeholder="Male, Female">
+                                    <div class="form-text">Example: Male, Female or Female.</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="ageRelaxationCriteria" class="form-label">Age Relaxation (JSON object)</label>
-                                    <input type="text" class="form-control" id="ageRelaxationCriteria" placeholder='{"OBC":3,"SC":5}'>
+                                    <label for="ageRelaxationCriteria" class="form-label">Age Relaxation</label>
+                                    <input type="text" class="form-control" id="ageRelaxationCriteria" placeholder="OBC:3, SC:5">
+                                    <div class="form-text">Use category:years pairs separated by commas.</div>
                                 </div>
                             </div>
                         </div>
@@ -256,6 +266,103 @@
             loadJobs();
         });
 
+        function parseCriteriaList(value) {
+            if (!value) {
+                return [];
+            }
+
+            if (Array.isArray(value)) {
+                return value.map(item => String(item).trim()).filter(Boolean);
+            }
+
+            if (typeof value !== 'string') {
+                return [];
+            }
+
+            const trimmedValue = value.trim();
+            if (!trimmedValue) {
+                return [];
+            }
+
+            try {
+                if (trimmedValue.startsWith('[')) {
+                    const parsed = JSON.parse(trimmedValue);
+                    if (Array.isArray(parsed)) {
+                        return parsed.map(item => String(item).trim()).filter(Boolean);
+                    }
+                }
+            } catch (error) {
+                console.warn('Falling back to comma parsing for criteria value:', value, error);
+            }
+
+            return trimmedValue
+                .split(/[,\n]/)
+                .map(item => item.trim())
+                .filter(Boolean);
+        }
+
+        function parseAgeRelaxation(value) {
+            if (!value) {
+                return {};
+            }
+
+            if (typeof value === 'object' && !Array.isArray(value)) {
+                return Object.fromEntries(
+                    Object.entries(value)
+                        .map(([key, mapValue]) => [String(key).trim(), Number(mapValue)])
+                        .filter(([key, mapValue]) => key && Number.isFinite(mapValue))
+                );
+            }
+
+            if (typeof value !== 'string') {
+                return {};
+            }
+
+            const trimmedValue = value.trim();
+            if (!trimmedValue) {
+                return {};
+            }
+
+            try {
+                if (trimmedValue.startsWith('{')) {
+                    return parseAgeRelaxation(JSON.parse(trimmedValue));
+                }
+            } catch (error) {
+                console.warn('Falling back to category:years parsing for age relaxation:', value, error);
+            }
+
+            return Object.fromEntries(
+                trimmedValue
+                    .split(/[,\n]/)
+                    .map(item => item.trim())
+                    .filter(Boolean)
+                    .map(item => item.split(/[:=]/, 2))
+                    .filter(parts => parts.length === 2)
+                    .map(([key, rawValue]) => [key.trim(), Number(rawValue.trim())])
+                    .filter(([key, mapValue]) => key && Number.isFinite(mapValue))
+            );
+        }
+
+        function formatCriteriaForInput(value) {
+            return parseCriteriaList(value).join(', ');
+        }
+
+        function formatAgeRelaxationForInput(value) {
+            return Object.entries(parseAgeRelaxation(value))
+                .map(([key, years]) => `${key}:${years}`)
+                .join(', ');
+        }
+
+        function readCriteriaInput(id) {
+            const values = parseCriteriaList(document.getElementById(id).value);
+            return values.length ? values.join(', ') : null;
+        }
+
+        function readAgeRelaxationInput() {
+            const values = parseAgeRelaxation(document.getElementById('ageRelaxationCriteria').value);
+            return Object.keys(values).length ? Object.entries(values).map(([key, years]) => `${key}:${years}`).join(', ') : null;
+        }
+
         async function loadJobs() {
             try {
                 const response = await fetch('/api/jobs/admin/all');
@@ -265,7 +372,7 @@
             } catch (error) {
                 console.error('Error loading jobs:', error);
                 document.getElementById('jobsTableBody').innerHTML =
-                    '<tr><td colspan="6">Error loading jobs</td></tr>';
+                    '<tr><td colspan="7">Error loading jobs</td></tr>';
             } finally {
                 document.getElementById('loadingSpinner').style.display = 'none';
             }
@@ -287,6 +394,7 @@
                     <td><span class="console-badge console-badge-primary">${job.type}</span></td>
                     <td>${job.salary}</td>
                     <td>${job.vacancies}</td>
+                    <td>${job.applicationDeadline || 'Date TBA'}</td>
                     <td>
                         <span class="console-badge ${job.active ? 'console-badge-success' : 'console-badge-danger'}">
                             ${job.active ? 'Active' : 'Inactive'}
@@ -328,10 +436,11 @@
                 document.getElementById('type').value = job.type || '';
                 document.getElementById('salary').value = job.salary || '';
                 document.getElementById('vacancies').value = job.vacancies || '';
-                document.getElementById('qualificationCriteria').value = job.qualificationCriteria || '';
-                document.getElementById('fieldCriteria').value = job.fieldCriteria || '';
-                document.getElementById('genderCriteria').value = job.genderCriteria || '';
-                document.getElementById('ageRelaxationCriteria').value = job.ageRelaxationCriteria || '';
+                document.getElementById('applicationDeadline').value = job.applicationDeadline || '';
+                document.getElementById('qualificationCriteria').value = formatCriteriaForInput(job.qualificationCriteria);
+                document.getElementById('fieldCriteria').value = formatCriteriaForInput(job.fieldCriteria);
+                document.getElementById('genderCriteria').value = formatCriteriaForInput(job.genderCriteria);
+                document.getElementById('ageRelaxationCriteria').value = formatAgeRelaxationForInput(job.ageRelaxationCriteria);
                 document.getElementById('minAge').value = job.minAge || '';
                 document.getElementById('maxAge').value = job.maxAge || '';
                 jobModal.show();
@@ -348,10 +457,11 @@
                 type: document.getElementById('type').value,
                 salary: document.getElementById('salary').value,
                 vacancies: document.getElementById('vacancies').value,
-                qualificationCriteria: document.getElementById('qualificationCriteria').value,
-                fieldCriteria: document.getElementById('fieldCriteria').value,
-                genderCriteria: document.getElementById('genderCriteria').value,
-                ageRelaxationCriteria: document.getElementById('ageRelaxationCriteria').value,
+                applicationDeadline: document.getElementById('applicationDeadline').value,
+                qualificationCriteria: readCriteriaInput('qualificationCriteria'),
+                fieldCriteria: readCriteriaInput('fieldCriteria'),
+                genderCriteria: readCriteriaInput('genderCriteria'),
+                ageRelaxationCriteria: readAgeRelaxationInput(),
                 minAge: document.getElementById('minAge').value ? parseInt(document.getElementById('minAge').value) : null,
                 maxAge: document.getElementById('maxAge').value ? parseInt(document.getElementById('maxAge').value) : null,
                 active: currentJobId ? currentJobActive : true

@@ -195,14 +195,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="qualificationCriteria" class="form-label">Qualifications (JSON array)</label>
-                                    <input type="text" class="form-control" id="qualificationCriteria" placeholder='["12th","Graduate"]'>
+                                    <label for="qualificationCriteria" class="form-label">Qualifications</label>
+                                    <input type="text" class="form-control" id="qualificationCriteria" placeholder="12th, Graduate">
+                                    <div class="form-text">Add one or more qualifications separated by commas.</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="fieldCriteria" class="form-label">Fields (JSON array)</label>
-                                    <input type="text" class="form-control" id="fieldCriteria" placeholder='["Science","Engineering"]'>
+                                    <label for="fieldCriteria" class="form-label">Fields</label>
+                                    <input type="text" class="form-control" id="fieldCriteria" placeholder="Science, Engineering">
+                                    <div class="form-text">Enter academic or interest fields separated by commas.</div>
                                 </div>
                             </div>
                         </div>
@@ -210,14 +212,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="genderCriteria" class="form-label">Gender (JSON array)</label>
-                                    <input type="text" class="form-control" id="genderCriteria" placeholder='["Male","Female"]'>
+                                    <label for="genderCriteria" class="form-label">Gender</label>
+                                    <input type="text" class="form-control" id="genderCriteria" placeholder="Male, Female">
+                                    <div class="form-text">Example: Male, Female or Female.</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="ageRelaxationCriteria" class="form-label">Age Relaxation (JSON object)</label>
-                                    <input type="text" class="form-control" id="ageRelaxationCriteria" placeholder='{"OBC":3,"SC":5}'>
+                                    <label for="ageRelaxationCriteria" class="form-label">Age Relaxation</label>
+                                    <input type="text" class="form-control" id="ageRelaxationCriteria" placeholder="OBC:3, SC:5">
+                                    <div class="form-text">Use category:years pairs separated by commas.</div>
                                 </div>
                             </div>
                         </div>
@@ -255,6 +259,103 @@
         document.addEventListener('DOMContentLoaded', function () {
             loadExams();
         });
+
+        function parseCriteriaList(value) {
+            if (!value) {
+                return [];
+            }
+
+            if (Array.isArray(value)) {
+                return value.map(item => String(item).trim()).filter(Boolean);
+            }
+
+            if (typeof value !== 'string') {
+                return [];
+            }
+
+            const trimmedValue = value.trim();
+            if (!trimmedValue) {
+                return [];
+            }
+
+            try {
+                if (trimmedValue.startsWith('[')) {
+                    const parsed = JSON.parse(trimmedValue);
+                    if (Array.isArray(parsed)) {
+                        return parsed.map(item => String(item).trim()).filter(Boolean);
+                    }
+                }
+            } catch (error) {
+                console.warn('Falling back to comma parsing for criteria value:', value, error);
+            }
+
+            return trimmedValue
+                .split(/[,\n]/)
+                .map(item => item.trim())
+                .filter(Boolean);
+        }
+
+        function parseAgeRelaxation(value) {
+            if (!value) {
+                return {};
+            }
+
+            if (typeof value === 'object' && !Array.isArray(value)) {
+                return Object.fromEntries(
+                    Object.entries(value)
+                        .map(([key, mapValue]) => [String(key).trim(), Number(mapValue)])
+                        .filter(([key, mapValue]) => key && Number.isFinite(mapValue))
+                );
+            }
+
+            if (typeof value !== 'string') {
+                return {};
+            }
+
+            const trimmedValue = value.trim();
+            if (!trimmedValue) {
+                return {};
+            }
+
+            try {
+                if (trimmedValue.startsWith('{')) {
+                    return parseAgeRelaxation(JSON.parse(trimmedValue));
+                }
+            } catch (error) {
+                console.warn('Falling back to category:years parsing for age relaxation:', value, error);
+            }
+
+            return Object.fromEntries(
+                trimmedValue
+                    .split(/[,\n]/)
+                    .map(item => item.trim())
+                    .filter(Boolean)
+                    .map(item => item.split(/[:=]/, 2))
+                    .filter(parts => parts.length === 2)
+                    .map(([key, rawValue]) => [key.trim(), Number(rawValue.trim())])
+                    .filter(([key, mapValue]) => key && Number.isFinite(mapValue))
+            );
+        }
+
+        function formatCriteriaForInput(value) {
+            return parseCriteriaList(value).join(', ');
+        }
+
+        function formatAgeRelaxationForInput(value) {
+            return Object.entries(parseAgeRelaxation(value))
+                .map(([key, years]) => `${key}:${years}`)
+                .join(', ');
+        }
+
+        function readCriteriaInput(id) {
+            const values = parseCriteriaList(document.getElementById(id).value);
+            return values.length ? values.join(', ') : null;
+        }
+
+        function readAgeRelaxationInput() {
+            const values = parseAgeRelaxation(document.getElementById('ageRelaxationCriteria').value);
+            return Object.keys(values).length ? Object.entries(values).map(([key, years]) => `${key}:${years}`).join(', ') : null;
+        }
 
         async function loadExams() {
             try {
@@ -328,10 +429,10 @@
                 document.getElementById('type').value = exam.type || '';
                 document.getElementById('examDate').value = exam.examDate || '';
                 document.getElementById('applicationFee').value = exam.applicationFee || '';
-                document.getElementById('qualificationCriteria').value = exam.qualificationCriteria || '';
-                document.getElementById('fieldCriteria').value = exam.fieldCriteria || '';
-                document.getElementById('genderCriteria').value = exam.genderCriteria || '';
-                document.getElementById('ageRelaxationCriteria').value = exam.ageRelaxationCriteria || '';
+                document.getElementById('qualificationCriteria').value = formatCriteriaForInput(exam.qualificationCriteria);
+                document.getElementById('fieldCriteria').value = formatCriteriaForInput(exam.fieldCriteria);
+                document.getElementById('genderCriteria').value = formatCriteriaForInput(exam.genderCriteria);
+                document.getElementById('ageRelaxationCriteria').value = formatAgeRelaxationForInput(exam.ageRelaxationCriteria);
                 document.getElementById('minAge').value = exam.minAge || '';
                 document.getElementById('maxAge').value = exam.maxAge || '';
                 examModal.show();
@@ -348,10 +449,10 @@
                 type: document.getElementById('type').value,
                 examDate: document.getElementById('examDate').value,
                 applicationFee: document.getElementById('applicationFee').value,
-                qualificationCriteria: document.getElementById('qualificationCriteria').value,
-                fieldCriteria: document.getElementById('fieldCriteria').value,
-                genderCriteria: document.getElementById('genderCriteria').value,
-                ageRelaxationCriteria: document.getElementById('ageRelaxationCriteria').value,
+                qualificationCriteria: readCriteriaInput('qualificationCriteria'),
+                fieldCriteria: readCriteriaInput('fieldCriteria'),
+                genderCriteria: readCriteriaInput('genderCriteria'),
+                ageRelaxationCriteria: readAgeRelaxationInput(),
                 minAge: document.getElementById('minAge').value ? parseInt(document.getElementById('minAge').value) : null,
                 maxAge: document.getElementById('maxAge').value ? parseInt(document.getElementById('maxAge').value) : null,
                 active: currentExamId ? currentExamActive : true
